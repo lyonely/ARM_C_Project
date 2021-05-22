@@ -4,7 +4,5 @@ BUILD: emulate
 
 emulate: emulate.o
 
-datatypes: datatypes.o
-
 clean:
 	rm -f *.o emulate
