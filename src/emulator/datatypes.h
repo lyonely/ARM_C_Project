@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdbool.h>
 
 typedef unsigned char Byte;
 typedef uint32_t Instruction;
