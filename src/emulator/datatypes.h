@@ -13,8 +13,8 @@ enum InstructionType {
 	DP, MUL, SDT, BRANCH
 };
 
-typedef struct {
+struct Registers{
 	Register general_regs[13];
 	Register pc;
 	Register cpsr;
-} Registers;
+};

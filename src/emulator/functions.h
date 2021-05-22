@@ -3,31 +3,31 @@
 
 long readBinary(FILE* file, void *destination);
 
-uint32_t is_set(Instr instruction);
+uint32_t is_set(Instruction instruction);
 
-uint32_t is_immediate(Instr instruction);
+uint32_t is_immediate(Instruction instruction);
 
-int opcode(Instr instruction);
+int opcode(Instruction instruction);
 
-int rd(Instr instruction);
+int rd(Instruction instruction);
 
-int rn(Instr instruction);
+int rn(Instruction instruction);
 
-int operand2(Instr instruction);
+int operand2(Instruction instruction);
 
-uint32_t is_pre_indexing(Instr instruction);
+uint32_t is_pre_indexing(Instruction instruction);
 
-uint32_t is_up(Instr instruction);
+uint32_t is_up(Instruction instruction);
 
-uint32_t is_load(Instr instruction);
+uint32_t is_load(Instruction instruction);
 
-int get_cond(Instr instruction);
+int get_cond(Instruction instruction);
 /*
 Instr_Type get_instr_type(Instr instruction); #todo
 */
-int instruction_is_valid(Instr instr, Registers* regs);
+int instruction_is_valid(Instruction instr, Registers* regs);
 
-uint32_t accumulate(Instr instruction);
+uint32_t accumulate(Instruction instruction);
 
 /*
 void set_n_z(Register *cpsr, int result); 
@@ -40,19 +40,19 @@ void set_z(Register *cpsr, int value);
 
 void set_n(Register *cpsr, int value); 
 */
-int rnMultiply(Instr instruction);
+int rnMultiply(Instruction instruction);
 
-int rdMultiply(Instr instruction);
+int rdMultiply(Instruction instruction);
 
-int rsMultiply(Instr instruction);
+int rsMultiply(Instruction instruction);
 
-int rmMultiply(Instr instruction);
+int rmMultiply(Instruction instruction);
 
-uint32_t setConditionCodes(Instr instruction);
+uint32_t setConditionCodes(Instruction instruction);
 /*
 void print_registers(Registers *regs); #todo
 
 void display_memory(Byte* memory, int memory_capacity); #todo
 */
-int sdt_offset(Instr instruction); 
+int sdt_offset(Instruction instruction); 
 

@@ -11,74 +11,74 @@ long readBinary(FILE* file, void *destination) {
 
 /*data processing instructions*/
 
-uint32_t is_set(Instr instruction) {
+uint32_t is_set(Instruction instruction) {
   return (instruction & 1 << 20);
 }
 
-uint32_t is_immediate(Instr instruction) {
+uint32_t is_immediate(Instruction instruction) {
   return (instruction & 1 << 25);
 }
 
-int opcode(Instr instruction) {
+int opcode(Instruction instruction) {
   return (instruction & 0x1e00000) >> 21;
 }
 
-int rn(Instr instruction) {
+int rn(Instruction instruction) {
   return (instruction & 0xf0000) >> 16;
 }
 
-int rd(Instr instruction) {
+int rd(Instruction instruction) {
   return (instruction & 0xf000) >> 12;
 }
 				
-int operand2(Instr instruction) {
+int operand2(Instruction instruction) {
   return (instruction & 0xfff);
 }
 
-uint32_t setConditionCodes(Instr instruction) {
+uint32_t setConditionCodes(Instruction instruction) {
   return (instruction & 1 << 20);
 }
 
 /*multiply instruction*/
 
-uint32_t accumulate(Instr instruction) {
+uint32_t accumulate(Instruction instruction) {
   return (instruction & 1 << 21);
 }
 
-int rnMultiply(Instr instruction) {
+int rnMultiply(Instruction instruction) {
   return (instruction & 0xf000) << 12;
 }
 
-int rdMultiply(Instr instruction){
+int rdMultiply(Instruction instruction){
   return (instruction & 0xf0000) << 16;
 }
 
-int rsMultiply(Instr instruction) {
+int rsMultiply(Instruction instruction) {
   return (instruction & 0xf00) << 8;
 }
 
-int rmMultiply(Instr instruction) {
+int rmMultiply(Instruction instruction) {
   return (instruction & 0xf);
 }
 
 /*single data transfer*/
-uint32_t is_pre_indexing(Instr instruction) {
+uint32_t is_pre_indexing(Instruction instruction) {
   return (instruction & 1 << 24);
 }
 
-uint32_t is_up(Instr instruction) {
+uint32_t is_up(Instruction instruction) {
   return (instruction & 1 << 23);
 }
 
-uint32_t is_load(Instr instruction) {
+uint32_t is_load(Instruction instruction) {
   return (instruction & 1 << 20);
 }
 
-int sdt_offset(Instr instruction) {
+int sdt_offset(Instruction instruction) {
   return (instruction & 0xfff);
 }
 
-int get_cond(Instr instruction) {
-  return (instruction >> 28)
+int get_cond(Instruction instruction) {
+  return (instruction >> 28l);
 }
 
