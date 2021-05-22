@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdint.h>
 
 typedef unsigned char Byte;
 typedef uint32_t Instruction;
@@ -10,7 +11,7 @@ enum Cond {
 
 enum InstructionType {
 	DP, MUL, SDT, BRANCH
-}
+};
 
 typedef struct {
 	Register general_regs[13];
