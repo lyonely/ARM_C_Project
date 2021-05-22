@@ -2,11 +2,11 @@
 #include "datatypes.h"
 #include "functions.h"
 
-void multiply(Instruction instr, Registers* rs) {
+void multiply(Instruction instr, struct Registers* rs) {
   //store values in 32 bit variables	
-  uint32_t op1 = rs->general[rmMultiply(instr)];
-  uint32_t op2 = rs->general[rsMultiply(instr)];
-  uint32_t op3 = rs->general[rnMultiply(instr)];
+  uint32_t op1 = rs->general_regs[rmMultiply(instr)];
+  uint32_t op2 = rs->general_regs[rsMultiply(instr)];
+  uint32_t op3 = rs->general_regs[rnMultiply(instr)];
   //multiply and accumulate
   uint64_t res = op1 * op2;
 
@@ -16,7 +16,7 @@ void multiply(Instruction instr, Registers* rs) {
   //truncate to 32 bits
   uint32_t res32 = res;
   //store result in rd
-  rs->general[rdMultiply(instr)] = res32;
+  rs->general_regs[rdMultiply(instr)] = res32;
   //set cpsr flags
   set_n_z(&rs->cpsr, res32);  
 }
