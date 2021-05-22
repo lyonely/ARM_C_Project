@@ -4,5 +4,7 @@ BUILD: emulate
 
 emulate: emulate.o
 
+data_processor: data_processor.o datatypes.h functions.h
+
 clean:
 	rm -f *.o emulate
