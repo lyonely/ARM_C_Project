@@ -13,7 +13,7 @@ enum InstructionType {
 	DP, MUL, SDT, BRANCH
 };
 
-struct Registers{
+struct Registers {
 	Register general_regs[13];
 	Register pc;
 	Register cpsr;

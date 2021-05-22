@@ -25,7 +25,7 @@ int get_cond(Instruction instruction);
 /*
 Instr_Type get_instr_type(Instr instruction); #todo
 */
-int instruction_is_valid(Instruction instr, Registers* regs);
+//int instruction_is_valid(Instruction instr, struct Registers* regs);
 
 uint32_t accumulate(Instruction instruction);
 

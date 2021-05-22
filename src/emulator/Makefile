@@ -1,10 +1,15 @@
 CC = gcc
-CFLAGS = -Wall -g -D_POSIX_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
-BUILD: emulate
+CFLAGS = -Wall -g -D_POSIX_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE -std=c99 -pedantic
+BUILD: emulate data_processor
 
 emulate: emulate.o
 
-data_processor: data_processor.o datatypes.h functions.h
+data_processor: data_processor.o functions.o
+
+data_processor.o: data_processor.c functions.h datatypes.h
+
+functions.o: functions.c datatypes.h
 
 clean:
-	rm -f *.o emulate
+	rm -f *.o emulate data_processor
+
