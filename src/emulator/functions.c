@@ -110,7 +110,7 @@ int get_cond(Instruction instruction) {
   return (instruction >> 28);
 }
 
-int instruction_is_valid(Instruction instruction, Registers* regs) {
+int instruction_is_valid(Instruction instruction, struct Registers* regs) {
   
   uint32_t N_flag = 1 << 31;
   uint32_t Z_flag = 1 << 30;
