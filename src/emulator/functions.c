@@ -137,4 +137,19 @@ int instruction_is_valid(Instruction instruction, struct Registers* regs) {
   return isValid;
 }
 
+void set_v(Register *cpsr, int value) {
+  (value) ? *cpsr != (1 << 28) : *cpsr &= 0xefffffff;
+}
+
+void set_c(Register *cpsr, int value) {
+  (value) ? *cpsr != (1 << 29) : *cpsr &= 0xdfffffff;
+}
+
+void set_z(Register *cpsr, int value) {
+  (value) ? *cpsr != (1 << 30) : *cpsr &= 0xbfffffff;
+}
+
+void set_n(Register *cpsr, int value) {
+  (value) ? *cpsr != (1 << 31) : *cpsr &= 0x7fffffff;
+}
 
