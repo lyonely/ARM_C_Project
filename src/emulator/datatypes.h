@@ -12,7 +12,7 @@ enum Cond {
 	LT = 0b1011, 
 	GT = 0b1100, 
 	LE = 0b1101, 
-	AL = 0b1110;
+	AL = 0b1110,
 
 };
 
@@ -20,7 +20,7 @@ enum InstructionType {
 	DP, MUL, SDT, BRANCH
 };
 
-struct Registers{
+struct Registers {
 	Register general_regs[13];
 	Register pc;
 	Register cpsr;
