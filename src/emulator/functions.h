@@ -48,7 +48,7 @@ int rsMultiply(Instruction instruction);
 
 int rmMultiply(Instruction instruction);
 
-uint32_t setConditionCodes(Instruction instruction);
+
 /*
 void print_registers(Registers *regs); #todo
 

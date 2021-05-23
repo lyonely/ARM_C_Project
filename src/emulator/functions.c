@@ -63,9 +63,9 @@ int operand2(Instruction instruction) {
   return (instruction & 0xfff);
 }
 
-uint32_t setConditionCodes(Instruction instruction) {
-  return (instruction & 1 << 20);
-}
+
+
+
 
 /*multiply instruction*/
 
