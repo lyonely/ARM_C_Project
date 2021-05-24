@@ -14,11 +14,16 @@ void and(Register *rd, Register *rn, uint32_t operand2) {
 	*rd = *rn & operand2;
 }
 
+// Bitwise exclusive OR
+void eor(Register *rd, Register *rn, uint32_t operand2) {
+	*rd = (*rn & ~operand2) | (~*rn & operand2);
+}
+
 int main(void) {
 	Register dest = 0;
 	Register source = 0x3;
 
-	and(&dest, &source, 0x2);
+	eor(&dest, &source, 0x2);
 	printf("%d\n", dest);
 
 	return 0;

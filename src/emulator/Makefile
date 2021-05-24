@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -g -D_POSIX_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE -std=c99 -pedantic
+CFLAGS = -Wall -g -D_POSIX_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE -std=c99
 BUILD: emulate data_processor
 
 emulate: emulate.o
