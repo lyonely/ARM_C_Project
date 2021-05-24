@@ -6,7 +6,14 @@ typedef uint32_t Instruction;
 typedef uint32_t Register;
 
 enum Cond {
-	EQ, NE, GE, LT, GT, LE, AL
+	EQ = 0b0000,
+       	NE = 0b0001, 
+	GE = 0b1010, 
+	LT = 0b1011, 
+	GT = 0b1100, 
+	LE = 0b1101, 
+	AL = 0b1110,
+
 };
 
 enum InstructionType {

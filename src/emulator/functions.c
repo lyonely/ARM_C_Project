@@ -9,6 +9,34 @@ long readBinary(FILE* file, void *destination) {
   return size;
 }
 
+int instruction_is_valid(Instruction instruction, Registers* regs) {
+  
+  uint32_t N_flag = 1 << 31;
+  uint32_t Z_flag = 1 << 30;
+  uint32_t V_flag = 1 << 28;
+  uint32_t cpsr = regs->cpsr;
+
+  uint32_t N_equals_V = (N_flag & cpsr) == ((V_flag & cpsr) << 3);
+  uint32_t Z_set = Z_flag & cpsr;
+  
+  int isValid = 0;
+
+  int cond = get_cond(Instruction instruction);
+
+  switch(cond) {
+    case EQ: isValid = Z_set; break;
+    case NE: isValid = !Z_set; break;
+    case GE: isValid = N_equals_V; break;
+    case LT: isValid = !N_equals_V; break;
+    case GT: isValid = (!Z_set) && N_equals_V; break;
+    case LE: isValid = Z_set || (!N_equals_V); break;
+    case AL: isValid = 1; break;
+    default: isValid = 0;
+  }
+  return isValid;
+}
+
+
 /*data processing instructions*/
 
 uint32_t is_set(Instruction instruction) {
@@ -35,9 +63,9 @@ int operand2(Instruction instruction) {
   return (instruction & 0xfff);
 }
 
-uint32_t setConditionCodes(Instruction instruction) {
-  return (instruction & 1 << 20);
-}
+
+
+
 
 /*multiply instruction*/
 
@@ -79,6 +107,49 @@ int sdt_offset(Instruction instruction) {
 }
 
 int get_cond(Instruction instruction) {
-  return (instruction >> 28l);
+  return (instruction >> 28);
+}
+
+int instruction_is_valid(Instruction instruction, struct Registers* regs) {
+  
+  uint32_t N_flag = 1 << 31;
+  uint32_t Z_flag = 1 << 30;
+  uint32_t V_flag = 1 << 28;
+  uint32_t cpsr = regs->cpsr;
+
+  uint32_t N_equals_V = (N_flag & cpsr) == ((V_flag & cpsr) << 3);
+  uint32_t Z_set = Z_flag & cpsr;
+  
+  int isValid = 0;
+
+  int cond = get_cond(Instruction instruction);
+
+  switch(cond) {
+    case EQ: isValid = Z_set; break;
+    case NE: isValid = !Z_set; break;
+    case GE: isValid = N_equals_V; break;
+    case LT: isValid = !N_equals_V; break;
+    case GT: isValid = (!Z_set) && N_equals_V; break;
+    case LE: isValid = Z_set || (!N_equals_V); break;
+    case AL: isValid = 1; break;
+    default: isValid = 0;
+  }
+  return isValid;
+}
+
+void set_v(Register *cpsr, int value) {
+  (value) ? *cpsr != (1 << 28) : *cpsr &= 0xefffffff;
+}
+
+void set_c(Register *cpsr, int value) {
+  (value) ? *cpsr != (1 << 29) : *cpsr &= 0xdfffffff;
+}
+
+void set_z(Register *cpsr, int value) {
+  (value) ? *cpsr != (1 << 30) : *cpsr &= 0xbfffffff;
+}
+
+void set_n(Register *cpsr, int value) {
+  (value) ? *cpsr != (1 << 31) : *cpsr &= 0x7fffffff;
 }
 

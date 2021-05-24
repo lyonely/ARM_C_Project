@@ -25,13 +25,10 @@ int get_cond(Instruction instruction);
 /*
 Instr_Type get_instr_type(Instr instruction); #todo
 */
-//int instruction_is_valid(Instruction instr, struct Registers* regs);
+int instruction_is_valid(Instruction instruction, struct Registers* regs);
 
 uint32_t accumulate(Instruction instruction);
 
-/*
-void set_n_z(Register *cpsr, int result); 
-	
 void set_v(Register *cpsr, int value);  
 
 void set_c(Register *cpsr, int value); 
@@ -39,7 +36,7 @@ void set_c(Register *cpsr, int value);
 void set_z(Register *cpsr, int value); 
 
 void set_n(Register *cpsr, int value); 
-*/
+
 int rnMultiply(Instruction instruction);
 
 int rdMultiply(Instruction instruction);
@@ -48,7 +45,7 @@ int rsMultiply(Instruction instruction);
 
 int rmMultiply(Instruction instruction);
 
-uint32_t setConditionCodes(Instruction instruction);
+
 /*
 void print_registers(Registers *regs); #todo
 
