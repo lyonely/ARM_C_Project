@@ -33,9 +33,8 @@ uint32_t is_load(Instruction instruction);
 // returns the condition field
 int get_cond(Instruction instruction);
 
-/*
-Instr_Type get_instr_type(Instr instruction); #todo
-*/
+// returns the instruction type
+InstructionType get_instr_type(Instruction instruction); #todo
 
 // checks if an instruction is valid based on the cond
 int instruction_is_valid(Instruction instruction, struct Registers* regs);

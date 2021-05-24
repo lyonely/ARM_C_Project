@@ -63,10 +63,6 @@ int operand2(Instruction instruction) {
   return (instruction & 0xfff);
 }
 
-
-
-
-
 /*multiply instruction*/
 
 uint32_t accumulate(Instruction instruction) {
@@ -138,18 +134,33 @@ int instruction_is_valid(Instruction instruction, struct Registers* regs) {
 }
 
 void set_v(Register *cpsr, int value) {
-  (value) ? *cpsr != (1 << 28) : *cpsr &= 0xefffffff;
+  (value) ? *cpsr = *cpsr | (1 << 28) : *cpsr & 0xefffffff;
 }
 
 void set_c(Register *cpsr, int value) {
-  (value) ? *cpsr != (1 << 29) : *cpsr &= 0xdfffffff;
+  (value) ? *cpsr = *cpsr | (1 << 29) : *cpsr &  0xdfffffff;
 }
 
 void set_z(Register *cpsr, int value) {
-  (value) ? *cpsr != (1 << 30) : *cpsr &= 0xbfffffff;
+  (value) ? *cpsr = *cpsr | (1 << 30) : *cpsr & 0xbfffffff;
 }
 
 void set_n(Register *cpsr, int value) {
-  (value) ? *cpsr != (1 << 31) : *cpsr &= 0x7fffffff;
+  (value) ? *cpsr = *cpsr | (1 << 31) : *cpsr & 0x7fffffff;
 }
 
+InstructionType get_instr_type(Instruction instruction) {
+  if (instruction & (1<<27)) {
+    return BRANCH; 
+  }
+
+  if (instruction & (1<<26)) {
+    return SDT;
+  }
+
+  if (instruction & (1<<25) || !(instruction & (1<<7)) || !(instruction & (1<<4))) {
+    return DP;
+  }
+  
+  return MUL;
+}
