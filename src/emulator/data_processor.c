@@ -1,12 +1,29 @@
 #include <stdio.h>
-#include "functions.h"
 #include <stdint.h>
+#include "functions.h"
 
+// Performs right rotation on a 32-bit binary number
 int rotate_right(uint32_t value, unsigned int rotation) {
 	unsigned int shifted = value >> rotation;
 	unsigned int rotated_bits = value << (32 - rotation);
 	return (shifted | rotated_bits);
 }
+
+// Bitwise AND
+void and(Register *rd, Register *rn, uint32_t operand2) {
+	*rd = *rn & operand2;
+}
+
+int main(void) {
+	Register dest = 0;
+	Register source = 0x3;
+
+	and(&dest, &source, 0x2);
+	printf("%d\n", dest);
+
+	return 0;
+}
+
 /*
 void process(Instruction i, struct Registers *regs) {
 	int cond = get_cond(i);
@@ -29,11 +46,15 @@ void process(Instruction i, struct Registers *regs) {
 		operand2 = rotate_right(imm, rotation);
 	} else {
 		// operand2 is a register
+		
+		int shift = (op2 & 0xff0) >> 4;
+		int rm_num = op2 & 0xf;
 
+		Register rm = regs -> general_regs[rm_num];
 	}
 
 	
-	switch(opcode) {
+	switch(op) {
 		case 0:	
 		case 1:
 		case 2:
@@ -47,13 +68,7 @@ void process(Instruction i, struct Registers *regs) {
 	
 	}
 }
-
 */
-int main(void) {
-	uint32_t x = 8;
-	unsigned int rotation = 5; 
-	
-	printf("%d\n", rotate_right(x, rotation));
 
-	return 0;
-}
+
+
