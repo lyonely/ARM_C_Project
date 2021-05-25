@@ -3,9 +3,6 @@
 #include <stdint.h>
 #include "functions.h"
 
-// Performs right rotation on a 32-bit binary number
-uint32_t rotate_right(uint32_t value, uint32_t rotation);
-
 // Bitwise AND
 uint32_t and(Register *rd, Register *rn, uint32_t operand2);
 

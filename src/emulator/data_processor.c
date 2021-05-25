@@ -5,13 +5,6 @@
 
 // TODO: check 'Set Condition Codes' bit and set CPSR flags accordingly
 
-// Performs right rotation on a 32-bit binary number
-uint32_t rotate_right(uint32_t value, uint32_t rotation) {
-	uint32_t shifted = value >> rotation;
-	uint32_t rotated_bits = value << (32 - rotation);
-	return (shifted | rotated_bits);
-}
-
 // Bitwise AND
 uint32_t and(Register *rd, Register *rn, uint32_t operand2) {
 	*rd = *rn & operand2;
