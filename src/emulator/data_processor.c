@@ -3,8 +3,6 @@
 #include "data_processor.h"
 #include "functions.h"
 
-// TODO: check 'Set Condition Codes' bit and set CPSR flags accordingly
-
 // Bitwise AND
 uint32_t and(Register *rd, Register *rn, uint32_t operand2) {
 	*rd = *rn & operand2;
@@ -63,9 +61,10 @@ uint32_t mov(Register *rd, uint32_t operand2) {
 	return *rd;
 }
 
-// Sets CPSR register flags based on the result
-void set_flags(Register cpsr, uint32_t result) {
+// Sets CPSR register flags based on the result, V flag unchanged
+void set_flags(int opcode, Register cpsr, uint32_t result, uint32_t carry) {
 	// Carry flag
+	set_c(&cpsr, carry);
 
 	// Zero flag
 	if (result == 0) {
@@ -77,9 +76,10 @@ void set_flags(Register cpsr, uint32_t result) {
 }
 
 void execute(int opcode, Register rd, Register rn, uint32_t operand2, 
-		uint32_t set_conds) {
+		uint32_t set_conds, Register cpsr) {
 	
 	uint32_t result;
+	uint32_t carry;
 
 	switch(opcode) {
 		case 0: result = and(&rd, &rn, operand2); break;
@@ -87,16 +87,18 @@ void execute(int opcode, Register rd, Register rn, uint32_t operand2,
 		case 2: result = sub(&rd, &rn, operand2); break;
 		case 3: result = rsb(&rd, &rn, operand2); break;
 		case 4: result = add(&rd, &rn, operand2); break;
-		case 5: result = tst(&rn, operand2); break;
-		case 6: result = teq(&rn, operand2); break;
-		case 7: result = cmp(&rn, operand2); break;
-		case 8: result = orr(&rd, &rn, operand2); break;
-		case 9:	result = mov(&rd, operand2); break;
+		case 8: result = tst(&rn, operand2); break;
+		case 9: result = teq(&rn, operand2); break;
+		case 10: result = cmp(&rn, operand2); break;
+		case 12: result = orr(&rd, &rn, operand2); break;
+		case 13: result = mov(&rd, operand2); break;
 	}
+
+	// TODO: set carry value
 
 	// Set CPSR flags
 	if (set_conds) {
-		// TODO: check the value of flags to be set		
+		set_flags(opcode, cpsr, result, carry);
 	}
 }
 
@@ -113,6 +115,7 @@ void process(Instruction i, struct Registers *regs) {
 
 	Register rn = regs -> general_regs[rn_num];
 	Register rd = regs -> general_regs[rd_num];
+	Register cpsr = regs -> cpsr;
 
 	if (is_imm) {
 		// operand2 is an immediate value
@@ -131,6 +134,6 @@ void process(Instruction i, struct Registers *regs) {
 		// TODO: apply shift to register
 	}
 
-	execute(op_code, rd, rn, operand2, set_conds);
+	execute(op_code, rd, rn, operand2, set_conds, cpsr);
 }
 
