@@ -9,7 +9,7 @@ typedef uint32_t Register;
 
 enum Cond {
 	EQ = 0b0000,
-       	NE = 0b0001, 
+    NE = 0b0001, 
 	GE = 0b1010, 
 	LT = 0b1011, 
 	GT = 0b1100, 
