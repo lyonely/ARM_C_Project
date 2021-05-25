@@ -39,6 +39,13 @@ int instruction_is_valid(Instruction instruction, Registers* regs) {
 
 /*data processing instructions*/
 
+// Performs right rotation on a 32-bit binary number
+uint32_t rotate_right(uint32_t value, uint32_t rotation) {
+	uint32_t shifted = value >> rotation;
+	uint32_t rotated_bits = value << (32 - rotation);
+	return (shifted | rotated_bits);
+}
+
 uint32_t is_set(Instruction instruction) {
   return (instruction & 1 << 20);
 }

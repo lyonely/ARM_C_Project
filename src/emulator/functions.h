@@ -5,6 +5,9 @@
 
 long readBinary(FILE* file, void *destination);
 
+// performs right rotation on a 32-bit binary number
+uint32_t rotate_right(uint32_t value, uint32_t rotation); 
+
 // checks if CPSR flags should be updated
 uint32_t is_set(Instruction instruction);
 
