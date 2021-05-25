@@ -150,6 +150,10 @@ void set_n(Register *cpsr, int value) {
 }
 
 InstructionType get_instr_type(Instruction instruction) {
+  if (!instruction) {
+    return ALLZERO;
+  }
+
   if (instruction & (1<<27)) {
     return BRANCH; 
   }
