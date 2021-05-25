@@ -8,9 +8,11 @@ data_processor.o: data_processor.c data_processor.h functions.c functions.h data
 
 branch.o: branch.c functions.c functions.h datatypes.h
 
-functions.o: functions.c datatypes.h
+functions.o: functions.c functions.h datatypes.h
 
-debug: debug.o data_processor.c data_processor.h functions.h datatypes.h
+debug: debug.o data_processor.o functions.o
+
+debug.o: data_processor.c data_processor.h functions.h datatypes.h
 
 clean:
 	rm -f *.o emulate debug

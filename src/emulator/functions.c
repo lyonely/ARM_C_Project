@@ -105,7 +105,7 @@ int sdt_offset(Instruction instruction) {
 int get_cond(Instruction instruction) {
   return (instruction >> 28);
 }
-/*
+
 void set_v(Register *cpsr, int value) {
   (value) ? *cpsr = *cpsr | (1 << 28) : *cpsr & 0xefffffff;
 }
@@ -121,9 +121,8 @@ void set_z(Register *cpsr, int value) {
 void set_n(Register *cpsr, int value) {
   (value) ? *cpsr = *cpsr | (1 << 31) : *cpsr & 0x7fffffff;
 }
-*/
 
-InstructionType get_instr_type(Instruction instruction) {
+enum InstructionType get_instr_type(Instruction instruction) {
   if (!instruction) {
     return ALLZERO;
   }

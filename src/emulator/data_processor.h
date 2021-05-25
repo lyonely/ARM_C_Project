@@ -4,7 +4,7 @@
 #include "functions.h"
 
 // Performs right rotation on a 32-bit binary number
-int rotate_right(uint32_t value, unsigned int rotation);
+uint32_t rotate_right(uint32_t value, uint32_t rotation);
 
 // Bitwise AND
 uint32_t and(Register *rd, Register *rn, uint32_t operand2);
@@ -36,12 +36,10 @@ uint32_t orr(Register *rd, Register *rn, uint32_t operand2);
 // Move operand2 to dest
 uint32_t mov(Register *rd, uint32_t operand2);
 
-/*
 void process(Instruction i, struct Registers *regs);
 
 void execute(int opcode, Register rd, Register rn, uint32_t operand2, 
 		uint32_t set_conds);
-*/
 
 
 #endif
