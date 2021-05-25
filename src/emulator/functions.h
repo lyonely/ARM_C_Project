@@ -5,6 +5,9 @@
 
 long readBinary(FILE* file, void *destination);
 
+// performs right rotation on a 32-bit binary number
+uint32_t rotate_right(uint32_t value, uint32_t rotation); 
+
 // checks if CPSR flags should be updated
 uint32_t is_set(Instruction instruction);
 
@@ -55,6 +58,9 @@ void set_z(Register *cpsr, int value);
 
 //sets the n bit if the value is not zero
 void set_n(Register *cpsr, int value); 
+
+//sets the n and z bit
+void set_n_z(Register *cpsr, int result);
 
 //(for multiply) returns the rn operand register
 int rnMultiply(Instruction instruction);

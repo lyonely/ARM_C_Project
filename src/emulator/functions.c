@@ -39,6 +39,13 @@ int instruction_is_valid(Instruction instruction, struct Registers* regs) {
 
 /*data processing instructions*/
 
+// Performs right rotation on a 32-bit binary number
+uint32_t rotate_right(uint32_t value, uint32_t rotation) {
+	uint32_t shifted = value >> rotation;
+	uint32_t rotated_bits = value << (32 - rotation);
+	return (shifted | rotated_bits);
+}
+
 uint32_t is_set(Instruction instruction) {
   return (instruction & 1 << 20);
 }
@@ -120,6 +127,11 @@ void set_z(Register *cpsr, int value) {
 
 void set_n(Register *cpsr, int value) {
   (value) ? *cpsr = *cpsr | (1 << 31) : *cpsr & 0x7fffffff;
+}
+
+void set_n_z(Register *cpsr, int result) {
+  set_z(cpsr, !result);
+  set_n(cpsr, 0x80000000 & result);
 }
 
 enum InstructionType get_instr_type(Instruction instruction) {
