@@ -173,3 +173,18 @@ InstructionType get_instr_type(Instruction instruction) {
   
   return MUL;
 }
+
+void print_registers(struct Registers *reg) {
+  printf("Registers:\n");
+
+  for (int i = 0; i < 13; i++) {
+    if (i < 10) {
+      printf("$%d  : %8x \n", i, regs->general_regs[i]);
+    } else {
+      printf("$%d : %8x \n", i, regs->general_regs[i]);
+    }
+  }
+
+  printf("PC  : %8x \n", regs->pc);
+  printf("CPSR: %8x \n", regs->cpsr);
+}
