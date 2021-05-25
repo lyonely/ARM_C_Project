@@ -6,7 +6,7 @@ emulate: emulate.o
 
 data_processor: data_processor.o functions.o
 
-data_processor.o: data_processor.c functions.h datatypes.h
+data_processor.o: data_processor.c data_processor.h functions.h datatypes.h
 
 functions.o: functions.c datatypes.h
 

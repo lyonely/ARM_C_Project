@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
-#include "functions.h"
+#include "data_processor.h"
 
 // TODO: check 'Set Condition Codes' bit and set CPSR flags accordingly
 
