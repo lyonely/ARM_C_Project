@@ -68,17 +68,6 @@ uint32_t mov(Register *rd, uint32_t operand2) {
 	*rd = operand2;
 	return *rd;
 }
-
-int main(void) {
-	Register dest = 0;
-	Register source = 0x3;
-
-	eor(&dest, &source, 0x2);
-	printf("%d\n", dest);
-
-	return 0;
-}
-
 /*
 void process(Instruction i, struct Registers *regs) {
 	int cond = get_cond(i);
@@ -106,24 +95,36 @@ void process(Instruction i, struct Registers *regs) {
 		int rm_num = op2 & 0xf;
 
 		Register rm = regs -> general_regs[rm_num];
+	
+		// TODO: apply shift to register
 	}
 
+	execute(opcode, rd, rn, operand2, set_conds);
+}
+
+void execute(int opcode, Register rd, Register rn, uint32_t operand2, 
+		uint32_t set_conds) {
 	
-	switch(op) {
-		case 0:	
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-	
+	uint32_t result;
+
+	switch(opcode) {
+		case 0: result = and(&rd, &rn, operand2); break;
+		case 1: result = eor(&rd, &rn, operand2); break;
+		case 2: result = sub(&rd, &rn, operand2); break;
+		case 3: result = rsb(&rd, &rn, operand2); break;
+		case 4: result = add(&rd, &rn, operand2); break;
+		case 5: result = tst(&rn, operand2); break;
+		case 6: result = teq(&rn, operand2); break;
+		case 7: result = cmp(&rn, operand2); break;
+		case 8: result = orr(&rd, &rn, operand2); break;
+		case 9:	result = mov(&rd, &operand2); break;
+	}
+
+	// Set CPSR flags
+	if (set_conds) {
+		// TODO: check the value of flags to be set		
 	}
 }
+
 */
-
-
 
