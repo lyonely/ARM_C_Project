@@ -56,6 +56,9 @@ void set_z(Register *cpsr, int value);
 //sets the n bit if the value is not zero
 void set_n(Register *cpsr, int value); 
 
+//sets the n and z bit
+void set_n_z(Register *cpsr, int result);
+
 //(for multiply) returns the rn operand register
 int rnMultiply(Instruction instruction);
 

@@ -149,6 +149,11 @@ void set_n(Register *cpsr, int value) {
   (value) ? *cpsr = *cpsr | (1 << 31) : *cpsr & 0x7fffffff;
 }
 
+void set_n_z(Register *cpsr, int result) {
+  set_z(cpsr, !result);
+  set_n(cpsr, 0x80000000 & result);
+}
+
 InstructionType get_instr_type(Instruction instruction) {
   if (!instruction) {
     return ALLZERO;
