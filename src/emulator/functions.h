@@ -1,3 +1,5 @@
+#ifndef FUNCTIONS_H
+#define FUNCTIONS_H
 #include <stdio.h>
 #include "datatypes.h"
 
@@ -76,3 +78,5 @@ void display_memory(Byte* memory, int memory_capacity); #todo
 //(for branch) returns the offset
 int sdt_offset(Instruction instruction); 
 
+
+#endif

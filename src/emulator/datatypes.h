@@ -1,3 +1,5 @@
+#ifndef DATATYPES_H
+#define DATATYPES_H
 #include <stdio.h>
 #include <stdint.h>
 
@@ -25,3 +27,7 @@ struct Registers {
 	Register pc;
 	Register cpsr;
 };
+
+
+#endif
+
