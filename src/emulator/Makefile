@@ -6,6 +6,8 @@ emulate: emulate.o
 
 data_processor.o: data_processor.c data_processor.h functions.c functions.h datatypes.h
 
+branch.o: branch.c functions.c functions.h datatypes.h
+
 functions.o: functions.c datatypes.h
 
 debug: debug.o data_processor.c data_processor.h functions.h datatypes.h
