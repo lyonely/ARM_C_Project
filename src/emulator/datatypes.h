@@ -1,3 +1,5 @@
+#ifndef DATATYPES_H
+#define DATATYPES_H
 #include <stdio.h>
 #include <stdint.h>
 
@@ -17,7 +19,7 @@ enum Cond {
 };
 
 enum InstructionType {
-	DP, MUL, SDT, BRANCH
+	DP, MUL, SDT, BRANCH, ALLZERO
 };
 
 struct Registers {
@@ -25,3 +27,7 @@ struct Registers {
 	Register pc;
 	Register cpsr;
 };
+
+
+#endif
+
