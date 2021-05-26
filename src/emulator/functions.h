@@ -74,10 +74,9 @@ int rsMultiply(Instruction instruction);
 //(for multiply) returns the rm operand register
 int rmMultiply(Instruction instruction);
 
+void print_registers(struct Registers *regs);
 
 /*
-void print_registers(Registers *regs); #todo
-
 void display_memory(Byte* memory, int memory_capacity); #todo
 */
 
