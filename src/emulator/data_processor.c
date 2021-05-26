@@ -75,6 +75,25 @@ void set_flags(int opcode, Register cpsr, uint32_t result, uint32_t carry) {
 	set_n(&cpsr, result >> 31);
 }
 
+uint32_t get_carry(int opcode, Register rn, uint32_t operand2) {
+	uint32_t carry = 0;
+	
+	switch(opcode) {
+		// add
+		case 4: if (rn > INT_MAX - operand2) {
+					carry = 1;
+				}
+				break;
+		// sub
+		case 2: if (rn < operand2) {
+					carry = 1;
+				}
+				break;
+	}
+
+	return carry;
+}
+
 void execute(int opcode, Register rd, Register rn, uint32_t operand2, 
 		uint32_t set_conds, Register cpsr) {
 	

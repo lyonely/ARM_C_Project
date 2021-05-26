@@ -36,7 +36,7 @@ uint32_t mov(Register *rd, uint32_t operand2);
 void process(Instruction i, struct Registers *regs);
 
 void execute(int opcode, Register rd, Register rn, uint32_t operand2, 
-		uint32_t set_conds);
+		uint32_t set_conds, Register cpsr);
 
 
 #endif
