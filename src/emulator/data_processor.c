@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <limits.h>
 #include "data_processor.h"
 #include "functions.h"
 
@@ -75,20 +76,19 @@ void set_flags(int opcode, Register cpsr, uint32_t result, uint32_t carry) {
 	set_n(&cpsr, result >> 31);
 }
 
+// Gets carry value based on the operation and operands
 uint32_t get_carry(int opcode, Register rn, uint32_t operand2) {
 	uint32_t carry = 0;
 	
-	switch(opcode) {
+	switch(opcode) {	
 		// add
-		case 4: if (rn > INT_MAX - operand2) {
-					carry = 1;
-				}
-				break;
-		// sub
-		case 2: if (rn < operand2) {
-					carry = 1;
-				}
-				break;
+		case 4: if (rn > INT_MAX - operand2) { carry = 1; } break;
+		// sub, cmp
+		case 2:
+		case 10: if (rn > operand2) { carry = 1; } break;
+		// rsb
+		case 3: if (operand2 > rn) { carry = 1; } break;
+		default: break; // TODO: get carry out from shift operation
 	}
 
 	return carry;
@@ -97,8 +97,8 @@ uint32_t get_carry(int opcode, Register rn, uint32_t operand2) {
 void execute(int opcode, Register rd, Register rn, uint32_t operand2, 
 		uint32_t set_conds, Register cpsr) {
 	
+	uint32_t carry = get_carry(opcode, rn, operand2);
 	uint32_t result;
-	uint32_t carry;
 
 	switch(opcode) {
 		case 0: result = and(&rd, &rn, operand2); break;
@@ -112,8 +112,6 @@ void execute(int opcode, Register rd, Register rn, uint32_t operand2,
 		case 12: result = orr(&rd, &rn, operand2); break;
 		case 13: result = mov(&rd, operand2); break;
 	}
-
-	// TODO: set carry value
 
 	// Set CPSR flags
 	if (set_conds) {
@@ -144,7 +142,7 @@ void process(Instruction i, struct Registers *regs) {
 		operand2 = rotate_right(imm, rotation);
 	} else {
 		// operand2 is a register
-		
+	
 		int shift = (op2 & 0xff0) >> 4;
 		int rm_num = op2 & 0xf;
 

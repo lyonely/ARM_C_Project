@@ -33,8 +33,16 @@ uint32_t orr(Register *rd, Register *rn, uint32_t operand2);
 // Move operand2 to dest
 uint32_t mov(Register *rd, uint32_t operand2);
 
+// Sets CPSR register flags based on the result, V flag unchanged
+void set_flags(int opcode, Register cpsr, uint32_t result, uint32_t carry);
+
+// Get carry bit based on operation and operands
+uint32_t get_carry(int opcode, Register rn, uint32_t operand2); 
+
+// Parse instruction into components
 void process(Instruction i, struct Registers *regs);
 
+// Calls operation with corresponding registers/operands
 void execute(int opcode, Register rd, Register rn, uint32_t operand2, 
 		uint32_t set_conds, Register cpsr);
 
