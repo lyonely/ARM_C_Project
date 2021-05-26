@@ -3,6 +3,7 @@
 #include <limits.h>
 #include "data_processor.h"
 #include "functions.h"
+#include "shifter.h"
 
 // Bitwise AND
 uint32_t and(Register *rd, Register *rn, uint32_t operand2) {
@@ -77,7 +78,7 @@ void set_flags(int opcode, Register cpsr, uint32_t result, uint32_t carry) {
 }
 
 // Gets carry value based on the operation and operands
-uint32_t get_carry(int opcode, Register rn, uint32_t operand2) {
+uint32_t get_carry(int opcode, Register rn, uint32_t operand2, int shifter_carryout) {
 	uint32_t carry = 0;
 	
 	switch(opcode) {	
@@ -88,16 +89,16 @@ uint32_t get_carry(int opcode, Register rn, uint32_t operand2) {
 		case 10: if (rn > operand2) { carry = 1; } break;
 		// rsb
 		case 3: if (operand2 > rn) { carry = 1; } break;
-		default: break; // TODO: get carry out from shift operation
+		default: carry = shifter_carryout; break;
 	}
 
 	return carry;
 }
 
 void execute(int opcode, Register rd, Register rn, uint32_t operand2, 
-		uint32_t set_conds, Register cpsr) {
+		uint32_t set_conds, Register cpsr, int shifter_carryout) {
 	
-	uint32_t carry = get_carry(opcode, rn, operand2);
+	uint32_t carry = get_carry(opcode, rn, operand2, shifter_carryout);
 	uint32_t result;
 
 	switch(opcode) {
@@ -121,36 +122,47 @@ void execute(int opcode, Register rd, Register rn, uint32_t operand2,
 
 
 void process(Instruction i, struct Registers *regs) {
-	int cond = get_cond(i);
-	uint32_t is_imm = is_immediate(i);
-	int op_code = opcode(i);
-	uint32_t set_conds = is_set(i);
-	int rn_num = rn(i);
-	int rd_num = rd(i);
-	int op2 = operand2(i);
-	uint32_t operand2;
+	if (instruction_is_valid(i, regs)) {
+		uint32_t is_imm = is_immediate(i);
+		int op_code = opcode(i);
+		uint32_t set_conds = is_set(i);
+		int rn_num = rn(i);
+		int rd_num = rd(i);
+		int op2 = operand2(i);
+		uint32_t operand2;
+		int shifter_carryout;
 
-	Register rn = regs -> general_regs[rn_num];
-	Register rd = regs -> general_regs[rd_num];
-	Register cpsr = regs -> cpsr;
+		Register rn = regs -> general_regs[rn_num];
+		Register rd = regs -> general_regs[rd_num];
+		Register cpsr = regs -> cpsr;
 
-	if (is_imm) {
-		// operand2 is an immediate value
+		if (is_imm) {
+			// operand2 is an immediate value
 
-		uint32_t rotation = ((op2 & 0xf00) >> 8) * 2;
-		uint32_t imm = op2 & 0xff;
-		operand2 = rotate_right(imm, rotation);
-	} else {
-		// operand2 is a register
-	
-		int shift = (op2 & 0xff0) >> 4;
-		int rm_num = op2 & 0xf;
+			uint32_t rotation = ((op2 & 0xf00) >> 8) * 2;
+			uint32_t imm = op2 & 0xff;
+			operand2 = rotate_right(imm, rotation);
+		} else {
+			// operand2 is a register
+			int rm_num = op2 & 0xf;
+			Register rm = regs -> general_regs[rm_num];
 
-		Register rm = regs -> general_regs[rm_num];
-	
-		// TODO: apply shift to register
+			int shift = op2 >> 4;
+			int shift_type = (shift >> 1) & 0x2;
+			int register_shift = shift & 0x1;
+			
+			int shift_value;
+			if (register_shift) {
+				// shift specified by register
+			} else {
+				// shift by constant
+				shift_value = shift >> 3;
+			}
+			operand2 = shift_result(rm, shift_type, shift_value); 
+			shifter_carryout = carry_output(rm, shift_type, shift_value);
+		}
+
+		execute(op_code, rd, rn, operand2, set_conds, cpsr, shifter_carryout);
 	}
-
-	execute(op_code, rd, rn, operand2, set_conds, cpsr);
 }
 
