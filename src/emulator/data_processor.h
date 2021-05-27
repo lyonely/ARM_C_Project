@@ -5,47 +5,42 @@
 #include "shifter.h"
 
 // Bitwise AND
-uint32_t and(Register *rd, Register *rn, uint32_t operand2);
+void and(Register *rd, Register rn, uint32_t operand2, Register *cpsr, uint32_t set_conds);
 
 // Bitwise exclusive OR
-uint32_t eor(Register *rd, Register *rn, uint32_t operand2);
+void eor(Register *rd, Register rn, uint32_t operand2, Register *cpsr, uint32_t set_conds);
 
 // Subtract operand2 from register
-uint32_t sub(Register *rd, Register *rn, uint32_t operand2);
+void sub(Register *rd, Register rn, uint32_t operand2, Register *cpsr, uint32_t set_conds);
 
 // Subtract register from operand2
-uint32_t rsb(Register *rd, Register *rn, uint32_t operand2);
+void rsb(Register *rd, Register rn, uint32_t operand2, Register *cpsr, uint32_t set_conds);
 
 // Addition
-uint32_t add(Register *rd, Register *rn, uint32_t operand2);
+void add(Register *rd, Register rn, uint32_t operand2, Register *cpsr, uint32_t set_conds);
 
 // Bitwise AND, result not written
-uint32_t tst(Register *rn, uint32_t operand2);
+void tst(Register rn, uint32_t operand2, Register *cpsr, uint32_t set_conds);
 
 // Bitwise XOR, result not written
-uint32_t teq(Register *rn, uint32_t operand2);
+void teq(Register rn, uint32_t operand2, Register *cpsr, uint32_t set_conds);
 
 // sub, result not written
-uint32_t cmp(Register *rn, uint32_t operand2);
+void cmp(Register rn, uint32_t operand2, Register *cpsr, uint32_t set_conds);
 
 // Bitwise OR
-uint32_t orr(Register *rd, Register *rn, uint32_t operand2);
+void orr(Register *rd, Register rn, uint32_t operand2, Register *cpsr, uint32_t set_conds);
 
 // Move operand2 to dest
-uint32_t mov(Register *rd, uint32_t operand2);
+void mov(Register *rd, uint32_t operand2, Register *cpsr, uint32_t set_conds);
 
-// Sets CPSR register flags based on the result, V flag unchanged
-void set_flags(Register cpsr, uint32_t result, uint32_t carry);
-
-// Get carry bit based on operation and operands
-uint32_t get_carry(int opcode, Register rn, uint32_t operand2, int shifter_carryout); 
 
 // Parse instruction into components
 void process(Instruction i, struct Registers *regs);
 
 // Calls operation with corresponding registers/operands
 void execute(int opcode, Register rd, Register rn, uint32_t operand2, 
-		uint32_t set_conds, Register cpsr, int shifter_carryout);
+		uint32_t set_conds, Register cpsr);
 
 
 #endif

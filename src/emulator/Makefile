@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -Wall -D_POSIX_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE -std=c99
+CFLAGS = -g -D_POSIX_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE -std=c99
 BUILD: emulate debug
 
 emulate: emulate.o

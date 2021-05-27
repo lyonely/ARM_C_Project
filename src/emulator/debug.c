@@ -3,43 +3,35 @@
 #include "data_processor.h"
 
 // Debugging file for data_processor
-
 int main(void) {
-	Register source = 0xfff;
-	Register dest = 5;
-	uint32_t op2 = 0xff;
+
+	int and_op = 0;
+	int eor_op = 1;
+	int sub_op = 2;
+	int rsb_op = 3;
+	int add_op = 4;
+	int tst_op = 8;
+	int teq_op = 9;
+	int cmp_op = 10;
+	int orr_op = 12;
+	int mov_op = 13;
+	struct Registers regs;
 	
-	int result;
+	regs.pc = 0;
+	regs.cpsr = 0;
+	regs.general_regs[0] = 0x4;
 
-	result = and(&dest, &source, op2);
-	printf("and -> rn AND op2: %d, rd: %d\n", result, dest);
+	printf("CPSR reg: %d\n", regs.cpsr);
 
-	result = eor(&dest, &source, op2);
-	printf("eor -> rn EOR op2: %d, rd: %d\n", result, dest);
-
-	result = sub(&dest, &source, op2);
-	printf("sub -> rn - op2: %d, rd: %d\n", result, dest);
+	// No cond, immediate, add, set flags, rn = 0, rd = 1
+	// rotate = 2, imm = 1000
+	Instruction i1 = 0b11100010100100000001001000001000;
 	
-	result = rsb(&dest, &source, op2);
-	printf("rsb -> op2 - rn: %d, rd: %d\n", result, dest);
-	
-	result = add(&dest, &source, op2);
-	printf("add -> rn + op2: %d, rd: %d\n", result, dest);
-	
-	result = tst(&source, op2);
-	printf("tst -> rn AND op2: %d, rd: %d\n", result, dest);
-
-	result = teq(&source, op2);
-	printf("teq -> rn EOR op2: %d, rd: %d\n", result, dest);
-
-	result = cmp(&source, op2);
-	printf("cmp -> rn - op2: %d, rd: %d\n", result, dest);
-
-	result = orr(&dest, &source, op2);
-	printf("orr -> rn OR op2: %d, rd: %d\n", result, dest);
-
-	result = mov(&dest, op2);
-	printf("mov -> op2: %d, rd: %d\n", result, dest);
-
+	/*
+	process(i1, &regs);
+	printf("rn: %d\n", regs.general_regs[0]);
+	printf("rd: %d\n", regs.general_regs[1]);
+	printf("cpsr flags: %d\n", regs.cpsr >> 28);	
+	*/
 	return 0;
 }
