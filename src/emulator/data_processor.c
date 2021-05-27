@@ -64,7 +64,7 @@ uint32_t mov(Register *rd, uint32_t operand2) {
 }
 
 // Sets CPSR register flags based on the result, V flag unchanged
-void set_flags(int opcode, Register cpsr, uint32_t result, uint32_t carry) {
+void set_flags(Register cpsr, uint32_t result, uint32_t carry) {
 	// Carry flag
 	set_c(&cpsr, carry);
 
