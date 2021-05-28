@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "functions.h"
 
+
 long readBinary(FILE* file, void *destination) {
   fseek(file, 0, SEEK_END); // seek to end of file
   long size = ftell(file) + 1; // get current file pointer + 1 for zero instruction at end of file
@@ -35,7 +36,6 @@ int instruction_is_valid(Instruction instruction, struct Registers* regs) {
   }
   return isValid;
 }
-
 
 /*data processing instructions*/
 
@@ -187,4 +187,20 @@ void print_registers(struct Registers *reg) {
 
   printf("PC  : %8x \n", reg->pc);
   printf("CPSR: %8x \n", reg->cpsr);
+}
+
+void print_memory(Byte* memory, int memory_capacity) {
+  printf("Non-zero memory:\n");
+
+  for (int i = 0; i < memory_capacity; i+=4) {
+
+    if (*((uint32_t*) (memory + i))) {
+      printf("0x%08x: 0x", i);
+      
+      for (int j = 0; j < 4; j++) {
+        printf("%02x", memory[i+j]);
+      }
+      printf("\n");
+    }
+  }
 }
