@@ -74,11 +74,12 @@ int rsMultiply(Instruction instruction);
 //(for multiply) returns the rm operand register
 int rmMultiply(Instruction instruction);
 
+//prints the state of the registers
 void print_registers(struct Registers *regs);
 
-/*
-void display_memory(Byte* memory, int memory_capacity); #todo
-*/
+//prints non-zero memory
+void print_memory(Byte* memory, int memory_capacity)
+
 
 //(for branch) returns the offset
 int sdt_offset(Instruction instruction); 

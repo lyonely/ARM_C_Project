@@ -113,33 +113,6 @@ int get_cond(Instruction instruction) {
   return (instruction >> 28);
 }
 
-int instruction_is_valid(Instruction instruction, struct Registers* regs) {
-  
-  uint32_t N_flag = 1 << 31;
-  uint32_t Z_flag = 1 << 30;
-  uint32_t V_flag = 1 << 28;
-  uint32_t cpsr = regs->cpsr;
-
-  uint32_t N_equals_V = (N_flag & cpsr) == ((V_flag & cpsr) << 3);
-  uint32_t Z_set = Z_flag & cpsr;
-  
-  int isValid = 0;
-
-  int cond = get_cond(Instruction instruction);
-
-  switch(cond) {
-    case EQ: isValid = Z_set; break;
-    case NE: isValid = !Z_set; break;
-    case GE: isValid = N_equals_V; break;
-    case LT: isValid = !N_equals_V; break;
-    case GT: isValid = (!Z_set) && N_equals_V; break;
-    case LE: isValid = Z_set || (!N_equals_V); break;
-    case AL: isValid = 1; break;
-    default: isValid = 0;
-  }
-  return isValid;
-}
-
 void set_v(Register *cpsr, int value) {
   (value) ? *cpsr = *cpsr | (1 << 28) : *cpsr & 0xefffffff;
 }
@@ -194,4 +167,20 @@ void print_registers(struct Registers *reg) {
 
   printf("PC  : %8x \n", regs->pc);
   printf("CPSR: %8x \n", regs->cpsr);
+}
+
+void print_memory(Byte* memory, int memory_capacity) {
+  printf("Non-zero memory:\n");
+
+  for (int i = 0; i < memory_capacity; i+=4) {
+
+    if (*((uint32_t*) (memory + i))) {
+      printf("0x%08x: 0x", i);
+      
+      for (int j = 0; j < 4; j++) {
+        printf("%02x", memory[i+j]);
+      }
+      printf("\n");
+    }
+  }
 }
