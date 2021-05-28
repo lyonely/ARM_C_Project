@@ -94,15 +94,15 @@ int rmMultiply(Instruction instruction) {
 
 /*single data transfer*/
 uint32_t is_pre_indexing(Instruction instruction) {
-  return (instruction & 1 << 24);
+  return (instruction << 24) & 1;
 }
 
 uint32_t is_up(Instruction instruction) {
-  return (instruction & 1 << 23);
+  return (instruction << 23) & 1;
 }
 
 uint32_t is_load(Instruction instruction) {
-  return (instruction & 1 << 20);
+  return (instruction << 20) & 1;
 }
 
 int sdt_offset(Instruction instruction) {
