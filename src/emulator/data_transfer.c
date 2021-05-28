@@ -3,35 +3,31 @@
 #include "functions.h"
 #include "datatypes.h"
 #include "shifter.h"
-
-// PC is register 15, total 17 registers (0 - 16)
 #define PC_Reg 15
 
 void single_data_transfer(Instruction instr, struct Registers *registers, Byte* memory){
 	// Executes a single data transfer instruction which loads data from memory 
-  	// to register OR stores data from registers to memory
-
+	// to register OR stores data from registers to memory
 	// baseRegister stores value in baseRegister
-  	uint32_t baseRegister = 0;
-
-    // initialize baseRegister pointer
-    if((rn(instr) == PC_Reg)){
+	uint32_t baseRegister = 0;
+	
+	// initialize baseRegister pointer
+	if((rn(instr) == PC_Reg)){
 		baseRegister = (registers -> pc);
 	} else {
 		baseRegister = (registers -> general_regs[rn(instr)]);
   	} 
 
-    uint32_t offset = 0;
+	uint32_t offset = 0;
 	
 	if(is_immediate(instr)){
 		// Offset interpreted as a shifted register
-	    // Assume single data transfer does not need to set cpsr
-	    int set_cpsr = 0;
-	    offset = (unsigned int) operand2_shiftedReg(operand2(instr), registers, set_cpsr);
-
+		// Assume single data transfer does not need to set cpsr
+		int set_cpsr = 0;
+		offset = (unsigned int) operand2_shiftedReg(operand2(instr), registers, set_cpsr);
 	} else {
-        // offset is an unsigned 12 bit immediate offset
-        offset = operand2(instr);
+		// offset is an unsigned 12 bit immediate offset
+		offset = operand2(instr);
 	}
 
     if(is_pre_indexing(instr)){
@@ -61,20 +57,19 @@ void single_data_transfer(Instruction instr, struct Registers *registers, Byte* 
 
     } else {
 		// post-indexing
-		
-		Register * baseRegisterPtr = (Register *) baseRegister;
+		Register * baseRegisterPtr = (Register *) baseRegister
 
 		if (is_load(instr)){
-        	// word is loaded from memory into destination register
-        	registers -> general_regs[rd(instr)] = *baseRegisterPtr;
-     		return;
-    	} else {
-        	// word stored into memory
-        	*baseRegisterPtr = registers -> general_regs[rd(instr)];
-        	return;
-      	}
+			// word is loaded from memory into destination register
+			registers -> general_regs[rd(instr)] = *baseRegisterPtr;
+			return;
+		} else {
+			// word stored into memory
+			*baseRegisterPtr = registers -> general_regs[rd(instr)];
+			return;
+		}
 
-		// update value of baseRegister using offset
+		// update value of base register (rn) using offset
 		if (is_up(instr)){
 			registers -> general_regs[rn(instr)] = baseRegister + offset;
 		} else {
