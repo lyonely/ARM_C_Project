@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "functions.h"
 
+
 long readBinary(FILE* file, void *destination) {
   fseek(file, 0, SEEK_END); // seek to end of file
   long size = ftell(file) + 1; // get current file pointer + 1 for zero instruction at end of file
@@ -9,7 +10,7 @@ long readBinary(FILE* file, void *destination) {
   return size;
 }
 
-int instruction_is_valid(Instruction instruction, Registers* regs) {
+int instruction_is_valid(Instruction instruction, struct Registers* regs) {
   
   uint32_t N_flag = 1 << 31;
   uint32_t Z_flag = 1 << 30;
@@ -21,7 +22,7 @@ int instruction_is_valid(Instruction instruction, Registers* regs) {
   
   int isValid = 0;
 
-  int cond = get_cond(Instruction instruction);
+  int cond = get_cond(instruction);
 
   switch(cond) {
     case EQ: isValid = Z_set; break;
@@ -35,7 +36,6 @@ int instruction_is_valid(Instruction instruction, Registers* regs) {
   }
   return isValid;
 }
-
 
 /*data processing instructions*/
 
@@ -134,7 +134,7 @@ void set_n_z(Register *cpsr, int result) {
   set_n(cpsr, 0x80000000 & result);
 }
 
-InstructionType get_instr_type(Instruction instruction) {
+enum InstructionType get_instr_type(Instruction instruction) {
   if (!instruction) {
     return ALLZERO;
   }
@@ -159,14 +159,14 @@ void print_registers(struct Registers *reg) {
 
   for (int i = 0; i < 13; i++) {
     if (i < 10) {
-      printf("$%d  : %8x \n", i, regs->general_regs[i]);
+      printf("$%d  : %8x \n", i, reg->general_regs[i]);
     } else {
-      printf("$%d : %8x \n", i, regs->general_regs[i]);
+      printf("$%d : %8x \n", i, reg->general_regs[i]);
     }
   }
 
-  printf("PC  : %8x \n", regs->pc);
-  printf("CPSR: %8x \n", regs->cpsr);
+  printf("PC  : %8x \n", reg->pc);
+  printf("CPSR: %8x \n", reg->cpsr);
 }
 
 void print_memory(Byte* memory, int memory_capacity) {

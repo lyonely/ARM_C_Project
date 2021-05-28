@@ -78,8 +78,7 @@ int rmMultiply(Instruction instruction);
 void print_registers(struct Registers *regs);
 
 //prints non-zero memory
-void print_memory(Byte* memory, int memory_capacity)
-
+void print_memory(Byte* memory, int memory_capacity);
 
 //(for branch) returns the offset
 int sdt_offset(Instruction instruction); 
