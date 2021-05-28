@@ -34,13 +34,11 @@ void orr(Register *rd, Register rn, uint32_t operand2, Register *cpsr, uint32_t 
 // Move operand2 to dest
 void mov(Register *rd, uint32_t operand2, Register *cpsr, uint32_t set_conds);
 
-
 // Parse instruction into components
 void process(Instruction i, struct Registers *regs);
 
 // Calls operation with corresponding registers/operands
 void execute(int opcode, Register *rd, Register rn, uint32_t operand2, 
 		uint32_t set_conds, Register *cpsr);
-
 
 #endif
