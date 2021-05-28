@@ -114,24 +114,44 @@ int get_cond(Instruction instruction) {
 }
 
 void set_v(Register *cpsr, int value) {
-  (value) ? *cpsr = *cpsr | (1 << 28) : *cpsr & 0xefffffff;
+	if (value) {
+		*cpsr |= (1 << 28);
+	} else {
+		*cpsr &= 0xefffffff;
+	}
 }
 
 void set_c(Register *cpsr, int value) {
-  (value) ? *cpsr = *cpsr | (1 << 29) : *cpsr &  0xdfffffff;
+	if (value) {
+		*cpsr |= (1 << 29);
+	} else {
+		*cpsr &= 0xdfffffff;
+	}
 }
 
 void set_z(Register *cpsr, int value) {
-  (value) ? *cpsr = *cpsr | (1 << 30) : *cpsr & 0xbfffffff;
+	if (value) {
+		*cpsr |= (1 << 30);
+	} else {
+		*cpsr &= 0xbfffffff;
+	}
 }
 
 void set_n(Register *cpsr, int value) {
-  (value) ? *cpsr = *cpsr | (1 << 31) : *cpsr & 0x7fffffff;
+	if (value) {
+		*cpsr |= (1 << 31);
+	} else {
+		*cpsr &= 0x7fffffff;
+	}
 }
 
 void set_n_z(Register *cpsr, int result) {
   set_z(cpsr, !result);
   set_n(cpsr, 0x80000000 & result);
+}
+
+void reset_flags(Register *cpsr) {
+	*cpsr &= 0x0fffffff;
 }
 
 enum InstructionType get_instr_type(Instruction instruction) {

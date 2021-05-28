@@ -62,6 +62,9 @@ void set_n(Register *cpsr, int value);
 //sets the n and z bit
 void set_n_z(Register *cpsr, int result);
 
+// resets CPSR register flags to 0
+void reset_flags(Register *cpsr);
+
 //(for multiply) returns the rn operand register
 int rnMultiply(Instruction instruction);
 
