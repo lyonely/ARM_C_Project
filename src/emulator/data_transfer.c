@@ -57,7 +57,7 @@ void single_data_transfer(Instruction instr, struct Registers *registers, Byte* 
 
     } else {
 		// post-indexing
-		Register * baseRegisterPtr = (Register *) baseRegister
+		Register * baseRegisterPtr = (Register *) baseRegister;
 
 		if (is_load(instr)){
 			// word is loaded from memory into destination register
