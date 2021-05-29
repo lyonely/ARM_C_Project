@@ -38,7 +38,7 @@ void pipeline(struct Registers* registers, Byte* memory) {
   int state = 0;
 
   while (1) {
-//	  printf("type: %d\n", type);
+	  printf("type: %d\n", type);
 	  if (type == NOOP) {
 	    continue;
 	  }
@@ -46,9 +46,9 @@ void pipeline(struct Registers* registers, Byte* memory) {
 	    toExecute = toDecode;
 	    toDecode = fetched;
 	    fetched = *((Instruction*) (memory + registers->pc));
-//	    printf("Instruction: %8x\n", fetched);
+	    printf("Instruction: %8x\n", fetched);
 	    perform(type, toExecute, registers, memory);
-//	    printf("Performed\n");
+	    printf("Performed\n");
 	    if ((type == BRANCH) && instruction_is_valid(toExecute, registers)) {
 		    state = 0;
 	    }
@@ -56,16 +56,16 @@ void pipeline(struct Registers* registers, Byte* memory) {
 	  } else if (state > 0) {
 	    toDecode = fetched;
 	    fetched = *((Instruction*) (memory + registers->pc));
-//	    printf("Instruction: %8x", fetched);
+	    printf("Instruction: %8x", fetched);
 	    type = get_instr_type(toDecode);
 	    state++;
 	  } else {
 	    fetched = *((Instruction*) (memory + registers->pc));
-//	    printf("Instruction: %8x", fetched);
+	    printf("Instruction: %8x", fetched);
 	    state++;
 	  }
 	  registers->pc+=4;
-//	  printf("PC: %3d\n", registers->pc);
+	  printf("PC: %3d\n", registers->pc);
 	}
 }
 
