@@ -3,6 +3,9 @@
 #include "functions.h"
 #include "datatypes.h"
 #include "data_processor.h"
+#include "multiply.h"
+#include "branch.h"
+#include "data_transfer.h"
 
 void perform(enum InstructionType type, Instruction instruction, struct Registers* reg, Byte* memory) {
 
