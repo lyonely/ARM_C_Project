@@ -159,6 +159,10 @@ enum InstructionType get_instr_type(Instruction instruction) {
     return ALLZERO;
   }
 
+  if (((instruction >> 4) & ((1 << 4) -1)) == 9 && (((instruction >> 22) & ((1 << 6) -1)) == 0)) {
+    return MUL;
+  }
+
   if (instruction & (1<<27)) {
     return BRANCH; 
   }
@@ -171,7 +175,7 @@ enum InstructionType get_instr_type(Instruction instruction) {
     return DP;
   }
   
-  return MUL;
+  return NOOP;
 }
 
 void print_registers(struct Registers *reg) {

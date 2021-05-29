@@ -19,7 +19,7 @@ enum Cond {
 };
 
 enum InstructionType {
-	DP, MUL, SDT, BRANCH, ALLZERO, NOOP
+	DP, MUL, SDT, BRANCH, NOOP, ALLZERO
 };
 
 struct Registers {
