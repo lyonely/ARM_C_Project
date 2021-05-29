@@ -85,5 +85,7 @@ int main(int argc, char **argv) {
   fclose(code);
 
   pipeline(registers, memory);
+
+  return 0;
 }
  
