@@ -4,18 +4,22 @@
 #include "datatypes.h"
 #include "data_processor.h"
 
-void perform(enum InstructionType type, Instruction instruction, struct Registers *reg, 
-		Byte* memory, int memory_capacity) {
+void perform(Instruction* fetched, Instruction instruction, struct Registers* reg, Byte* memory, int *stop) {
 
-  if (!instruction_is_valid(instruction, reg)) {
-	return;
+  if (!instruction) {
+    *stop = 1;	
+    return;
   }
 
+  if (!instruction_is_valid(instruction, reg)) {
+    return;
+  }
+
+  enum InstructionType type;
+
+  type = get_instr_type(instruction);
+
   switch(type) {
-  case ALLZERO:
-    print_registers(reg);
-    print_memory(memory, memory_capacity);
-    exit(EXIT_SUCCESS);
   case DP:
     process(instruction, reg);
     return;
@@ -27,7 +31,13 @@ void perform(enum InstructionType type, Instruction instruction, struct Register
     return;
   case BRANCH:
     branch(instruction, reg);
+    *fetched = NOOP;
     return;
+  case NOOP:
+    return;
+  default:
+    printf("Invalid instruction");
+    exit(EXIT_FAILURE);
   }
 }
 
@@ -47,32 +57,19 @@ int main(int argc, char **argv) {
   fclose(code);
 
   Instruction fetched;
-  Instruction toDecode;
-  enum InstructionType type;
-  Instruction toExecute;
-  int state = 0;
+  Instruction decoded;
+  int stop = 0;
 
-  while(1) {
-    if (state == 2) {
-      toExecute = toDecode;	  
-      toDecode = fetched;
-      fetched = *((Instruction*) (memory+registers->pc));
-      perform(type, toExecute, registers, memory, 1<<15);
-      if (type == BRANCH && instruction_is_valid(toExecute, registers)) {
-        state = 0;
-      }
-      type = get_instr_type(toDecode);
-    } else if (state == 1) {
-      toDecode = fetched;
-      fetched = *((Instruction*) (memory+registers->pc));
-      type = get_instr_type(toDecode);
-      state = 2;
-    } else {
-      fetched = *((Instruction*) (memory+registers->pc));
-      state = 1;
-    }
+  do {
+    fetched = *((Instruction*) (memory+registers->pc));
     registers->pc+=4;
-  }
+    perform(&fetched, decoded, registers, memory, &stop);
+    decoded = fetched;
+  } while (!stop);
 
+  print_registers(registers);
+  print_memory(memory, 1<<15);
+  free(registers);
+  exit(EXIT_SUCCESS);
 }
-
+ 

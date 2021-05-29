@@ -179,14 +179,14 @@ void print_registers(struct Registers *reg) {
 
   for (int i = 0; i < 13; i++) {
     if (i < 10) {
-      printf("$%d  : %8x \n", i, reg->general_regs[i]);
+      printf("$%d  : %10d (0x%08x)\n", i, reg->general_regs[i], reg->general_regs[i]);
     } else {
-      printf("$%d : %8x \n", i, reg->general_regs[i]);
+      printf("$%d : %10d (0x%08x)\n", i, reg->general_regs[i], reg->general_regs[i]);
     }
   }
 
-  printf("PC  : %8x \n", reg->pc);
-  printf("CPSR: %8x \n", reg->cpsr);
+  printf("PC  : %10d (0x%08x)\n", reg->pc, reg->pc);
+  printf("CPSR: %10d (0x%08x)\n", reg->cpsr, reg->cpsr);
 }
 
 void print_memory(Byte* memory, int memory_capacity) {
