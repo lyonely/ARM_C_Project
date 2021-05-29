@@ -94,15 +94,15 @@ int rmMultiply(Instruction instruction) {
 
 /*single data transfer*/
 uint32_t is_pre_indexing(Instruction instruction) {
-  return (instruction & 1 << 24);
+  return (instruction >> 24) & 1;
 }
 
 uint32_t is_up(Instruction instruction) {
-  return (instruction & 1 << 23);
+  return (instruction >> 23) & 1;
 }
 
 uint32_t is_load(Instruction instruction) {
-  return (instruction & 1 << 20);
+  return (instruction >> 20) & 1;
 }
 
 int sdt_offset(Instruction instruction) {
@@ -159,6 +159,10 @@ enum InstructionType get_instr_type(Instruction instruction) {
     return ALLZERO;
   }
 
+  if (((instruction >> 4) & ((1 << 4) -1)) == 9 && (((instruction >> 22) & ((1 << 6) -1)) == 0)) {
+    return MUL;
+  }
+
   if (instruction & (1<<27)) {
     return BRANCH; 
   }
@@ -171,7 +175,7 @@ enum InstructionType get_instr_type(Instruction instruction) {
     return DP;
   }
   
-  return MUL;
+  return NOOP;
 }
 
 void print_registers(struct Registers *reg) {
@@ -179,14 +183,14 @@ void print_registers(struct Registers *reg) {
 
   for (int i = 0; i < 13; i++) {
     if (i < 10) {
-      printf("$%d  : %8x \n", i, reg->general_regs[i]);
+      printf("$%d  : %10d (0x%08x)\n", i, reg->general_regs[i], reg->general_regs[i]);
     } else {
-      printf("$%d : %8x \n", i, reg->general_regs[i]);
+      printf("$%d : %10d (0x%08x)\n", i, reg->general_regs[i], reg->general_regs[i]);
     }
   }
 
-  printf("PC  : %8x \n", reg->pc);
-  printf("CPSR: %8x \n", reg->cpsr);
+  printf("PC  : %10d (0x%08x)\n", reg->pc, reg->pc);
+  printf("CPSR: %10d (0x%08x)\n", reg->cpsr, reg->cpsr);
 }
 
 void print_memory(Byte* memory, int memory_capacity) {
