@@ -16,7 +16,7 @@ void perform(enum InstructionType type, Instruction instruction, struct Register
   switch(type) {
   case ALLZERO:
     print_registers(reg);
-    print_memory(memory, 1<<15);
+    print_memory(memory, 1<<16);
     exit(EXIT_SUCCESS);
   case DP:
     process(instruction, reg);
@@ -35,9 +35,9 @@ void perform(enum InstructionType type, Instruction instruction, struct Register
 
 void pipeline(struct Registers* registers, Byte* memory) {
   Instruction fetched;
-  enum InstructionType type;
+  enum InstructionType type = ALLZERO;
   Instruction toDecode;
-  Instruction toExecute;
+  Instruction toExecute = -1;
   int state = 0;
 
   while (1) {
@@ -54,6 +54,7 @@ void pipeline(struct Registers* registers, Byte* memory) {
 	    printf("Performed\n");
 	    if ((type == BRANCH) && instruction_is_valid(toExecute, registers)) {
 		    state = 0;
+		    printf("branch function");
 	    }
 	    type = get_instr_type(toDecode);
 	  } else if (state > 0) {
@@ -80,10 +81,13 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
  
-  struct Registers* registers = calloc(1, sizeof(struct Registers));
 
   Byte *memory = calloc(1<<15, 1);
   readBinary(code, memory);
+
+  struct Registers* registers = calloc(1, sizeof(struct Registers));
+  registers->pc = 0;
+  registers->cpsr = 0;
 
   fclose(code);
 
