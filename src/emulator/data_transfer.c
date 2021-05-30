@@ -34,38 +34,51 @@ void single_data_transfer(Instruction instr, struct Registers *registers, Byte* 
       // add or subtract offset from base register before data transfer
 	  // pre indexing does not change the value of the base register
 
-		uint32_t* address;
-
+		
  		if (is_up(instr)){
         	// add offset to base register (result is a memory address)
-			address = (uint32_t*)(baseRegister + offset);
+			baseRegister += offset;
 
-      	} else {
+      		} else {
         	// subtract offset from base register
-        	address = (uint32_t*)(baseRegister - offset);
-      	}
+        		baseRegister -= offset;
+      		}
 
       	if (is_load(instr)){
-        	// word is loaded from memory
-        	registers -> general_regs[rd(instr)] = *address;
+		if (baseRegister >= (1<<15)) {
+			printf("Error: Out of bounds memory access at address 0x%08x\n", baseRegister);
+			return;
+		}
+			// word is loaded from memory
+        	registers -> general_regs[rd(instr)] = *((uint32_t*) (memory + baseRegister));
      		return;
     	} else {
-        	// word stored into memory
-        	*address = registers -> general_regs[rd(instr)]; 
+		if (baseRegister >= (1<<15)) {
+			printf("Error: Out of bounds memory access at address 0x%08x\n", baseRegister);
+			return;
+		}
+			// word stored into memory
+        	*((uint32_t*)(memory + baseRegister)) = registers -> general_regs[rd(instr)]; 
         	return;
       	}
 
     } else {
 		// post-indexing
-		Register * baseRegisterPtr = (Register *) baseRegister;
-
 		if (is_load(instr)){
+		if (baseRegister >= (1<<15)) {
+			printf("Error: Out of bounds memory access at address 0x%08x\n", baseRegister);
+			return;
+		}
 			// word is loaded from memory into destination register
-			registers -> general_regs[rd(instr)] = *baseRegisterPtr;
+			registers -> general_regs[rd(instr)] = *((uint32_t*) (baseRegister + memory));
 			return;
 		} else {
+		if (baseRegister >= (1<<15)) {
+			printf("Error: Out of bounds memory access at address 0x%08x\n", baseRegister);
+			return;
+		}
 			// word stored into memory
-			*baseRegisterPtr = registers -> general_regs[rd(instr)];
+			*((uint32_t*) (baseRegister + memory)) = registers -> general_regs[rd(instr)];
 			return;
 		}
 
