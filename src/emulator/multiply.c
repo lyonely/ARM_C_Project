@@ -18,5 +18,7 @@ void multiply(Instruction instr, struct Registers* rs) {
   //store result in rd
   rs->general_regs[rdMultiply(instr)] = res32;
   //set cpsr flags
-  set_n_z(&rs->cpsr, res32);  
+  if (is_set(instr)) {
+  	set_n_z(&rs->cpsr, res32);
+  }  
 }
