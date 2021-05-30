@@ -47,11 +47,11 @@ uint32_t rotate_right(uint32_t value, uint32_t rotation) {
 }
 
 uint32_t is_set(Instruction instruction) {
-  return (instruction & 1 << 20);
+  return (instruction & (1 << 20));
 }
 
 uint32_t is_immediate(Instruction instruction) {
-  return (instruction & 1 << 25);
+  return (instruction & (1 << 25));
 }
 
 int opcode(Instruction instruction) {
@@ -73,19 +73,19 @@ int operand2(Instruction instruction) {
 /*multiply instruction*/
 
 uint32_t accumulate(Instruction instruction) {
-  return (instruction & 1 << 21);
+  return (instruction & (1 << 21));
 }
 
 int rnMultiply(Instruction instruction) {
-  return (instruction & 0xf000) << 12;
+  return (instruction & 0xf000) >> 12;
 }
 
 int rdMultiply(Instruction instruction){
-  return (instruction & 0xf0000) << 16;
+  return (instruction & 0xf0000) >> 16;
 }
 
 int rsMultiply(Instruction instruction) {
-  return (instruction & 0xf00) << 8;
+  return (instruction & 0xf00) >> 8;
 }
 
 int rmMultiply(Instruction instruction) {
