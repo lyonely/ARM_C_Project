@@ -6,7 +6,7 @@ long readBinary(FILE* file, void *destination) {
   fseek(file, 0, SEEK_END); // seek to end of file
   long size = ftell(file) + 1; // get current file pointer + 1 for zero instruction at end of file
   fseek(file, 0, SEEK_SET); // seek back to beginning of file for reading
-  fread(destination, 1, sizeof(destination), file);
+  fread(destination, 1, (size_t) size, file);
   return size;
 }
 

@@ -41,7 +41,10 @@ void pipeline(struct Registers* registers, Byte* memory) {
   int state = 0;
 
   while (1) {
-	  printf("type: %d\n", type);
+
+
+
+
 	  if (type == NOOP) {
 	    continue;
 	  }
@@ -49,40 +52,64 @@ void pipeline(struct Registers* registers, Byte* memory) {
 	    toExecute = toDecode;
 	    toDecode = fetched;
 	    fetched = *((Instruction*) (memory + registers->pc));
-	    printf("Instruction: %8x\n", fetched);
+
+
 	    perform(type, toExecute, registers, memory);
-	    printf("Performed\n");
+
 	    if ((type == BRANCH) && instruction_is_valid(toExecute, registers)) {
+
+		perform(type, toExecute, registers, memory);
+		if ((type == BRANCH) && instruction_is_valid(toExecute, registers)) {
+
 		    state = 0;
-		    printf("branch function");
+
 	    }
 	    type = get_instr_type(toDecode);
+	  
 	  } else if (state > 0) {
 	    toDecode = fetched;
 	    fetched = *((Instruction*) (memory + registers->pc));
-	    printf("Instruction: %8x", fetched);
+
+
+
+
 	    type = get_instr_type(toDecode);
 	    state++;
+	  
 	  } else {
+
 	    fetched = *((Instruction*) (memory + registers->pc));
-	    printf("Instruction: %8x", fetched);
+
 	    state++;
 	  }
 	  registers->pc+=4;
-	  printf("PC: %3d\n", registers->pc);
+
+
+		fetched = *((Instruction*) (memory + registers->pc));
+	    state++;
+	  }
+	  registers->pc+=4;
+
 	}
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char *argv[]) {
   FILE *code;
-  
-  if ((code = fopen(argv[argc - 1], "r")) == NULL) {
+
+  if (argc != 2) {
+	perror("Wrong number of file arguments.\n");
+	exit(EXIT_FAILURE);
+  }
+
+  code = fopen(argv[1], "rb");
+
+  if (code == NULL) {
     perror("Error opening file\n");
     exit(EXIT_FAILURE);
   }
  
 
-  Byte *memory = calloc(1<<15, 1);
+  Byte *memory = calloc(1<<16, 1);
   readBinary(code, memory);
 
   struct Registers* registers = calloc(1, sizeof(struct Registers));
@@ -92,6 +119,9 @@ int main(int argc, char **argv) {
   fclose(code);
 
   pipeline(registers, memory);
+
+  free(registers);
+  free(memory);
 
   return 0;
 }

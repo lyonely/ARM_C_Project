@@ -3,7 +3,7 @@ CFLAGS = -g -D_POSIX_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE -std=c99
 BUILD: emulate
 
 emulate: emulate.o data_processor.o branch.o shifter.o functions.o multiply.o data_transfer.o
-	$(CC) -o emulate emulate.o data_processor.o branch.o shifter.o functions.o multiply.o data_transfer.o 
+	$(CC) -o emulate emulate.o data_processor.o branch.o shifter.o functions.o multiply.o data_transfer.o -o ../../out/emulate 
 
 emulate.o: emulate.c functions.h datatypes.h data_processor.h multiply.h data_transfer.h branch.h
 	$(CC) $(CFLAGS) -c emulate.c
@@ -27,5 +27,5 @@ data_transfer.o : data_transfer.c data_transfer.h functions.h shifter.h datatype
 	$(CC) $(CFLAGS) -c data_transfer.c
 
 clean:
-	rm -f *.o emulate debug
-	rm -f emulate
+	rm -f *.o emulate
+
