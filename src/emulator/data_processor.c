@@ -73,7 +73,7 @@ void teq(Register rn, uint32_t operand2, Register *cpsr, uint32_t set_conds) {
 void cmp(Register rn, uint32_t operand2, Register *cpsr, uint32_t set_conds) {
 	int res = rn - operand2;
 	if (set_conds) {
-		set_c(cpsr, rn > operand2);
+		set_c(cpsr, rn >= operand2);
 		set_n_z(cpsr, res);
 	}
 }
