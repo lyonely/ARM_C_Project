@@ -3,6 +3,7 @@
 #include "functions.h"
 #include "datatypes.h"
 #include "shifter.h"
+
 #define PC_Reg 15
 
 void single_data_transfer(Instruction instr, struct Registers *registers, Byte* memory){
@@ -45,7 +46,7 @@ void single_data_transfer(Instruction instr, struct Registers *registers, Byte* 
       		}
 
       	if (is_load(instr)){
-		if (baseRegister >= (1<<15)) {
+		if (baseRegister >= MEMORY_CAPACITY) {
 			printf("Error: Out of bounds memory access at address 0x%08x\n", baseRegister);
 			return;
 		}
@@ -53,7 +54,7 @@ void single_data_transfer(Instruction instr, struct Registers *registers, Byte* 
         	registers -> general_regs[rd(instr)] = *((uint32_t*) (memory + baseRegister));
      		return;
     	} else {
-		if (baseRegister >= (1<<15)) {
+		if (baseRegister >= MEMORY_CAPACITY) {
 			printf("Error: Out of bounds memory access at address 0x%08x\n", baseRegister);
 			return;
 		}
@@ -65,7 +66,7 @@ void single_data_transfer(Instruction instr, struct Registers *registers, Byte* 
     } else {
 		// post-indexing
 	if (is_load(instr)){
-		if (baseRegister >= (1<<15)) {
+		if (baseRegister >= MEMORY_CAPACITY) {
 			printf("Error: Out of bounds memory access at address 0x%08x\n", baseRegister);
 			return;
 		}
@@ -73,7 +74,7 @@ void single_data_transfer(Instruction instr, struct Registers *registers, Byte* 
 			registers -> general_regs[rd(instr)] = *((uint32_t*) (baseRegister + memory));
 			
 		} else {
-		if (baseRegister >= (1<<15)) {
+		if (baseRegister >= MEMORY_CAPACITY) {
 			printf("Error: Out of bounds memory access at address 0x%08x\n", baseRegister);
 			return;
 		}
