@@ -56,7 +56,7 @@ void pipeline(struct Registers* registers, Byte* memory) {
 	    perform(type, toExecute, registers, memory);
 //	    printf("Executed\n");
 	    if ((type == BRANCH) && instruction_is_valid(toExecute, registers)) {
-		    state = 1;
+		    state = 0;
 //		    printf("Branch Function\n");
 	    }
 	    type = get_instr_type(toDecode);

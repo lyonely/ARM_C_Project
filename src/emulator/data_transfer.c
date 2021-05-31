@@ -64,14 +64,14 @@ void single_data_transfer(Instruction instr, struct Registers *registers, Byte* 
 
     } else {
 		// post-indexing
-		if (is_load(instr)){
+	if (is_load(instr)){
 		if (baseRegister >= (1<<15)) {
 			printf("Error: Out of bounds memory access at address 0x%08x\n", baseRegister);
 			return;
 		}
 			// word is loaded from memory into destination register
 			registers -> general_regs[rd(instr)] = *((uint32_t*) (baseRegister + memory));
-			return;
+			
 		} else {
 		if (baseRegister >= (1<<15)) {
 			printf("Error: Out of bounds memory access at address 0x%08x\n", baseRegister);
@@ -79,7 +79,7 @@ void single_data_transfer(Instruction instr, struct Registers *registers, Byte* 
 		}
 			// word stored into memory
 			*((uint32_t*) (baseRegister + memory)) = registers -> general_regs[rd(instr)];
-			return;
+			
 		}
 
 		// update value of base register (rn) using offset
