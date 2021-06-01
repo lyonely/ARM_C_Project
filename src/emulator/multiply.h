@@ -4,7 +4,7 @@
 #include "datatypes.h"
 #include "functions.h"
 
-void multiply(Instruction instr, struct Registers* rs);
+void multiply(Instruction instruction, struct Registers* registers);
 
 #endif
 

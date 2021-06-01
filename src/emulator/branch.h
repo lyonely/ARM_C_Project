@@ -4,7 +4,7 @@
 #include "datatypes.h"
 #include "functions.h"
 
-void branch(Instruction instr, struct Registers* reg);
+void branch(Instruction instruction, struct Registers* registers);
 
 #endif
 
