@@ -4,6 +4,7 @@
 #include "datatypes.h"
 #include "functions.h"
 
+/* Executes the branch instruction. */
 void branch(Instruction instruction, struct Registers* registers);
 
 #endif

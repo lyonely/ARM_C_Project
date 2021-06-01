@@ -4,6 +4,7 @@
 #include "datatypes.h"
 #include "functions.h"
 
+/* Executes the multiply instruction */
 void multiply(Instruction instruction, struct Registers* registers);
 
 #endif
