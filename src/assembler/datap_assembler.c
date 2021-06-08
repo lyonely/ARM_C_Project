@@ -59,9 +59,11 @@ void set_op2reg_shifttype_field(int type, Instruction* i) {
 	*i |= (type << 5);
 }
 
-// Sets bits 11-8 to rs number and sets bit 4 (register specified shift)
+// Sets bits 11-8 to rs number, sets bit 7 = 0 and sets bit 4
+// (register specified shift)
 void set_op2reg_shiftreg_field(int rs, Instruction* i) {
 	*i |= 0x10;
+	*i &= 0xFFFFFF7F;
 	*i |= (rs << 8);
 }
 
@@ -70,3 +72,6 @@ void set_op2reg_rm_field(int rm, Instruction* i) {
 	*i |= rm;
 }
 
+void build_datap_instr(Instruction* i) {
+
+}
