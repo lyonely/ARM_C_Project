@@ -9,5 +9,9 @@ assemble.o: assemble.c datatypes.h
 
 datap_assembler.o: datap_assembler.c datap_assembler.h datatypes.h
 
+functions.o: functions.c functions.h datatypes.h
+	$(CC) $(CFLAGS) -c functions.c
+
 clean:
 	rm -f *.o assemble
+	
