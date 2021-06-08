@@ -5,5 +5,9 @@ BUILD: assemble
 assemble: assemble.o
 	$(CC) assemble.o -o ../../out/assemble
 
+assemble.o: assemble.c datatypes.h
+
+datap_assembler.o: datap_assembler.c datap_assembler.h datatypes.h
+
 clean:
 	rm -f *.o assemble

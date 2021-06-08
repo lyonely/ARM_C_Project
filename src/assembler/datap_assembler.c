@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "datatypes.h"
 
 // TODO: check input values are of valid length before setting bits
 
