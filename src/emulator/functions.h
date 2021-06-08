@@ -9,10 +9,10 @@ long readBinary(FILE* file, void *destination);
 uint32_t rotate_right(uint32_t value, uint32_t rotation); 
 
 // checks if CPSR flags should be updated
-uint32_t is_set(Instruction instruction);
+int is_set(Instruction instruction);
 
 // (for data processing) checks if operand2 is an immediate constant
-uint32_t is_immediate(Instruction instruction);
+int is_immediate(Instruction instruction);
 
 // (for data processing) returns the opcode
 int opcode(Instruction instruction);
@@ -27,13 +27,13 @@ int rn(Instruction instruction);
 int operand2(Instruction instruction);
 
 // (for single data transfer) checks if pre-indexing flag is set
-uint32_t is_pre_indexing(Instruction instruction);
+int is_pre_indexing(Instruction instruction);
 
 // (for single data transfer) checks if up bit is set
-uint32_t is_up(Instruction instruction);
+int is_up(Instruction instruction);
 
 // (for single data transfer) checks if load bit is set
-uint32_t is_load(Instruction instruction);
+int is_load(Instruction instruction);
 
 // returns the condition field
 int get_cond(Instruction instruction);
@@ -45,7 +45,7 @@ enum InstructionType get_instr_type(Instruction instruction);
 int instruction_is_valid(Instruction instruction, struct Registers* regs);
 
 //checks if the accumulate bit is set
-uint32_t accumulate(Instruction instruction);
+int accumulate(Instruction instruction);
 
 //sets the v bit if the value is not zero
 void set_v(Register *cpsr, int value);  
@@ -77,11 +77,11 @@ int rsMultiply(Instruction instruction);
 //(for multiply) returns the rm operand register
 int rmMultiply(Instruction instruction);
 
+//prints the state of the registers
 void print_registers(struct Registers *regs);
 
-/*
-void display_memory(Byte* memory, int memory_capacity); #todo
-*/
+//prints non-zero memory
+void print_memory(Byte* memory);
 
 //(for branch) returns the offset
 int sdt_offset(Instruction instruction); 

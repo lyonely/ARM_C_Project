@@ -1,23 +1,65 @@
 #include <stdio.h>
 #include "functions.h"
 
+#define N_FLAG 1<<31
+#define Z_FLAG 1<<30
+#define C_FLAG 1<<29
+#define V_FLAG 1<<28
+
+#define SET_CONDITION_MASK 1<<20
+#define IMMEDIATE_MASK 1<<25
+#define OPCODE_MASK 0x1e00000
+#define OPCODE_SHIFT 21
+#define RN_MASK 0xf0000
+#define RN_SHIFT 16
+#define RD_MASK 0xf000
+#define RD_SHIFT 12
+#define OPERAND2_MASK 0xfff
+
+#define ACCUMULATE_MASK 1<<21
+#define RN_MULTIPLY_MASK 0xf000
+#define RN_MULTIPLY_SHIFT 12
+#define RD_MULTIPLY_MASK 0xf0000
+#define RD_MULTIPLY_SHIFT 16
+#define RS_MULTIPLY_MASK 0xf00
+#define RS_MULTIPLY_SHIFT 8
+#define RM_MULTIPLY_MASK 0xf
+
+#define PRE_INDEXING_SHIFT 24
+#define UP_SHIFT 23
+#define LOAD_SHIFT 20
+#define OFFSET_MASK 0xfff
+#define COND_SHIFT 28
+
+#define V0_MASK 0xefffffff
+#define C0_MASK 0xdfffffff
+#define Z0_MASK 0xbfffffff
+#define N0_MASK 0x7fffffff
+#define BIT_31_MASK 1<<31
+#define RESET_FLAGS_MASK 0x0fffffff
+
+#define MULTIPLY_BITS_7_4 9
+#define MULTIPLY_BITS_27_22 0
+#define BIT_27_MASK 1<<27
+#define BIT_26_MASK 1<<26
+#define BIT_25_MASK 1<<25
+#define BIT_7_MASK 1<<7
+#define BIT_4_MASK 1<<4
+
 long readBinary(FILE* file, void *destination) {
   fseek(file, 0, SEEK_END); // seek to end of file
   long size = ftell(file) + 1; // get current file pointer + 1 for zero instruction at end of file
   fseek(file, 0, SEEK_SET); // seek back to beginning of file for reading
-  fread(destination, 1, sizeof(destination), file);
+  fread(destination, 1, (size_t) size, file);
   return size;
 }
 
 int instruction_is_valid(Instruction instruction, struct Registers* regs) {
   
-  uint32_t N_flag = 1 << 31;
-  uint32_t Z_flag = 1 << 30;
-  uint32_t V_flag = 1 << 28;
   uint32_t cpsr = regs->cpsr;
 
-  uint32_t N_equals_V = (N_flag & cpsr) == ((V_flag & cpsr) << 3);
-  uint32_t Z_set = Z_flag & cpsr;
+  uint32_t N_equals_V = (N_FLAG & cpsr) == ((V_FLAG & cpsr) << 3);
+  uint32_t Z_set = Z_FLAG & cpsr;
   
   int isValid = 0;
 
@@ -36,7 +78,6 @@ int instruction_is_valid(Instruction instruction, struct Registers* regs) {
   return isValid;
 }
 
-
 /*data processing instructions*/
 
 // Performs right rotation on a 32-bit binary number
@@ -46,112 +87,112 @@ uint32_t rotate_right(uint32_t value, uint32_t rotation) {
 	return (shifted | rotated_bits);
 }
 
-uint32_t is_set(Instruction instruction) {
-  return (instruction & 1 << 20);
+int is_set(Instruction instruction) {
+  return (instruction & SET_CONDITION_MASK);
 }
 
-uint32_t is_immediate(Instruction instruction) {
-  return (instruction & 1 << 25);
+int is_immediate(Instruction instruction) {
+  return (instruction & IMMEDIATE_MASK);
 }
 
 int opcode(Instruction instruction) {
-  return (instruction & 0x1e00000) >> 21;
+  return (instruction & OPCODE_MASK) >> OPCODE_SHIFT;
 }
 
 int rn(Instruction instruction) {
-  return (instruction & 0xf0000) >> 16;
+  return (instruction & RN_MASK) >> RN_SHIFT;
 }
 
 int rd(Instruction instruction) {
-  return (instruction & 0xf000) >> 12;
+  return (instruction & RD_MASK) >> RD_SHIFT;
 }
 				
 int operand2(Instruction instruction) {
-  return (instruction & 0xfff);
+  return (instruction & OPERAND2_MASK);
 }
 
 /*multiply instruction*/
 
-uint32_t accumulate(Instruction instruction) {
-  return (instruction & 1 << 21);
+int accumulate(Instruction instruction) {
+  return (instruction & ACCUMULATE_MASK);
 }
 
 int rnMultiply(Instruction instruction) {
-  return (instruction & 0xf000) << 12;
+  return (instruction & RN_MULTIPLY_MASK) >> RN_MULTIPLY_SHIFT;
 }
 
 int rdMultiply(Instruction instruction){
-  return (instruction & 0xf0000) << 16;
+  return (instruction & RD_MULTIPLY_MASK) >> RD_MULTIPLY_SHIFT;
 }
 
 int rsMultiply(Instruction instruction) {
-  return (instruction & 0xf00) << 8;
+  return (instruction & RS_MULTIPLY_MASK) >> RS_MULTIPLY_SHIFT;
 }
 
 int rmMultiply(Instruction instruction) {
-  return (instruction & 0xf);
+  return (instruction & RM_MULTIPLY_MASK);
 }
 
 /*single data transfer*/
-uint32_t is_pre_indexing(Instruction instruction) {
-  return (instruction & 1 << 24);
+int is_pre_indexing(Instruction instruction) {
+  return (instruction >> PRE_INDEXING_SHIFT) & 1;
 }
 
-uint32_t is_up(Instruction instruction) {
-  return (instruction & 1 << 23);
+int is_up(Instruction instruction) {
+  return (instruction >> UP_SHIFT) & 1;
 }
 
-uint32_t is_load(Instruction instruction) {
-  return (instruction & 1 << 20);
+int is_load(Instruction instruction) {
+  return (instruction >> LOAD_SHIFT) & 1;
 }
 
 int sdt_offset(Instruction instruction) {
-  return (instruction & 0xfff);
+  return (instruction & OFFSET_MASK);
 }
 
 int get_cond(Instruction instruction) {
-  return (instruction >> 28);
+  return (instruction >> COND_SHIFT);
 }
 
 void set_v(Register *cpsr, int value) {
 	if (value) {
-		*cpsr |= (1 << 28);
+		*cpsr |= V_FLAG;
 	} else {
-		*cpsr &= 0xefffffff;
+		*cpsr &= V0_MASK;
 	}
 }
 
 void set_c(Register *cpsr, int value) {
 	if (value) {
-		*cpsr |= (1 << 29);
+		*cpsr |= C_FLAG;
 	} else {
-		*cpsr &= 0xdfffffff;
+		*cpsr &= C0_MASK;
 	}
 }
 
 void set_z(Register *cpsr, int value) {
 	if (value) {
-		*cpsr |= (1 << 30);
+		*cpsr |= Z_FLAG;
 	} else {
-		*cpsr &= 0xbfffffff;
+		*cpsr &= Z0_MASK;
 	}
 }
 
 void set_n(Register *cpsr, int value) {
 	if (value) {
-		*cpsr |= (1 << 31);
+		*cpsr |= N_FLAG;
 	} else {
-		*cpsr &= 0x7fffffff;
+		*cpsr &= N0_MASK;
 	}
 }
 
 void set_n_z(Register *cpsr, int result) {
   set_z(cpsr, !result);
-  set_n(cpsr, 0x80000000 & result);
+  set_n(cpsr, BIT_31_MASK & result);
 }
 
 void reset_flags(Register *cpsr) {
-	*cpsr &= 0x0fffffff;
+	*cpsr &= RESET_FLAGS_MASK;
 }
 
 enum InstructionType get_instr_type(Instruction instruction) {
@@ -159,19 +200,23 @@ enum InstructionType get_instr_type(Instruction instruction) {
     return ALLZERO;
   }
 
-  if (instruction & (1<<27)) {
+  if (((instruction >> 4) & ((1 << 4) -1)) == MULTIPLY_BITS_7_4 && (((instruction >> 22) & ((1 << 6) -1)) == MULTIPLY_BITS_27_22)) {
+    return MUL;
+  }
+
+  if (instruction & BIT_27_MASK) {
     return BRANCH; 
   }
 
-  if (instruction & (1<<26)) {
+  if (instruction & BIT_26_MASK) {
     return SDT;
   }
 
-  if (instruction & (1<<25) || !(instruction & (1<<7)) || !(instruction & (1<<4))) {
+  if (instruction & BIT_25_MASK || !(instruction & BIT_7_MASK) || !(instruction & BIT_4_MASK)) {
     return DP;
   }
   
-  return MUL;
+  return NOOP;
 }
 
 void print_registers(struct Registers *reg) {
@@ -179,12 +224,28 @@ void print_registers(struct Registers *reg) {
 
   for (int i = 0; i < 13; i++) {
     if (i < 10) {
-      printf("$%d  : %8x \n", i, reg->general_regs[i]);
+      printf("$%d  : %10d (0x%08x)\n", i, reg->general_regs[i], reg->general_regs[i]);
     } else {
-      printf("$%d : %8x \n", i, reg->general_regs[i]);
+      printf("$%d : %10d (0x%08x)\n", i, reg->general_regs[i], reg->general_regs[i]);
     }
   }
 
-  printf("PC  : %8x \n", reg->pc);
-  printf("CPSR: %8x \n", reg->cpsr);
+  printf("PC  : %10d (0x%08x)\n", reg->pc, reg->pc);
+  printf("CPSR: %10d (0x%08x)\n", reg->cpsr, reg->cpsr);
+}
+
+void print_memory(Byte* memory) {
+  printf("Non-zero memory:\n");
+
+  for (int i = 0; i < MEMORY_CAPACITY; i+=4) {
+
+    if (*((uint32_t*) (memory + i))) {
+      printf("0x%08x: 0x", i);
+      
+      for (int j = 0; j < 4; j++) {
+        printf("%02x", memory[i+j]);
+      }
+      printf("\n");
+    }
+  }
 }

@@ -4,16 +4,18 @@
 #include "datatypes.h"
 
 int carry_output(int rm_value, int shift_type, int shift_value) {
-	int carry;
-	switch(shift_type) {
-		// Logical left
-		case 0: carry = (rm_value << (shift_value - 1)) >> 31; break;
-		// Logical right and arithmetic right
-		case 1: 
-		case 2: carry = (rm_value >> (shift_value - 1)) & 0x1; break;
-		// Rotate right
-		case 3: carry = (rm_value >> (shift_value - 1)) & 0x1; break;
-	}
+	int carry = 0;
+	if (shift_value > 0) {
+		switch(shift_type) {
+			// Logical left
+			case 0: carry = (rm_value << (shift_value - 1)) >> 31; break;
+			// Logical right and arithmetic right
+			case 1: 
+			case 2: carry = (rm_value >> (shift_value - 1)) & 0x1; break;
+			// Rotate right
+			case 3: carry = (rm_value >> (shift_value - 1)) & 0x1; break;
+		}
+	}	
 	return carry;
 }
 
@@ -21,7 +23,7 @@ int shift_result(int rm_value, int shift_type, int shift_value) {
 	int result;
 	switch(shift_type) {
 		// Logical left
-		case 0: result = rm_value << shift_value; break;
+		case 0: result = rm_value << shift_value; break; 
 		// Logical right
 		case 1: result = rm_value >> shift_value; break;
 		// Arithmetic right
