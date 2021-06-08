@@ -26,6 +26,8 @@ int main(int argc, char **argv) {
     perror("Error reading file.\n");
     exit(EXIT_FAILURE);
   }
+  
+  fclose(fp);
 
   /* TEXT FILE HAS BEEN READ INTO ASSEMBLY_CODE ARRAY */
 
