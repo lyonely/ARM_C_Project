@@ -2,6 +2,22 @@
 #include "datatypes.h"
 #include "datap_assembler.h"
 
+int get_opcode(Operation op) {
+  switch(op) {
+    case AND: return 0b0000;
+    case EOR: return 0b0001;
+    case SUB: return 0b0010;
+    case RSB: return 0b0011;
+    case ADD: return 0b0100;
+    case TST: return 0b1000;
+    case TEQ: return 0b1001;
+    case CMP: return 0b1010;
+    case ORR: return 0b1100;
+    case MOV: return 0b1101;
+    default: return 0b1111; // unused opcode value
+  }
+}
+
 // Sets bits 31-28 to 1110 (always cond)
 void set_cond_field(Instruction* i) {
 	*i &= 0x0fffffff;

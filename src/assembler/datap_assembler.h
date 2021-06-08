@@ -15,6 +15,9 @@ typedef struct DataProcessingInstruction {
   int rm; // is_imm = 0 
 } datap_instr_t;
 
+// Returns opcode from mnemonic
+int get_opcode(Operation op);
+
 // Sets bits 31-28 to 1110 (always cond)
 void set_cond_field(Instruction* i);
 
@@ -51,5 +54,6 @@ void set_op2reg_shiftreg_field(int rs, Instruction* i);
 // Sets bits 3-0 to rm number
 void set_op2reg_rm_field(int rm, Instruction* i);
 
+// Converts data processing struct into Instruction
 void build_datap_instr(datap_instr_t* instr, Instruction* i);
 
