@@ -21,5 +21,7 @@ SymbolTable create_symboltable(char* source);
 
 Address lookup_symbol(SymbolTable* table, char* symbol);
 
+void free_symboltable(SymbolTable *table);
+
 
 #endif 
