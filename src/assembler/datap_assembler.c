@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include "datatypes.h"
-
-// TODO: check input values are of valid length before setting bits
+#include "datap_assembler.h"
 
 // Sets bits 31-28 to 1110 (always cond)
 void set_cond_field(Instruction* i) {
@@ -72,6 +71,25 @@ void set_op2reg_rm_field(int rm, Instruction* i) {
 	*i |= rm;
 }
 
-void build_datap_instr(Instruction* i) {
-
+void build_datap_instr(datap_instr_t* instr, Instruction* i) {
+  set_cond_field(i);
+  set_opcode_field(instr->opcode, i);
+  set_flag_field(instr->opcode, i);
+  set_rn_field(instr->rn, i);
+  set_rd_field(instr->rd, i);
+  
+  if (instr->is_imm) {
+    set_imm_field(i);
+    set_op2imm_rotate_field(instr->rotation, i);
+    set_op2imm_imm_field(instr->imm, i);
+  } else {
+    set_op2reg_rm_field(instr->rm, i);
+    set_op2reg_shifttype_field(instr->shift_type, i);
+    if (instr->shift_by_reg) { 
+      set_op2reg_shiftreg_field(instr->rs, i);
+    } else {
+      set_op2reg_shiftamt_field(instr->shift_amount, i);
+    }
+  }
 }
+

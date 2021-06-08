@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include "datatypes.h"
 
-struct DataProcessingInstruction {
+typedef struct DataProcessingInstruction {
   int opcode;
   int rd;
   int rn;
@@ -51,5 +51,5 @@ void set_op2reg_shiftreg_field(int rs, Instruction* i);
 // Sets bits 3-0 to rm number
 void set_op2reg_rm_field(int rm, Instruction* i);
 
-void build_datap_instr(Instruction* i);
+void build_datap_instr(datap_instr_t* instr, Instruction* i);
 
