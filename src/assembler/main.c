@@ -30,6 +30,8 @@ int main(int argc, char **argv) {
 
   /* TEXT FILE HAS BEEN READ INTO ASSEMBLY_CODE ARRAY */
 
+  // assemble(assembly_code, size);
+
   free(assembly_code);
   return 0;
 }

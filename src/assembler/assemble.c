@@ -5,7 +5,7 @@
 #include "datap_assembler.h"
 #include "functions.h"
 
-void assemble(int num_lines) {
+void assemble(char** assembly_code, int num_lines) {
   // Converted instructions stored here
   Instruction *instructions = calloc(num_lines, sizeof(Instruction));
   
