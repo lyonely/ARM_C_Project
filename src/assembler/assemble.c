@@ -32,7 +32,7 @@ void assemble(int num_lines) {
       case TEQ:
       case CMP: 
         datap_instr = malloc(sizeof(DataProcessingInstruction));
-        // Populate datap_instr with the correct fields //
+        // TODO: Populate datap_instr with the correct fields
         build_datap_instr(datap_instr, instr);
         break;
       case MUL:
