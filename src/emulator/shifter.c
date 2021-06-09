@@ -94,32 +94,31 @@ int shift(int rm_value, int shift_type, int shift_value, int set_cpsr, Register 
 }
 
 
-int operand2_shiftedReg(int op2, struct Registers* registers, int set_cpsr){
+int operand2_shifted_reg(int op2, struct Registers* registers, int set_cpsr){
   
-  	// get pointer to register rm, get shift type & get shift
-    int rm = op2 & 0xf;
-	int rmValue = registers -> general_regs[rm];
+  // get pointer to register rm, get shift type & get shift
+  int rm = op2 & 0xf;
+	int rm_value = registers -> general_regs[rm];
 	int op2_shift = op2 >> 4;
 	int shift_type = (op2_shift >> 1) & 0x2;
 
-    // extract bit 4: indicates if shift value is a 5-bit uint or a register
-    int bitFour = op2_shift & 1;
+  // extract bit 4: indicates if shift value is a 5-bit uint or a register
+  int bit_four = op2_shift & 1;
 	
 	int shift_value = 0;
 
-    if(bitFour){
-    	// case when bitFour is 1 is optional
+    if(bit_four){
+    // case when bit_four is 1 is optional
 		// Hence blank code body; will revisit if there is sufficient time
     } else {
-      	// bitFour is 0
+    // bit_four is 0
 		// Shift amount is directly given in bits 7 - 11 of operand2
 		// which is bit 4 - 8 of shift variable
-		shift_value = op2_shift >> 3;
+		  shift_value = op2_shift >> 3;
     }
     
     Register *cpsr = &(registers -> cpsr);
     // shift function executes a shift operation, returns value of op2
-    return shift(rmValue, shift_type, shift_value, set_cpsr, cpsr);
+    return shift(rm_value, shift_type, shift_value, set_cpsr, cpsr);
 } 
-
 

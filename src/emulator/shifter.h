@@ -16,7 +16,7 @@ int shift_result(int rm_value, int shift_type, int shift_value);
 int shift(int rm_value, int shift_type, int shift_value, int set_cpsr, Register *cpsr);
 
 // returns value of operand2 from shifted register
-int operand2_shiftedReg(int op2, struct Registers* registers, int set_cpsr);
-
+int operand2_shifted_reg(int op2, struct Registers* registers, int set_cpsr);
 
 #endif
+

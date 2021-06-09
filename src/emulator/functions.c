@@ -46,7 +46,7 @@
 #define BIT_7_MASK 1<<7
 #define BIT_4_MASK 1<<4
 
-long readBinary(FILE* file, void *destination) {
+long read_binary(FILE* file, void *destination) {
   fseek(file, 0, SEEK_END); // seek to end of file
   long size = ftell(file) + 1; // get current file pointer + 1 for zero instruction at end of file
   fseek(file, 0, SEEK_SET); // seek back to beginning of file for reading
@@ -61,21 +61,21 @@ int instruction_is_valid(Instruction instruction, struct Registers* regs) {
   uint32_t N_equals_V = (N_FLAG & cpsr) == ((V_FLAG & cpsr) << 3);
   uint32_t Z_set = Z_FLAG & cpsr;
   
-  int isValid = 0;
+  int is_valid = 0;
 
   int cond = get_cond(instruction);
 
   switch(cond) {
-    case EQ: isValid = Z_set; break;
-    case NE: isValid = !Z_set; break;
-    case GE: isValid = N_equals_V; break;
-    case LT: isValid = !N_equals_V; break;
-    case GT: isValid = (!Z_set) && N_equals_V; break;
-    case LE: isValid = Z_set || (!N_equals_V); break;
-    case AL: isValid = 1; break;
-    default: isValid = 0;
+    case EQ: is_valid = Z_set; break;
+    case NE: is_valid = !Z_set; break;
+    case GE: is_valid = N_equals_V; break;
+    case LT: is_valid = !N_equals_V; break;
+    case GT: is_valid = (!Z_set) && N_equals_V; break;
+    case LE: is_valid = Z_set || (!N_equals_V); break;
+    case AL: is_valid = 1; break;
+    default: is_valid = 0;
   }
-  return isValid;
+  return is_valid;
 }
 
 /*data processing instructions*/
@@ -117,19 +117,19 @@ int accumulate(Instruction instruction) {
   return (instruction & ACCUMULATE_MASK);
 }
 
-int rnMultiply(Instruction instruction) {
+int rn_multiply(Instruction instruction) {
   return (instruction & RN_MULTIPLY_MASK) >> RN_MULTIPLY_SHIFT;
 }
 
-int rdMultiply(Instruction instruction){
+int rd_multiply(Instruction instruction){
   return (instruction & RD_MULTIPLY_MASK) >> RD_MULTIPLY_SHIFT;
 }
 
-int rsMultiply(Instruction instruction) {
+int rs_multiply(Instruction instruction) {
   return (instruction & RS_MULTIPLY_MASK) >> RS_MULTIPLY_SHIFT;
 }
 
-int rmMultiply(Instruction instruction) {
+int rm_multiply(Instruction instruction) {
   return (instruction & RM_MULTIPLY_MASK);
 }
 
@@ -249,3 +249,4 @@ void print_memory(Byte* memory) {
     }
   }
 }
+

@@ -35,6 +35,8 @@ void perform(enum InstructionType type, Instruction instruction, struct Register
 		case BRANCH:
 			branch(instruction, registers);
 			return;
+	  case NOOP:
+	    return;
 	}
 }
 
@@ -56,32 +58,32 @@ void perform(enum InstructionType type, Instruction instruction, struct Register
 void pipeline(struct Registers* registers, Byte* memory) {
 	Instruction fetched;
 	enum InstructionType type = ALLZERO;
-	Instruction toDecode;
-	Instruction toExecute;
+	Instruction to_decode;
+	Instruction to_execute;
 	int state = 0;
 	while (1) {
 		if (type == NOOP) {
 			continue;
 		}
 		if (state > 1) {
-			toExecute = toDecode;
-			toDecode = fetched;
+			to_execute = to_decode;
+			to_decode = fetched;
 			fetched = *((Instruction*) (memory + registers->pc));
-			perform(type, toExecute, registers, memory);
-			if ((type == BRANCH) && instruction_is_valid(toExecute, registers)) {
+			perform(type, to_execute, registers, memory);
+			if ((type == BRANCH) && instruction_is_valid(to_execute, registers)) {
 				state = 0;
 			}
-			type = get_instr_type(toDecode);
+			type = get_instr_type(to_decode);
 		} else if (state > 0) {
-			toDecode = fetched;
+			to_decode = fetched;
 			fetched = *((Instruction*) (memory + registers->pc));
-			type = get_instr_type(toDecode);
+			type = get_instr_type(to_decode);
 			state++;
 		} else {
 			fetched = *((Instruction*) (memory + registers->pc));
 			state++;
 		}
-		registers->pc+=4;
+		registers->pc += 4;
 	}
 }
 
@@ -100,7 +102,7 @@ int main(int argc, char *argv[]) {
 	}
 	
 	Byte *memory = calloc(MEMORY_CAPACITY, 1);
-	readBinary(code, memory);
+	read_binary(code, memory);
 	
 	struct Registers* registers = calloc(1, sizeof(struct Registers));
 	

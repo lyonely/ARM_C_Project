@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "datatypes.h"
 
-long readBinary(FILE* file, void *destination);
+long read_binary(FILE* file, void *destination);
 
 // performs right rotation on a 32-bit binary number
 uint32_t rotate_right(uint32_t value, uint32_t rotation); 
@@ -66,16 +66,16 @@ void set_n_z(Register *cpsr, int result);
 void reset_flags(Register *cpsr);
 
 //(for multiply) returns the rn operand register
-int rnMultiply(Instruction instruction);
+int rn_multiply(Instruction instruction);
 
 //(for multiply) returns the destination register
-int rdMultiply(Instruction instruction);
+int rd_multiply(Instruction instruction);
 
 //(for multiply) returns the rs operand register
-int rsMultiply(Instruction instruction);
+int rs_multiply(Instruction instruction);
 
 //(for multiply) returns the rm operand register
-int rmMultiply(Instruction instruction);
+int rm_multiply(Instruction instruction);
 
 //prints the state of the registers
 void print_registers(struct Registers *regs);
@@ -86,5 +86,5 @@ void print_memory(Byte* memory);
 //(for branch) returns the offset
 int sdt_offset(Instruction instruction); 
 
-
 #endif
+

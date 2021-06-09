@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define MEMORY_CAPACITY 1<<15
+#define MEMORY_CAPACITY (1 << 15)
 
 typedef unsigned char Byte;
 typedef uint32_t Instruction;
@@ -17,7 +17,6 @@ enum Cond {
 	GT = 0b1100, 
 	LE = 0b1101, 
 	AL = 0b1110,
-
 };
 
 enum InstructionType {
@@ -27,7 +26,6 @@ enum InstructionType {
 	BRANCH = 1, 
 	NOOP = -1, 
 	ALLZERO = 0
-
 };
 
 struct Registers {
