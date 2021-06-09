@@ -3,16 +3,16 @@
 #include "datatypes.h"
 
 
-//Returns mnemonic for a given string
-Mnemonic string_to_mnemonic(char *str);
+//Returns operation for a given string
+Operation string_to_operation(char *str);
 
 
 //Returns the condition for a given string
 Condition string_to_condition(char *str);
 
 
-//Returns opcode for a given mnemonic
-Opcode mnemonic_to_opcode(Mnemonic mnemonic);
+//Returns opcode for a given operation 
+Opcode mnemonic_to_opcode(Operation operation);
 
 
 //Returns register address (number) given by the string
