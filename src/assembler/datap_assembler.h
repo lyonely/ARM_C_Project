@@ -44,7 +44,7 @@ void set_op2reg_shiftreg_field(int rs, Instruction* i);
 void set_op2reg_rm_field(int rm, Instruction* i);
 
 // Converts data processing struct into Instruction
-void build_datap_instr(datap_instr_t* instr, Instruction* i);
+void build_datap_instr(DataProcessingInstruction* instr, Instruction* i);
 
 #endif
 
