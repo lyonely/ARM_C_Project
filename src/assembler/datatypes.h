@@ -40,6 +40,7 @@ typedef enum {
     ANDEQ
 } Operation;
 
+// used for defining opcode
 typedef enum {
   // And. 
   AND_O = 0x0,
@@ -63,13 +64,15 @@ typedef enum {
   MOV_O = 0xD,
 } Opcode;
 
+//used to identify type of shift for shifter
 typedef enum {
   LSL_S = 0,
   LSR_S = 1,
   ASR_S = 2,
   ROR_S = 3,
-} Shift; 
+} Shift;
 
+// used to identify type of condition
 typedef enum {
   EQ = 0,
   NE = 1,
