@@ -105,5 +105,17 @@ typedef struct {
   int rm;
 } MultiplyInstruction;
 
+typedef uint32_t Address;
+
+typedef struct {
+  char* symbol;
+  Address address;
+} Symbol;
+
+typedef struct {
+  int size;
+  Symbol* table;
+} SymbolTable;
+
 #endif
 
