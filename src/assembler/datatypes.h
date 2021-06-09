@@ -7,11 +7,11 @@ typedef uint32_t Instruction;
 typedef struct {
     char ** array;
     uint16_t size;
-} String_array;    
+} StringArray;    
+
+typedef uint8_t RegAddress;
 
 typedef uint32_t Word;
-
-typedef uint8_t Reg_address;
 
 /* Enum for representing the Mnemonics of different operations */
 typedef enum {
