@@ -97,6 +97,13 @@ typedef struct {
   int rm; // is_imm = 0 
 } DataProcessingInstruction;
 
+typedef struct {
+  int acc;
+  int rd;
+  int rn;
+  int rs;
+  int rm;
+} MultiplyInstruction;
 
 #endif
 
