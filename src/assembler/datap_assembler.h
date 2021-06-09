@@ -1,19 +1,8 @@
+#ifndef DATAP_ASSEMBLER_H
+#define DATAP_ASSEMBLER_H
+
 #include <stdint.h>
 #include "datatypes.h"
-
-typedef struct DataProcessingInstruction {
-  int opcode;
-  int rd;
-  int rn;
-  int is_imm;
-  int rotation; // set when is_imm = 1
-  int imm; // set when is_imm = 1
-  int shift_type; // set when is_imm = 0
-  int shift_by_reg; // is_imm = 0
-  int shift_amount; // is_imm = 0, shift_by_reg = 0
-  int rs; // is_imm = 0, shift_by_reg = 1
-  int rm; // is_imm = 0 
-} datap_instr_t;
 
 // Returns opcode from mnemonic
 int get_opcode(Operation op);
@@ -25,10 +14,10 @@ void set_cond_field(Instruction* i);
 void set_imm_field(Instruction* i);
 
 // Sets bits 24-21 to specified opcode
-void set_opcode_field(int opcode, Instruction* i);
+void set_opcode_field(Opcode opcode, Instruction* i);
 
 // Sets bit 20 if opcode is tst, teq, cmp
-void set_flag_field(int opcode, Instruction* i);
+void set_flag_field(Opcode opcode, Instruction* i);
 
 // Sets bits 19-16 to rn number
 void set_rn_field(int rn, Instruction* i);
@@ -46,7 +35,7 @@ void set_op2imm_imm_field(int imm, Instruction* i);
 void set_op2reg_shiftamt_field(int amt, Instruction* i); 
 
 // Sets bits 6-5 to shift type
-void set_op2reg_shifttype_field(int type, Instruction* i);
+void set_op2reg_shifttype_field(Shift type, Instruction* i);
 
 // Sets bits 11-8 to rs number, bit 7 = 0 and sets bit 4 (register specified shift)
 void set_op2reg_shiftreg_field(int rs, Instruction* i); 
@@ -56,4 +45,6 @@ void set_op2reg_rm_field(int rm, Instruction* i);
 
 // Converts data processing struct into Instruction
 void build_datap_instr(datap_instr_t* instr, Instruction* i);
+
+#endif
 

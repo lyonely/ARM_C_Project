@@ -1,22 +1,5 @@
 #include <stdint.h>
 #include "datatypes.h"
-#include "datap_assembler.h"
-
-int get_opcode(Operation op) {
-  switch(op) {
-    case AND: return 0b0000;
-    case EOR: return 0b0001;
-    case SUB: return 0b0010;
-    case RSB: return 0b0011;
-    case ADD: return 0b0100;
-    case TST: return 0b1000;
-    case TEQ: return 0b1001;
-    case CMP: return 0b1010;
-    case ORR: return 0b1100;
-    case MOV: return 0b1101;
-    default: return 0b1111; // unused opcode value
-  }
-}
 
 // Sets bits 31-28 to 1110 (always cond)
 void set_cond_field(Instruction* i) {
@@ -30,12 +13,12 @@ void set_imm_field(Instruction* i) {
 }
 
 // Sets bits 24-21 to specified opcode
-void set_opcode_field(int opcode, Instruction* i) {
+void set_opcode_field(Opcode opcode, Instruction* i) {
 	*i |= (opcode << 21);
 }
 
 // Sets bit 20 if opcode is tst, teq, cmp
-void set_flag_field(int opcode, Instruction* i) {
+void set_flag_field(Opcode opcode, Instruction* i) {
 	switch(opcode) {
 		case 8:
 		case 9:
@@ -70,7 +53,7 @@ void set_op2reg_shiftamt_field(int amt, Instruction* i) {
 }
 
 // Sets bits 6-5 to shift type
-void set_op2reg_shifttype_field(int type, Instruction* i) {
+void set_op2reg_shifttype_field(Shift type, Instruction* i) {
 	*i |= (type << 5);
 }
 
@@ -87,7 +70,7 @@ void set_op2reg_rm_field(int rm, Instruction* i) {
 	*i |= rm;
 }
 
-void build_datap_instr(datap_instr_t* instr, Instruction* i) {
+void build_datap_instr(DataProcessingInstruction* instr, Instruction* i) {
   set_cond_field(i);
   set_opcode_field(instr->opcode, i);
   set_flag_field(instr->opcode, i);
