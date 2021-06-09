@@ -117,5 +117,9 @@ typedef struct {
   Symbol* table;
 } SymbolTable;
 
+typedef struct {
+  Condition cond;
+  char* symbol;
+} BranchInstruction;
 #endif
 
