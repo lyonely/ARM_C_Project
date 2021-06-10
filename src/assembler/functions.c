@@ -46,4 +46,3 @@ void set_op2reg_rm_field(int rm, Instruction* i) {
 	*i |= rm;
 }
 
-

@@ -43,6 +43,7 @@ void assemble(char** assembly_code, int num_lines) {
         datap_instr = malloc(sizeof(DataProcessingInstruction));
         // TODO: Populate datap_instr with the correct fields
         build_datap_instr(datap_instr, instr);
+        free(datap_instr);
         break;
 
       // Multiply
@@ -51,6 +52,7 @@ void assemble(char** assembly_code, int num_lines) {
         mul_instr = malloc(sizeof(MultiplyInstruction));
         // TODO: Populate mul_instr with correct fields
         build_multiply_instr(mul_instr, instr);
+        free(mul_instr);
         break;
       
       // Single Data Transfer
@@ -58,6 +60,7 @@ void assemble(char** assembly_code, int num_lines) {
       case STR:
         sdt_instr = malloc(sizeof(DataTransferInstruction));
         build_sdt_instr(sdt_instr, instr);
+        free(sdt_instr);
         break;
 
       // Branch
@@ -70,6 +73,7 @@ void assemble(char** assembly_code, int num_lines) {
       case B:
         branch_instr = malloc(sizeof(BranchInstruction));
         // build_branch_instr(branch_instr, instr, curr_addr, symboltable);
+        free(branch_instr);
         break;
 
       default:
@@ -82,4 +86,5 @@ void assemble(char** assembly_code, int num_lines) {
   
   // Writes instruction array to binary file
   write_to_file(instructions, num_lines);
+  free(instructions);
 }
