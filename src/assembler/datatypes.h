@@ -2,6 +2,8 @@
 #define ASSEMBLER_DATATYPES_H
 #include <stdint.h>
 
+#define MAX_CHARS_PER_LINE (511)
+
 typedef uint32_t Instruction;
 
 typedef struct {
