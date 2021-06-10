@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "assemble.h"
+#include "datatypes.h"
 
 int main(int argc, char **argv) {
   FILE *fp = fopen(argv[1], "r");
@@ -27,10 +28,17 @@ int main(int argc, char **argv) {
   }
   
   fclose(fp);
+  
+  StringArray *source = malloc(sizeof(StringArray));
 
-  /* TEXT FILE HAS BEEN READ INTO ASSEMBLY_CODE ARRAY */
+  source->array = assembly_code;
+  source->size = size;
+  /* TEXT FILE HAS BEEN READ INTO SOURCE STRINGARRAY */
+
+  // assemble(source);
 
   free(assembly_code);
+  free(source);
   return 0;
 }
 
