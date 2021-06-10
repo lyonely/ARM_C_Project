@@ -1,5 +1,6 @@
 #ifndef ASSEMBLER_DATATYPES_H
 #define ASSEMBLER_DATATYPES_H
+#define WORD_SIZE 32
 #include <stdint.h>
 
 #define MAX_CHARS_PER_LINE (511)
