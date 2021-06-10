@@ -3,6 +3,8 @@
 #define WORD_SIZE 32
 #include <stdint.h>
 
+#define MAX_CHARS_PER_LINE (511)
+
 typedef uint32_t Instruction;
 
 typedef struct {

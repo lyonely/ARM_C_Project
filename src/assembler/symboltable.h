@@ -4,7 +4,7 @@
 #include "datatypes.h"
 
 /* Creates a symbol table given the source code as a string */
-SymbolTable create_symboltable(char* source);
+SymbolTable create_symboltable(char** source);
 
 /* Returns address of a label using a symbol table */
 Address lookup_symbol(SymbolTable* table, char* symbol);
@@ -13,4 +13,5 @@ Address lookup_symbol(SymbolTable* table, char* symbol);
 void free_symboltable(SymbolTable *table);
 
 
-#endif 
+#endif
+
