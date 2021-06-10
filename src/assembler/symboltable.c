@@ -5,33 +5,20 @@
 #include "symboltable.h"
 #include "datatypes.h"
 
-/*
-char* next_line(char* source){
-    char* line = strsep(&source, '\n');
+/* Helper function to check if given line is a label */
+int is_label(char* line);
 
-    if(line == NULL) {
-        return NULL;
-    } 
-
-    while(isspace(*line)) {
-        line++;
-    }
-
-    if(strcmp(line, "") == 0) {
-        return strsep(&source, '\n');
-    }
-
-    return line;
-}
-*/
-
-SymbolTable create_symboltable(char** source){
-    if(source == NULL){
+/* Creates a symbol table given the source code as an array of strings */
+SymbolTable create_symboltable(StringArray source){
+    if(source.array == NULL){
         perror("SourceFile is NULL, create_symboltable failed");
         exit(EXIT_FAILURE);
     }
 
+    int source_num_lines = source.size; 
+
     /* Allocates memory for a symbol table */
+    /* Assumes every 2 lines is a label */
     SymbolTable *symbol_table = malloc(sizeof(SymbolTable));
     if(symbol_table == NULL){
         perror("Memory couldn't be allocated for symbol table. Create_symboltable failed.");
@@ -39,8 +26,12 @@ SymbolTable create_symboltable(char** source){
     }
 
     /* Allocates enough memory for all symbols */
-    /* Initially assumes there will be at most strlen(source) / 2 symbols */
-    symbol_table->table = malloc(sizeof(strlen(source) / 2) * sizeof(Symbol));
+    /* Initially assumes every other line is a label */
+    symbol_table->table = malloc((MAX_CHARS_PER_LINE + 1) * source_num_lines / 2);
+    if(symbol_table->table == NULL){
+        perror("Memory couldn't be allocated for symbol table. Create_symboltable failed.");
+        exit(EXIT_FAILURE);
+    }
     
     symbol_table->size = 0;
 
@@ -48,8 +39,10 @@ SymbolTable create_symboltable(char** source){
     int current_table_size = 0;
     char* line;
 
-    while(line = next_line(source) != NULL){
-        if(is_label(line)){
+   for(int i = 0; i < source_num_lines; i ++){
+       line = source.array[i];
+
+       if(is_label(line)){
             // line is a label, remove the last ':' character
             line[strlen(line) - 1] = '\0';
         } else {
@@ -63,7 +56,7 @@ SymbolTable create_symboltable(char** source){
 
         symbol_table -> table[current_table_size] = new_symbol;
         current_table_size++;
-    }
+   }
 
     /* Reallocate memory to match actual number of symbols stored */
     symbol_table -> table = realloc(symbol_table -> table, current_table_size * sizeof(Symbol));
@@ -71,7 +64,6 @@ SymbolTable create_symboltable(char** source){
     return *symbol_table;
 }
 
-/* Checks if given line is a label */
 int is_label(char* line){
     char* colon = strchr(line, ':');
     if(colon != NULL){
