@@ -5,6 +5,6 @@
 #include "datatypes.h"
 
 //Converts multiply struct into Instruction
-void build_multiply_instruction(MultiplyInstruction* instr, Instruction* i);
+void build_multiply_instr(MultiplyInstruction* instr, Instruction* i);
 
 #endif

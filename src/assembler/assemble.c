@@ -3,6 +3,9 @@
 #include "assemble.h"
 #include "datatypes.h"
 #include "datap_assembler.h"
+#include "multiply_assembler.h"
+#include "branch_assembler.h"
+#include "sdt_assembler.h"
 #include "functions.h"
 
 void assemble(char** assembly_code, int num_lines) {
@@ -19,8 +22,12 @@ void assemble(char** assembly_code, int num_lines) {
     Operation op; // TODO: get operation
     
     DataProcessingInstruction *datap_instr;
+    MultiplyInstruction *mul_instr;
+    BranchInstruction *branch_instr;
+    DataTransferInstruction *sdt_instr;
 
     switch(op) {
+      // Data Processing
       case AND:
       case EOR:
       case SUB:
@@ -31,28 +38,46 @@ void assemble(char** assembly_code, int num_lines) {
       case TST:
       case TEQ:
       case CMP: 
+      case LSL:
+      case ANDEQ:
         datap_instr = malloc(sizeof(DataProcessingInstruction));
         // TODO: Populate datap_instr with the correct fields
         build_datap_instr(datap_instr, instr);
         break;
+
+      // Multiply
       case MUL:
       case MLA:
+        mul_instr = malloc(sizeof(MultiplyInstruction));
+        // TODO: Populate mul_instr with correct fields
+        build_multiply_instr(mul_instr, instr);
+        break;
+      
+      // Single Data Transfer
       case LDR:
       case STR:
+        sdt_instr = malloc(sizeof(DataTransferInstruction));
+        build_sdt_instr(sdt_instr, instr);
+        break;
+
+      // Branch
       case BEQ:
       case BNE:
+      case BGE:
       case BLT:
       case BGT:
       case BLE:
       case B:
-      case LSL:
-      case ANDEQ:
+        branch_instr = malloc(sizeof(BranchInstruction));
+        // build_branch_instr(branch_instr, instr, curr_addr, symboltable);
+        break;
+
       default:
         break;
     }
 
     instructions[current_line] = *instr;
-
+    current_line++;
   }
   
   // Writes instruction array to binary file
