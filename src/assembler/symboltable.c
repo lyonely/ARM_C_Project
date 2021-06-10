@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "typedefs.h"
 #include "symboltable.h"
 
 SymbolTable create_symboltable(char* source){
@@ -11,32 +10,56 @@ SymbolTable create_symboltable(char* source){
     }
 
     /* Allocates memory for a symbol table */
-    SymbolTable *table = calloc(strlen(source)/2, sizeof(Symbol));
-    if(table == NULL){
+    SymbolTable *symbol_table = malloc(sizeof(SymbolTable));
+    if(symbol_table == NULL){
         perror("Memory couldn't be allocated for symbol table. Create_symboltable failed.");
         exit(EXIT_FAILURE);
     }
+
+    /* Allocates enough memory for all symbols */
+    /* Initially assumes there will be at most strlen(source) / 2 symbols */
+    symbol_table -> table = malloc(sizeof(strlen(source) / 2) * sizeof(Symbol));
     
-    table -> size = 0;
+    symbol_table -> size = 0;
+
 
     Address address = 0;
-    int tableIndex = 0;
+    int current_table_size = 0;
+    char* line;
 
-    char* currentLine;
+    while(line = next_line(source) != NULL){
+        if(is_label(line)){
+            // line is a label, remove the last ':' character
+            line[strlen(line) - 1] = '\0';
+        } else {
+            // line is not a label, increment address;
+            address += sizeof(line);
+        }
 
+        Symbol new_symbol;
+        new_symbol.address = address;
+        new_symbol.symbol = line;
+
+        symbol_table -> table[current_table_size] = new_symbol;
+        current_table_size ++;
+    }
+
+    /* Reallocate memory to match actual number of symbols stored */
+    symbol_table -> table = realloc(symbol_table -> table, current_table_size * sizeof(Symbol));
+    symbol_table -> size = current_table_size;
+    return *symbol_table;
 }
 
-/* Checks if given line is preceded by a label */
+/* Checks if given line is a label */
 int is_label(char* line){
     char* colon = strchr(line, ':');
     if(colon != NULL){
         return 1;
     } 
-
     return 0;
 }
 
-/* Returns next line of a source code. */
+/* Returns next line of a source code upon every call. */
 /* Returns NULL if no more instructions to process */
 char* next_line(char* source){
     char* line = strsep(&source, '\n');
@@ -52,10 +75,11 @@ char* next_line(char* source){
 
     /* If line is just an empty string after whitespace removal,
        continue reading */
-    while(strcmp(line, "") == 0) {
-
+    if(strcmp(line, "") == 0) {
+        return strsep(&source, '\n');
     }
 
+    return line;
 }
 
 
