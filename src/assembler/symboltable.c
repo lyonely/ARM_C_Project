@@ -1,10 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "symboltable.h"
 #include "datatypes.h"
 
-SymbolTable create_symboltable(char* source){
+/*
+char* next_line(char* source){
+    char* line = strsep(&source, '\n');
+
+    if(line == NULL) {
+        return NULL;
+    } 
+
+    while(isspace(*line)) {
+        line++;
+    }
+
+    if(strcmp(line, "") == 0) {
+        return strsep(&source, '\n');
+    }
+
+    return line;
+}
+*/
+
+SymbolTable create_symboltable(char** source){
     if(source == NULL){
         perror("SourceFile is NULL, create_symboltable failed");
         exit(EXIT_FAILURE);
@@ -19,10 +40,9 @@ SymbolTable create_symboltable(char* source){
 
     /* Allocates enough memory for all symbols */
     /* Initially assumes there will be at most strlen(source) / 2 symbols */
-    symbol_table -> table = malloc(sizeof(strlen(source) / 2) * sizeof(Symbol));
+    symbol_table->table = malloc(sizeof(strlen(source) / 2) * sizeof(Symbol));
     
-    symbol_table -> size = 0;
-
+    symbol_table->size = 0;
 
     Address address = 0;
     int current_table_size = 0;
@@ -42,7 +62,7 @@ SymbolTable create_symboltable(char* source){
         new_symbol.symbol = line;
 
         symbol_table -> table[current_table_size] = new_symbol;
-        current_table_size ++;
+        current_table_size++;
     }
 
     /* Reallocate memory to match actual number of symbols stored */
@@ -59,30 +79,6 @@ int is_label(char* line){
     } 
     return 0;
 }
-
-/* Returns next line of a source code upon every call. */
-/* Returns NULL if no more instructions to process */
-char* next_line(char* source){
-    char* line = strsep(&source, '\n');
-
-    if(line == NULL) {
-        returns NULL;
-    } 
-
-    /* removes whitespace from line */
-    while(isspace(*line)) {
-        line ++;
-    }
-
-    /* If line is just an empty string after whitespace removal,
-       continue reading */
-    if(strcmp(line, "") == 0) {
-        return strsep(&source, '\n');
-    }
-
-    return line;
-}
-
 
 /* Returns address of a label using a symbol table */
 Address lookup_symbol(SymbolTable* table, char* symbol) {
@@ -117,7 +113,4 @@ void free_symboltable(SymbolTable *table){
 
     free(table);
 }
-
-
-
 
