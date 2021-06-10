@@ -9,13 +9,13 @@
 int is_label(char* line);
 
 /* Creates a symbol table given the source code as an array of strings */
-SymbolTable create_symboltable(StringArray source){
-    if(source.array == NULL){
+SymbolTable create_symboltable(StringArray* source){
+    if(source->array == NULL){
         perror("SourceFile is NULL, create_symboltable failed");
         exit(EXIT_FAILURE);
     }
 
-    int source_num_lines = source.size; 
+    int source_num_lines = source->size; 
 
     /* Allocates memory for a symbol table */
     /* Assumes every 2 lines is a label */
@@ -40,7 +40,7 @@ SymbolTable create_symboltable(StringArray source){
     char* line;
 
    for(int i = 0; i < source_num_lines; i ++){
-       line = source.array[i];
+       line = source->array[i];
 
        if(is_label(line)){
             // line is a label, remove the last ':' character
@@ -89,7 +89,6 @@ Address lookup_symbol(SymbolTable* table, char* symbol) {
     perror("Label not found in symbol table. Lookup_symbol failed");
     exit(EXIT_FAILURE);
 }
-
 
 /* Frees a symbol table, including memory used for every entry */
 void free_symboltable(SymbolTable *table){
