@@ -13,6 +13,18 @@ typedef uint8_t RegAddress;
 
 typedef uint32_t Word;
 
+typedef uint32_t Address;
+
+typedef struct {
+  char* symbol;
+  Address address;
+} Symbol;
+
+typedef struct {
+  int size;
+  Symbol* table;
+} SymbolTable;
+
 /* Enum for representing the Mnemonics of different operations */
 typedef enum {
     ADD,
@@ -96,6 +108,35 @@ typedef struct {
   int rs; // is_imm = 0, shift_by_reg = 1
   int rm; // is_imm = 0 
 } DataProcessingInstruction;
+
+typedef struct {
+  int acc;
+  int rd;
+  int rn;
+  int rs;
+  int rm;
+} MultiplyInstruction;
+
+typedef struct {
+  Condition cond;
+  char* symbol;
+} BranchInstruction;
+
+typedef struct {
+  Condition cond;
+  int is_imm;
+  int preindex;
+  int up_bit;
+  int load_store;
+  int rn;
+  int rd;
+  int imm_offset;
+  Shift shift_type;
+  int shift_by_reg;
+  int shift_amount;
+  int rs;
+  int rm;
+} DataTransferInstruction;
 
 
 #endif
