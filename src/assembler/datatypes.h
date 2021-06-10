@@ -81,9 +81,6 @@ typedef enum {
 //used to identify type of shift for shifter
 typedef enum {
   LSL_S = 0,
-  LSR_S = 1,
-  ASR_S = 2,
-  ROR_S = 3,
 } Shift;
 
 // used to identify type of condition

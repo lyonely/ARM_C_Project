@@ -103,3 +103,70 @@ Condition string_to_condition(char *str) {
   fprintf(stderr, "No such condition found.\n");
   exit(EXIT_FAILURE);
 }
+
+Opcode mnemonic_to_opcode(Operation operation) {
+	switch (operation) {
+    case ADD:
+      return ADD_O;
+      break;
+    case SUB:
+      return SUB_O;
+      break;
+    case RSB:
+      return RSB_O;
+      break;
+    case AND:
+      return AND_O;
+      break;
+    case EOR:
+      return EOR_O;
+      break;
+    case ORR:
+      return ORR_O;
+      break;
+    case MOV:
+      return MOV_O;
+      break;
+    case TST:
+      return TST_O;
+      break;
+    case TEQ:
+      return TEQ_O;
+      break;
+    case CMP:
+      return CMP_O;
+      break;
+    default:
+      fprintf(stderr, "No such opcode found.\n");
+      exit(EXIT_FAILURE);
+      break;
+  }			
+}	
+
+RegAddress string_to_reg_address(char *str) {
+	return strtol(&str[1], (char **) NULL, 10);
+}	
+
+Shift string_to_shift(char *str) {
+	if(!strcmp(str, "lsl")) {
+		return LSL_S;
+	}
+	fprintf(stderr, "No such shift found.\n");
+  exit(EXIT_FAILURE);
+}	
+
+void parse_shift(StringArray *tokens, Instruction *instruction) {
+	
+}
+
+void parse_operand(StringArray *tokens, Instruction *instruction) {
+
+}				
+
+Word parse_immediate_value(char *str) {
+	if(strstr(str, "0x")) {
+		return strtol(str, (char **)NULL, 16);
+	} else {
+		return strtol(str, (char **)NULL, 10);
+	}
+}	
