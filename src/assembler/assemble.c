@@ -7,17 +7,19 @@
 #include "branch_assembler.h"
 #include "sdt_assembler.h"
 #include "functions.h"
+#include "symboltable.h"
 
-void assemble(char** assembly_code, int num_lines) {
+void assemble(StringArray *source) {
   // Converted instructions stored here
-  Instruction *instructions = calloc(num_lines, sizeof(Instruction));
+  Instruction *instructions = calloc(source->size, sizeof(Instruction));
   
   // TODO: create symbol table (symboltable)
-  // TODO: read mnemonic and operands (parser)
+  create_symboltable(source);
+  // TODO: read mnemonic and operands (tokeniser)
 
   int current_line = 0;
   
-  while(current_line < num_lines) {
+  while(current_line < source->size) {
     Instruction *instr = malloc(sizeof(Instruction));
     Operation op; // TODO: get operation
     
@@ -85,6 +87,6 @@ void assemble(char** assembly_code, int num_lines) {
   }
   
   // Writes instruction array to binary file
-  write_to_file(instructions, num_lines);
+  write_to_file(instructions, source->size);
   free(instructions);
 }

@@ -5,15 +5,7 @@
 #include "symboltable.h"
 #include "datatypes.h"
 
-/*
-char* next_line(char* source){
-    char* line = strsep(&source, '\n');
-
-    if(line == NULL) {
-        return NULL;
-    } 
-
-    while(isspace(*line)) {
+/* char* next_line(char* source){ char* line = strsep(&source, '\n'); if(line == NULL) { return NULL; } while(isspace(*line)) {
         line++;
     }
 
@@ -25,7 +17,7 @@ char* next_line(char* source){
 }
 */
 
-SymbolTable create_symboltable(char** source){
+SymbolTable create_symboltable(StringArray* source){
     if(source == NULL){
         perror("SourceFile is NULL, create_symboltable failed");
         exit(EXIT_FAILURE);
