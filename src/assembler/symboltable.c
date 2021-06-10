@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "symboltable.h"
+#include "datatypes.h"
 
 SymbolTable create_symboltable(char* source){
     if(source == NULL){
