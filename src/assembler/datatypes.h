@@ -15,11 +15,13 @@ typedef uint32_t Word;
 
 typedef uint32_t Address;
 
+/* Struct to represent an entry in the symbol table */
 typedef struct {
   char* symbol;
   Address address;
 } Symbol;
 
+/* Struct to represent the symbol table container */
 typedef struct {
   int size;
   Symbol* table;
