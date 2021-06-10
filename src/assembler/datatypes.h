@@ -15,11 +15,13 @@ typedef uint32_t Word;
 
 typedef uint32_t Address;
 
+/* Struct to represent an entry in the symbol table */
 typedef struct {
   char* symbol;
   Address address;
 } Symbol;
 
+/* Struct to represent the symbol table container */
 typedef struct {
   int size;
   Symbol* table;
@@ -78,9 +80,6 @@ typedef enum {
 //used to identify type of shift for shifter
 typedef enum {
   LSL_S = 0,
-  LSR_S = 1,
-  ASR_S = 2,
-  ROR_S = 3,
 } Shift;
 
 // used to identify type of condition
