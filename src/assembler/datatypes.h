@@ -1,6 +1,9 @@
 #ifndef ASSEMBLER_DATATYPES_H
 #define ASSEMBLER_DATATYPES_H
+#define WORD_SIZE 32
 #include <stdint.h>
+
+#define MAX_CHARS_PER_LINE (511)
 
 typedef uint32_t Instruction;
 
@@ -80,6 +83,9 @@ typedef enum {
 //used to identify type of shift for shifter
 typedef enum {
   LSL_S = 0,
+  LSR_S = 1,
+  ASR_S = 2,
+  ROR_S = 3
 } Shift;
 
 // used to identify type of condition
@@ -135,7 +141,6 @@ typedef struct {
   int rs;
   int rm;
 } DataTransferInstruction;
-
 
 #endif
 

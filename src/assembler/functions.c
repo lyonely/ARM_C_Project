@@ -8,6 +8,21 @@ void write_to_file(Instruction *instructions, int num_instructions) {
   fclose(fp);
 }
 
+// Converts Instruction from big-endian to little-endian
+void get_little_endian(Instruction *i) {
+  Instruction byte1 = *i & 0xFF000000;
+  Instruction byte2 = *i & 0x00FF0000;
+  Instruction byte3 = *i & 0x0000FF00;
+  Instruction byte4 = *i & 0x000000FF;
+
+  byte1 = byte1 >> 24;
+  byte2 = byte2 >> 8;
+  byte3 = byte3 << 8;
+  byte4 = byte4 << 24;
+
+  *i = byte1 | byte2 | byte3 | byte4;
+}
+
 // Sets bit 25
 void set_imm_field(Instruction* i) {
 	*i |= 0x02000000;

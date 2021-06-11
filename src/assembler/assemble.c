@@ -8,13 +8,15 @@
 #include "sdt_assembler.h"
 #include "functions.h"
 #include "symboltable.h"
+#include "parser.h"
 
 void assemble(StringArray *source) {
   // Converted instructions stored here
   Instruction *instructions = calloc(source->size, sizeof(Instruction));
+
+  // Symbol Table
+  SymbolTable *symboltable = create_symboltable(source);
   
-  // TODO: create symbol table (symboltable)
-  create_symboltable(source);
   // TODO: read mnemonic and operands (tokeniser)
 
   int current_line = 0;

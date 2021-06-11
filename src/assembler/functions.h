@@ -7,6 +7,9 @@
 // Writes an array of instructions into a binary file (/out/program.bin)
 void write_to_file(Instruction *instructions, int num_instructions);
 
+// Converts instruction from big-endian to little-endian format
+void get_little_endian(Instruction *i);
+
 // Sets bit 25 of instruction
 void set_imm_field(Instruction* i);
 
