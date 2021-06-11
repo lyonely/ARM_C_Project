@@ -61,8 +61,7 @@ typedef enum {
   DATA_P,
   MULTIPLY,
   SDT,
-  BRANCH,
-  SPECIAL
+  BRANCH
 } Type;
 
 // used for defining opcode
@@ -175,9 +174,7 @@ typedef struct {
         } reg_shift;
       } shift;
     } reg_operand;
-
   } operand;
-
 } Op2;
 
 typedef struct {
@@ -205,7 +202,8 @@ typedef struct {
     struct {
       int rd;
       int rn;
-      int expression;
+      int offset;
+      int preindex;
     } sdt_token;
 
   } instr_token;

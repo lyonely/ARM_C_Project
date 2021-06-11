@@ -26,17 +26,6 @@ void get_little_endian(Instruction *i) {
 
 Type get_type(Operation opcode) {
   switch(opcode) {
-    case ADD:
-    case SUB:
-    case RSB:
-    case AND:
-    case EOR:
-    case ORR:
-    case MOV:
-    case TST:
-    case TEQ:
-    case CMP:
-      return DATA_P; break;
     case MUL:
     case MLA:
       return MULTIPLY; break;
@@ -51,12 +40,8 @@ Type get_type(Operation opcode) {
     case BLE:
     case B:
       return BRANCH; break;
-    case LSL:
-    case ANDEQ:
-      return SPECIAL; break;
     default:
-      perror("Opcode type not found");
-      exit(EXIT_FAILURE);
+      return DATA_P; break;
   }
 }
 

@@ -10,10 +10,13 @@
 void tokenise_operand2(char* op2, Token *token) {
 }
 
+// TODO
+void tokenise_sdt_address(char* address, Token *token) {
+}
+
 void tokenise_dataprocessing(char* str, Token *token) {
   char* args = strcpy(malloc(strlen(str) + 1), str);
-  char* operand;
-  operand = strtok(args, ",");
+  char* operand = strtok(args, ",");
   switch(token->opcode) {
     case TST:
     case TEQ:
@@ -25,6 +28,13 @@ void tokenise_dataprocessing(char* str, Token *token) {
       token->instr_token.datap_token.rd = string_to_reg_address(operand);
       tokenise_operand2(strtok(NULL, ","), token);
       break;
+    case LSL:
+      token->opcode = MOV;
+      token->instr_token.datap_token.rn = string_to_reg_address(operand);
+      token->instr_token.datap_token.rd = string_to_reg_address(operand);
+      tokenise_operand2(strtok(NULL, ","), token);
+    case ANDEQ:
+      token->cond = EQ;
     default:
       token->instr_token.datap_token.rd = string_to_reg_address(operand);
       operand = strtok(NULL, ",");
@@ -35,32 +45,45 @@ void tokenise_dataprocessing(char* str, Token *token) {
   free(args);
 }
 
-// TODO
-void tokenise_datatransfer(char* args, Token *token) {
+void tokenise_datatransfer(char* str, Token *token) {
+  char* args = strcpy(malloc(strlen(str) + 1), str);
+  char* operand = strtok(args, ",");
+  token->instr_token.sdt_token.rd = string_to_reg_address(operand);
+  operand = strtok(NULL, "");
+  tokenise_sdt_address(operand, token);
+  free(args);
 }
 
-// TODO
-void tokenise_multiply(char* args, Token *token) {
+void tokenise_multiply(char* str, Token *token) {
+  char* args = strcpy(malloc(strlen(str) + 1), str);
+  char* operand = strtok(args, ",");
+  token->instr_token.multiply_token.rd = string_to_reg_address(operand);
+  operand = strtok(NULL, ",");
+  token->instr_token.multiply_token.rm = string_to_reg_address(operand);
+  operand = strtok(NULL, ",");
+  token->instr_token.multiply_token.rs = string_to_reg_address(operand);
+
+  if (token->opcode == MLA) {
+    operand = strtok(NULL, ",");
+    token->instr_token.multiply_token.rn = string_to_reg_address(operand);
+  }
+  free(args);
 }
 
-void tokenise_branch(char* args, Token *token, SymbolTable *symboltable) {
-  if (strchr(args, ',')) {
+void tokenise_branch(char* str, Token *token, SymbolTable *symboltable) {
+  if (strchr(str, ',')) {
     perror("Wrong number of args provided in tokenise_branch");
     exit(EXIT_FAILURE);
   }
   
-  if (args[0] == '#') {
-    size_t arg_len = strlen(args);
+  if (str[0] == '#') {
+    size_t arg_len = strlen(str);
     char addr[arg_len];
-    memcpy(addr, &args[1], arg_len);
+    memcpy(addr, &str[1], arg_len);
     token->instr_token.branch_token.target_address = (Address) parse_immediate_value(addr);
   } else {
-    token->instr_token.branch_token.target_address = lookup_symbol(symboltable, args); 
+    token->instr_token.branch_token.target_address = lookup_symbol(symboltable, str); 
   }
-}
-
-// TODO
-void tokenise_special(char* args, Token *token) {
 }
 
 // Tokenises assembly code into array of Tokens
@@ -116,8 +139,6 @@ Token **tokenise(StringArray *code, SymbolTable *symboltable) {
         tokenise_datatransfer(line, token);
       case BRANCH:
         tokenise_branch(line, token, symboltable);
-      case SPECIAL:
-        tokenise_special(line, token);
       default:
         perror("instruction type does not exist in tokenise");
         exit(EXIT_FAILURE);
