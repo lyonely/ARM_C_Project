@@ -10,6 +10,9 @@ void write_to_file(Instruction *instructions, int num_instructions);
 // Converts instruction from big-endian to little-endian format
 void get_little_endian(Instruction *i);
 
+// Gets instruction type of operation
+Type get_type(Operation opcode);
+
 // Sets bit 25 of instruction
 void set_imm_field(Instruction* i);
 

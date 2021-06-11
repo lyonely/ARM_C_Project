@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "datatypes.h"
 
 // Writes an array of instructions into a binary file
@@ -21,6 +22,42 @@ void get_little_endian(Instruction *i) {
   byte4 = byte4 << 24;
 
   *i = byte1 | byte2 | byte3 | byte4;
+}
+
+Type get_type(Operation opcode) {
+  switch(opcode) {
+    case ADD:
+    case SUB:
+    case RSB:
+    case AND:
+    case EOR:
+    case ORR:
+    case MOV:
+    case TST:
+    case TEQ:
+    case CMP:
+      return DATA_P; break;
+    case MUL:
+    case MLA:
+      return MULTIPLY; break;
+    case LDR:
+    case STR:
+      return SDT; break;
+    case BEQ:
+    case BNE:
+    case BGE:
+    case BLT:
+    case BGT:
+    case BLE:
+    case B:
+      return BRANCH; break;
+    case LSL:
+    case ANDEQ:
+      return SPECIAL; break;
+    default:
+      perror("Opcode type not found");
+      exit(EXIT_FAILURE);
+  }
 }
 
 // Sets bit 25

@@ -33,7 +33,7 @@ void parse_operand_data_processing(StringArray *tokens, DataProcessingInstructio
 void parse_operand_data_transfer(StringArray *tokens, DataTransferInstruction *instruction);
 
 //Returns the immediate value given by the string
-Word parse_immediate_value(char *str);
+uint32_t parse_immediate_value(char *str);
 
 #endif
 

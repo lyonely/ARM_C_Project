@@ -265,16 +265,11 @@ void parse_operand_data_transfer(StringArray *tokens, DataTransferInstruction *i
   }
 }
 
-Word parse_immediate_value(char *str) {
+uint32_t parse_immediate_value(char *str) {
 	if(strstr(str, "0x")) {
 		return strtol(str, (char **)NULL, 16);
 	} else {
 		return strtol(str, (char **)NULL, 10);
 	}
-}
-
-// Tokenises string, returns opcode, stores tokens in string array
-Operation tokenise(char *line, StringArray *tokens) {
-  
 }
 

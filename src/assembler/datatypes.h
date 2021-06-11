@@ -56,6 +56,15 @@ typedef enum {
     ANDEQ
 } Operation;
 
+/* Represents five types of instructions */
+typedef enum {
+  DATA_P,
+  MULTIPLY,
+  SDT,
+  BRANCH,
+  SPECIAL
+} Type;
+
 // used for defining opcode
 typedef enum {
   // And. 
@@ -141,6 +150,66 @@ typedef struct {
   int rs;
   int rm;
 } DataTransferInstruction;
+
+typedef struct {
+  int is_imm;
+  
+  union {
+    struct {
+      char immediate;
+      int rotation;
+    } imm_operand;
+
+    struct {
+      int shift_by_reg;
+      Shift shift_type;
+      int rm;
+
+      union {
+        struct {
+          int shift_amount;
+        } const_shift;
+
+        struct {
+          int rs;
+        } reg_shift;
+      } shift;
+    } reg_operand;
+
+  } operand;
+
+} Op2;
+
+typedef struct {
+  Address address;
+  Operation opcode;
+  Condition cond;
+  union {
+    struct {
+      int rd;
+      int rn;
+      Op2 operand2;
+    } datap_token;
+
+    struct {
+      int rd;
+      int rm;
+      int rs;
+      int rn;
+    } multiply_token;
+
+    struct {
+      Address target_address;
+    } branch_token;
+
+    struct {
+      int rd;
+      int rn;
+      int expression;
+    } sdt_token;
+
+  } instr_token;
+} Token;
 
 #endif
 
