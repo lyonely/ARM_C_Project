@@ -1,6 +1,7 @@
 #ifndef __OTHELLO_H__
 #define __OTHELLO_H__
 
+#include <stdbool.h>
 #define HEIGHT 8
 #define WIDTH 8
 
@@ -9,6 +10,7 @@ typedef char board_t[HEIGHT][WIDTH];
 typedef struct {
 	int row;
 	int col;
+	int player;
 } move_t;
 
 typedef struct {
