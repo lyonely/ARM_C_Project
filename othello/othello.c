@@ -30,13 +30,11 @@ void print_board(board_t* board) {
     for(int row = 0; row < HEIGHT; row ++) {
         for(int col = 0; col < WIDTH; col ++) {
             if(col == 7) {
-                printf(" %c ", *board[row][col]);
+                printf(" %c \n", *board[row][col]);
             } else {
                 printf(" %c |", *board[row][col]);
             }
         }
-
-        printf("\n");
     }
 };
 
@@ -85,6 +83,12 @@ bool is_legal(move_t move, board_t* board){
                         return true;
                     }
                 }
+
+                if(move.col - c >= 0) {
+                    if(*board[move.row + r][move.col + c] == player_piece) {
+                        return true;
+                    }
+                }
             }
 
             if(move.row - r < 8){
@@ -93,13 +97,17 @@ bool is_legal(move_t move, board_t* board){
                         return true;
                     }
                 }
+
+                if(move.col - c >= 0) {
+                    if(*board[move.row + r][move.col + c] == player_piece) {
+                        return true;
+                    }
+                }
             }
         }
     }
 
-
-
-    return true;
+    return false;
 }
 
 
@@ -145,4 +153,11 @@ int outcome(board_t* board){
 int main(void){
     board_t* board = initial_board();
     print_board(board);
+    printf("endgame: %i\n",endgame(board));
+
+    move_t move;
+    move.row = 2;
+    move.col = 3;
+    move.player = BLACK;
+    printf("is legal: %i\n", is_legal(move,board));
 }
