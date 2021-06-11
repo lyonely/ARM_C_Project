@@ -158,11 +158,9 @@ Shift string_to_shift(char *str) {
 void parse_shift_data_processing(StringArray *tokens, DataProcessingInstruction *instruction) {
 	instruction->shift_type = string_to_shift(tokens->array[0]);
   if ('#' == tokens->array[1][0]) {
-    // In the form <#expression>
     char *number = &tokens->array[1][1];
     instruction->shift_amount = parse_immediate_value(number);
   } else if ('r' == tokens->array[1][0]) {
-    // Is a register
     instruction->rs = string_to_reg_address(tokens->array[1]);
   } else {
     fprintf(stderr, "Shift not number or register");
@@ -186,7 +184,6 @@ void parse_shift_data_transfer(StringArray *tokens, DataTransferInstruction *ins
 void parse_operand_data_processing(StringArray *tokens, DataProcessingInstruction *instruction) {
   char **sections = tokens->array;
   if ('#' == sections[0][0]) {
-    // In the form <#expression>
     instruction->imm = parse_immediate_value(&sections[0][1]);
 
     uint16_t shift = WORD_SIZE;
@@ -200,11 +197,9 @@ void parse_operand_data_processing(StringArray *tokens, DataProcessingInstructio
     instruction->shift_amount = shift;
 
   } else if ('r' == sections[0][0]) {
-    // In the form Rm{,<shift>}
     instruction->rm = string_to_reg_address(sections[0]);
 
     if (tokens->size >= 2) {
-      // Has shift
       StringArray *shift_tokens = malloc(sizeof(StringArray));
 
       if (!shift_tokens) {
@@ -212,7 +207,6 @@ void parse_operand_data_processing(StringArray *tokens, DataProcessingInstructio
         exit(EXIT_FAILURE);
       }
 
-      // Pass the <shift> section into parse_shift
       shift_tokens->array = &sections[1];
       shift_tokens->size = tokens->size - 1;
       parse_shift_data_processing(shift_tokens, instruction);
@@ -227,7 +221,6 @@ void parse_operand_data_processing(StringArray *tokens, DataProcessingInstructio
 void parse_operand_data_transfer(StringArray *tokens, DataTransferInstruction *instruction) {
   char **sections = tokens->array;
   if ('#' == sections[0][0]) {
-    // In the form <#expression>
     instruction->imm_offset = parse_immediate_value(&sections[0][1]);
 
     uint16_t shift = WORD_SIZE;
@@ -241,11 +234,9 @@ void parse_operand_data_transfer(StringArray *tokens, DataTransferInstruction *i
     instruction->shift_amount = shift;
 
   } else if ('r' == sections[0][0]) {
-    // In the form Rm{,<shift>}
     instruction->rm = string_to_reg_address(sections[0]);
 
     if (tokens->size >= 2) {
-      // Has shift
       StringArray *shift_tokens = malloc(sizeof(StringArray));
 
       if (!shift_tokens) {
@@ -253,7 +244,6 @@ void parse_operand_data_transfer(StringArray *tokens, DataTransferInstruction *i
         exit(EXIT_FAILURE);
       }
 
-      // Pass the <shift> section into parse_shift
       shift_tokens->array = &sections[1];
       shift_tokens->size = tokens->size - 1;
       parse_shift_data_transfer(shift_tokens, instruction);
