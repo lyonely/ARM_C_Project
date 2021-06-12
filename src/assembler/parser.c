@@ -147,7 +147,7 @@ RegAddress string_to_reg_address(char *str) {
 	return strtol(&str[1], (char **) NULL, 10);
 }	
 
-Shift string_to_shift(char *str) {
+ShiftType string_to_shift(char *str) {
 	if(!strcmp(str, "lsl")) {
 		return LSL_S;
 	}
@@ -155,55 +155,65 @@ Shift string_to_shift(char *str) {
   exit(EXIT_FAILURE);
 }	
 
-void parse_shift_data_processing(StringArray *tokens, DataProcessingInstruction *instruction) {
-	instruction->shift_type = string_to_shift(tokens->array[0]);
-  if ('#' == tokens->array[1][0]) {
-    // In the form <#expression>
-    char *number = &tokens->array[1][1];
-    instruction->shift_amount = parse_immediate_value(number);
-  } else if ('r' == tokens->array[1][0]) {
-    // Is a register
-    instruction->rs = string_to_reg_address(tokens->array[1]);
+void parse_shift_data_processing(StringArray *args, Token *token) {
+	token->DataP.operand2.reg_operand.shift_type = string_to_shift(args->array[0]); // Shift type stored
+
+  if ('#' == args->array[1][0]) {
+    // Shift by immediate
+    char *number = &args->array[1][1];
+    token->DataP.operand2.reg_operand.shift.is_imm = 1;
+    token->DataP.operand2.reg_operand.shift.immediate_shift = parse_immediate_value(number);
+  } else if ('r' == args->array[1][0]) {
+    // Shift by register
+    token->DataP.operand2.reg_operand.shift.is_imm = 0;
+    token->DataP.operand2.reg_operand.shift.rs = string_to_reg_address(args->array[1]);
   } else {
     fprintf(stderr, "Shift not number or register");
     exit(EXIT_FAILURE);
   }
 }
 
-void parse_shift_data_transfer(StringArray *tokens, DataTransferInstruction *instruction) {
-	instruction->shift_type = string_to_shift(tokens->array[0]);
-  if ('#' == tokens->array[1][0]) {
-    char *number = &tokens->array[1][1];
-    instruction->shift_amount = parse_immediate_value(number);
-  } else if ('r' == tokens->array[1][0]) {
-    instruction->rs = string_to_reg_address(tokens->array[1]);
+void parse_shift_data_transfer(StringArray *args, Token *token) {
+	token->SDT.offset.ShiftedReg.shift_type = string_to_shift(args->array[0]);
+  
+  if ('#' == args->array[1][0]) {
+    // Shift by immediate
+    char *number = &args->array[1][1];
+    token->SDT.offset.ShiftedReg.shift.is_imm = 1;
+    token->SDT.offset.ShiftedReg.shift.immediate_shift = parse_immediate_value(number);
+  } else if ('r' == args->array[1][0]) {
+    // Shift by register
+    token->SDT.offset.ShiftedReg.shift.is_imm = 0;
+    token->SDT.offset.ShiftedReg.shift.rs = string_to_reg_address(args->array[1]);
   } else {
     fprintf(stderr, "Shift not number or register");
     exit(EXIT_FAILURE);
   }
 }	
 
-void parse_operand_data_processing(StringArray *tokens, DataProcessingInstruction *instruction) {
-  char **sections = tokens->array;
+void parse_operand_data_processing(StringArray *args, Token *token) {
+  char **sections = args->array;
   if ('#' == sections[0][0]) {
     // In the form <#expression>
-    instruction->imm = parse_immediate_value(&sections[0][1]);
-
+    char *imm_addr = &token->DataP.operand2.imm_operand.immediate;
+    int *rotation = &token->DataP.operand2.imm_operand.rotation;
+    token->DataP.operand2.is_imm = 1;
+    
+    *imm_addr = parse_immediate_value(&sections[0][1]);
     uint16_t shift = WORD_SIZE;
-    if (instruction->imm > 0xFF) {
-      while (!(instruction->imm & 0x3)) {
-          instruction->imm >>= 2;
+    if (*imm_addr > 0xFF) {
+      while (!(*imm_addr & 0x3)) {
+          *imm_addr >>= 2;
           shift--;
       }
     }
-
-    instruction->shift_amount = shift;
-
+    *rotation = shift;
   } else if ('r' == sections[0][0]) {
+    token->DataP.operand2.is_imm = 0;
     // In the form Rm{,<shift>}
-    instruction->rm = string_to_reg_address(sections[0]);
+    token->DataP.operand2.reg_operand.rm = string_to_reg_address(sections[0]);
 
-    if (tokens->size >= 2) {
+    if (args->size >= 2) {
       // Has shift
       StringArray *shift_tokens = malloc(sizeof(StringArray));
 
@@ -214,8 +224,8 @@ void parse_operand_data_processing(StringArray *tokens, DataProcessingInstructio
 
       // Pass the <shift> section into parse_shift
       shift_tokens->array = &sections[1];
-      shift_tokens->size = tokens->size - 1;
-      parse_shift_data_processing(shift_tokens, instruction);
+      shift_tokens->size = args->size - 1;
+      parse_shift_data_processing(shift_tokens, token);
       free(shift_tokens);
     }
   } else {
@@ -224,27 +234,19 @@ void parse_operand_data_processing(StringArray *tokens, DataProcessingInstructio
   }
 }				
 
-void parse_operand_data_transfer(StringArray *tokens, DataTransferInstruction *instruction) {
-  char **sections = tokens->array;
-  if ('#' == sections[0][0]) {
-    // In the form <#expression>
-    instruction->imm_offset = parse_immediate_value(&sections[0][1]);
-
-    uint16_t shift = WORD_SIZE;
-    if (instruction->imm_offset > 0xFF) {
-      while (!(instruction->imm_offset & 0x3)) {
-          instruction->imm_offset >>= 2;
-          shift--;
-      }
-    }
-
-    instruction->shift_amount = shift;
-
+void parse_operand_data_transfer(StringArray *args, Token *token) {
+  char **sections = args->array;
+  if ('=' == sections[0][0]) {
+    // In the form <#expression>, 12 bits unsigned
+    token->SDT.offset.is_imm = 0;
+    token->SDT.offset.expression = parse_immediate_value(&sections[0][1]);
+ 
   } else if ('r' == sections[0][0]) {
     // In the form Rm{,<shift>}
-    instruction->rm = string_to_reg_address(sections[0]);
+    token->SDT.offset.is_imm = 1;
+    token->SDT.rn = string_to_reg_address(sections[0]);
 
-    if (tokens->size >= 2) {
+    if (args->size >= 2) {
       // Has shift
       StringArray *shift_tokens = malloc(sizeof(StringArray));
 
@@ -255,8 +257,8 @@ void parse_operand_data_transfer(StringArray *tokens, DataTransferInstruction *i
 
       // Pass the <shift> section into parse_shift
       shift_tokens->array = &sections[1];
-      shift_tokens->size = tokens->size - 1;
-      parse_shift_data_transfer(shift_tokens, instruction);
+      shift_tokens->size = args->size - 1;
+      parse_shift_data_transfer(shift_tokens, token);
       free(shift_tokens);
     }
   } else {

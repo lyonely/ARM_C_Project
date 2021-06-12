@@ -45,6 +45,31 @@ Type get_type(Operation opcode) {
   }
 }
 
+unsigned int get_num_args(Operation opcode) {
+  switch(opcode) {
+    case MLA:
+      return 4;
+    case BEQ:
+    case BNE:
+    case BGE:
+    case BLT:
+    case BGT:
+    case BLE:
+    case B:
+      return 1;
+    case AND:
+    case EOR:
+    case SUB:
+    case RSB:
+    case ADD:
+    case ORR:
+    case MUL:
+      return 3;
+    default:
+      return 2;
+  }
+}
+
 // Sets bit 25
 void set_imm_field(Instruction* i) {
 	*i |= 0x02000000;

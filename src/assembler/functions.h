@@ -13,6 +13,9 @@ void get_little_endian(Instruction *i);
 // Gets instruction type of operation
 Type get_type(Operation opcode);
 
+// Gets expected number of arguments for operation
+unsigned int get_num_args(Operation opcode);
+
 // Sets bit 25 of instruction
 void set_imm_field(Instruction* i);
 
