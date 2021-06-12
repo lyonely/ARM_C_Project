@@ -52,60 +52,108 @@ bool is_legal(move_t move, board_t board){
     }
 
     char player_piece;
+	char opponent_piece;
 
     if(move.player == BLACK){
         player_piece = 'X';
+		opponent_piece = 'O';
     } else if (move.player == WHITE){
         player_piece = 'O';
+		opponent_piece = 'X';
     }
     
-    // check if there is another piece of same type vertically
-    for(int r = 0; r < HEIGHT; r ++){
-        if((*board)[r][move.col] == player_piece){
-            return true;
-        }
-    }
+	// checks the N direction
+	if (!(move.row == 0) && ((*board)[move.row - 1][move.col] == opponent_piece)) {
+		for (int r = move.row - 1; r >= 0; r--) {
+			if ((*board)[r][move.col] == '-') {
+				break;
+			} else if ((*board)[r][move.col] == player_piece) {
+				return true;
+			}
+		}
+	}
 
-    // check if there is another piece of same type horitzontally
-    for(int c = 0; c < WIDTH; c ++){
-        if((*board)[move.row][c] == player_piece){
-            return true;
-        }
-    }
+	// checks the NE direction
+	if (!(move.row == 0) && !(move.col == 7) \
+			&& ((*board)[move.row - 1][move.col + 1] = opponent_piece)) {
+		for (int i = 1; (move.row - i) >= 0 || (move.col + i) <= 7; i++) {
+			if ((*board)[move.row - i][move.col + i] == '-') {
+				break;
+			} else if ((*board)[move.row - i][move.col + i] == player_piece) {
+				return true;
+			}
+		}
+	}
 
-    // check if there is another piece of same type diagonally
-    for(int r = 0; r < HEIGHT; r ++) {
-        for(int c = 0; c < WIDTH; c ++) {
-            if(move.row + r < 8){
-                if(move.col + c < 8) {
-                    if((*board)[move.row + r][move.col + c] == player_piece) {
-                        return true;
-                    }
-                }
+	// checks the E direction
+	if (!(move.col == 7) && ((*board)[move.row][move.col + 1] == opponent_piece)) {
+		for (int c = move.col + 1; c <= 7; c++) {
+			if ((*board)[move.row][c] == '-') {
+				break;
+			} else if ((*board)[move.row][c] == player_piece) {
+				return true;
+			}
+		}
+	}
 
-                if(move.col - c >= 0) {
-                    if((*board)[move.row + r][move.col + c] == player_piece) {
-                        return true;
-                    }
-                }
-            }
+	// checks the SE direction
+	if (!(move.row == 7) && !(move.col == 7) \
+			&& ((*board)[move.row + 1][move.col + 1] = opponent_piece)) {
+		for (int i = 1; (move.row + i) <= 7 || (move.col + i) <= 7; i++) {
+			if ((*board)[move.row + i][move.col + i] == '-') {
+				break;
+			} else if ((*board)[move.row + i][move.col + i] == player_piece) {
+				return true;
+			}
+		}
+	}
 
-            if(move.row - r < 8){
-                if(move.col - c < 8) {
-                    if((*board)[move.row + r][move.col + c] == player_piece) {
-                        return true;
-                    }
-                }
+	// checks the S direction
+	if (!(move.row == 7) && ((*board)[move.row + 1][move.col] == opponent_piece)) {
+		for (int r = move.row + 1; r <= 7; r++) {
+			if ((*board)[r][move.col] == '-') {
+				break;
+			} else if ((*board)[r][move.col] == player_piece) {
+				return true;
+			}
+		}
+	}
 
-                if(move.col - c >= 0) {
-                    if((*board)[move.row + r][move.col + c] == player_piece) {
-                        return true;
-                    }
-                }
-            }
-        }
-    }
+	// checks the SW direction
+	if (!(move.row == 7) && !(move.col == 0) \
+			&& ((*board)[move.row + 1][move.col - 1] = opponent_piece)) {
+		for (int i = 1; (move.row + i) <= 7 || (move.col - i) >= 0; i++) {
+			if ((*board)[move.row + i][move.col - i] == '-') {
+				break;
+			} else if ((*board)[move.row + i][move.col - i] == player_piece) {
+				return true;
+			}
+		}
+	}
 
+	// checks the W direction
+	if (!(move.col == 0) && ((*board)[move.row][move.col - 1] == opponent_piece)) {
+		for (int c = move.col - 1; c >= 0; c--) {
+			if ((*board)[move.row][c] == '-') {
+				break;
+			} else if ((*board)[move.row][c] == player_piece) {
+				return true;
+			}
+		}
+	}
+
+	// checks the NW direction
+	if (!(move.col == 0) && !(move.row == 0) \
+			&& ((*board)[move.row - 1][move.col - 1] = opponent_piece)) {
+		for (int i = 1; (move.row - 1) >= 0 || (move.col - 1) >= 0; i++) {
+			if ((*board)[move.row - i][move.col - i] == '-') {
+				break;
+			} else if ((*board)[move.row - i][move.col - i] == player_piece) {
+				return true;
+			}
+		}
+	}
+	
     return false;
 }
 
