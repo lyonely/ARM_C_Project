@@ -170,6 +170,40 @@ bool endgame(board_t board){
     return true;
 }
 
+legalmoves_t* legalmove(board_t* board, Player player) {
+	legalmoves_t* legalmoves = malloc(sizeof(legalmoves_t));
+	if (legalmoves == NULL) {
+		perror("Failed to allocate memory for legalmoves_t");
+		exit(EXIT_FAILURE);
+	}
+	legalmoves->size = 0;
+	legalmoves->moves = calloc(HEIGHT*WIDTH, sizeof(move_t));
+	if (legalmoves->moves == NULL) {
+		perror("Failed to allocate memory for moves array");
+		exit(EXIT_FAILURE);
+	}
+
+	move_t move;
+	(&move)->player = player;
+	
+	for (int r = 0; r < HEIGHT; r++) {
+		for (int c = 0; c < WIDTH; c++) {
+			(&move)->row = r;
+			(&move)->col = c;
+			if (is_legal(move, *board)) {
+				legalmoves->moves[legalmoves->size] = move;
+				legalmoves->size++;
+			}
+		}
+	}
+
+	legalmoves->moves = realloc(legalmoves->moves, legalmoves->size * sizeof(move_t));
+	if (legalmoves->moves == NULL) {
+		perror("Failed to reallocate memory for moves array");
+		exit(EXIT_FAILURE);
+	}
+	return legalmoves;
+}
 
 // determines the winning player or if it is a draw
 int outcome(board_t board){
