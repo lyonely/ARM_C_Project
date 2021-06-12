@@ -94,7 +94,7 @@ typedef enum {
   LSR_S = 1,
   ASR_S = 2,
   ROR_S = 3
-} Shift;
+} ShiftType;
 
 // used to identify type of condition
 typedef enum {
@@ -114,7 +114,7 @@ typedef struct {
   int is_imm;
   int rotation; // set when is_imm = 1
   int imm; // set when is_imm = 1
-  Shift shift_type; // set when is_imm = 0
+  ShiftType shift_type; // set when is_imm = 0
   int shift_by_reg; // is_imm = 0
   int shift_amount; // is_imm = 0, shift_by_reg = 0
   int rs; // is_imm = 0, shift_by_reg = 1
@@ -143,12 +143,18 @@ typedef struct {
   int rn;
   int rd;
   int imm_offset;
-  Shift shift_type;
+  ShiftType shift_type;
   int shift_by_reg;
   int shift_amount;
   int rs;
   int rm;
 } DataTransferInstruction;
+
+typedef struct {
+  int is_imm;
+  int immediate_shift;
+  int rs;
+} Shift;
 
 typedef struct {
   int is_imm;
@@ -161,52 +167,58 @@ typedef struct {
 
     struct {
       int shift_by_reg;
-      Shift shift_type;
+      ShiftType shift_type;
       int rm;
-
-      union {
-        struct {
-          int shift_amount;
-        } const_shift;
-
-        struct {
-          int rs;
-        } reg_shift;
-      } shift;
+      Shift shift;
     } reg_operand;
-  } operand;
+  };
 } Op2;
+
+typedef struct {
+  int is_imm; // = 1 if offset is interpreted as shifted register
+
+  union {
+    int expression; // offset by <#expression> bytes
+
+    struct {
+      int preindex;
+      ShiftType shift_type;
+      int rm;
+      int up_bit; // =1 if offset is added, =0 if offset is subtracted
+      Shift shift;
+    } ShiftedReg;
+  };
+} Offset;
 
 typedef struct {
   Address address;
   Operation opcode;
   Condition cond;
+  unsigned int num_args;
   union {
     struct {
       int rd;
       int rn;
       Op2 operand2;
-    } datap_token;
+    } DataP;
 
     struct {
       int rd;
       int rm;
       int rs;
       int rn;
-    } multiply_token;
+    } Multiply;
 
     struct {
       Address target_address;
-    } branch_token;
+    } Branch;
 
     struct {
       int rd;
       int rn;
-      int offset;
-      int preindex;
-    } sdt_token;
-
-  } instr_token;
+      Offset offset;
+    } SDT;
+  };
 } Token;
 
 #endif
