@@ -26,7 +26,9 @@ board_t initial_board(void) {
 
 // prints the current state of the board
 void print_board(board_t board) {
+    printf("  A   B   C   D   E   F   G   H\n");
     for(int row = 0; row < HEIGHT; row ++) {
+        printf("%d", row + 1);
         for(int col = 0; col < WIDTH; col ++) {
             if(col == 7) {
                 printf(" %c \n", (*board)[row][col]);
@@ -362,6 +364,7 @@ int outcome(board_t board){
     return 0;
 }
 
+/*
 // temporary main function for testing
 int main(void){
     board_t board = initial_board();
@@ -373,4 +376,9 @@ int main(void){
     move.col = 3;
     move.player = BLACK;
     printf("is legal: %i\n", is_legal(move,board));
+
+    printf("***************** Welcome to our game of OTHELLO! *****************\n\n");
+    printf("Flip your opponent's pieces by trapping them between 2 of your own.\n");
+    printf("Your aim is to own more pieces than your opponent when the game is over.\n");
 }
+*/
