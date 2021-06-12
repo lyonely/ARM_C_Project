@@ -75,7 +75,7 @@ bool is_legal(move_t move, board_t board){
 
 	// checks the NE direction
 	if (!(move.row == 0) && !(move.col == 7) \
-			&& ((*board)[move.row - 1][move.col + 1] = opponent_piece)) {
+			&& ((*board)[move.row - 1][move.col + 1] == opponent_piece)) {
 		for (int i = 1; (move.row - i) >= 0 || (move.col + i) <= 7; i++) {
 			if ((*board)[move.row - i][move.col + i] == '-') {
 				break;
@@ -98,7 +98,7 @@ bool is_legal(move_t move, board_t board){
 
 	// checks the SE direction
 	if (!(move.row == 7) && !(move.col == 7) \
-			&& ((*board)[move.row + 1][move.col + 1] = opponent_piece)) {
+			&& ((*board)[move.row + 1][move.col + 1] == opponent_piece)) {
 		for (int i = 1; (move.row + i) <= 7 || (move.col + i) <= 7; i++) {
 			if ((*board)[move.row + i][move.col + i] == '-') {
 				break;
@@ -121,7 +121,7 @@ bool is_legal(move_t move, board_t board){
 
 	// checks the SW direction
 	if (!(move.row == 7) && !(move.col == 0) \
-			&& ((*board)[move.row + 1][move.col - 1] = opponent_piece)) {
+			&& ((*board)[move.row + 1][move.col - 1] == opponent_piece)) {
 		for (int i = 1; (move.row + i) <= 7 || (move.col - i) >= 0; i++) {
 			if ((*board)[move.row + i][move.col - i] == '-') {
 				break;
@@ -144,7 +144,7 @@ bool is_legal(move_t move, board_t board){
 
 	// checks the NW direction
 	if (!(move.col == 0) && !(move.row == 0) \
-			&& ((*board)[move.row - 1][move.col - 1] = opponent_piece)) {
+			&& ((*board)[move.row - 1][move.col - 1] == opponent_piece)) {
 		for (int i = 1; (move.row - 1) >= 0 || (move.col - 1) >= 0; i++) {
 			if ((*board)[move.row - i][move.col - i] == '-') {
 				break;
@@ -170,7 +170,7 @@ bool endgame(board_t board){
     return true;
 }
 
-legalmoves_t* legalmove(board_t* board, Player player) {
+legalmoves_t* legalmove(board_t board, Player player) {
 	legalmoves_t* legalmoves = malloc(sizeof(legalmoves_t));
 	if (legalmoves == NULL) {
 		perror("Failed to allocate memory for legalmoves_t");
@@ -190,7 +190,7 @@ legalmoves_t* legalmove(board_t* board, Player player) {
 		for (int c = 0; c < WIDTH; c++) {
 			(&move)->row = r;
 			(&move)->col = c;
-			if (is_legal(move, *board)) {
+			if (is_legal(move, board)) {
 				legalmoves->moves[legalmoves->size] = move;
 				legalmoves->size++;
 			}
@@ -203,6 +203,138 @@ legalmoves_t* legalmove(board_t* board, Player player) {
 		exit(EXIT_FAILURE);
 	}
 	return legalmoves;
+}
+
+// PRE: input move is legal
+// updates the board with the move
+void make_move(move_t move, board_t board) {
+
+	char player_piece;
+	char opponent_piece;
+
+    if(move.player == BLACK){
+        player_piece = 'X';
+		opponent_piece = 'O';
+    } else if (move.player == WHITE){
+        player_piece = 'O';
+		opponent_piece = 'X';
+    }
+
+    // checks the N direction
+	if (!(move.row == 0) && ((*board)[move.row - 1][move.col] == opponent_piece)) {
+		for (int r = move.row - 1; r >= 0; r--) {
+			if ((*board)[r][move.col] == '-') {
+				break;
+			} else if ((*board)[r][move.col] == player_piece) {
+				for (int i = move.row - 1; i >= r; i--) {
+					(*board)[i][move.col] = player_piece;
+				}
+				break;
+			}
+		}
+	}
+
+	// checks the NE direction
+	if (!(move.row == 0) && !(move.col == 7) \
+			&& ((*board)[move.row - 1][move.col + 1] = opponent_piece)) {
+		for (int i = 1; (move.row - i) >= 0 || (move.col + i) <= 7; i++) {
+			if ((*board)[move.row - i][move.col + i] == '-') {
+				break;
+			} else if ((*board)[move.row - i][move.col + i] == player_piece) {
+				for (int j = 1; j <= i; j++) {
+					(*board)[move.row - j][move.col + j] = player_piece;
+				}
+				break;
+			}
+		}
+	}
+
+	// checks the E direction
+	if (!(move.col == 7) && ((*board)[move.row][move.col + 1] == opponent_piece)) {
+		for (int c = move.col + 1; c <= 7; c++) {
+			if ((*board)[move.row][c] == '-') {
+				break;
+			} else if ((*board)[move.row][c] == player_piece) {
+				for (int i = move.col + 1; i <= c; i++) {
+					(*board)[move.row][i] = player_piece;
+				}
+				break;
+			}
+		}
+	}
+
+	// checks the SE direction
+	if (!(move.row == 7) && !(move.col == 7) \
+			&& ((*board)[move.row + 1][move.col + 1] = opponent_piece)) {
+		for (int i = 1; (move.row + i) <= 7 || (move.col + i) <= 7; i++) {
+			if ((*board)[move.row + i][move.col + i] == '-') {
+				break;
+			} else if ((*board)[move.row + i][move.col + i] == player_piece) {
+				for (int j = 1; j <= i; j++) {
+					(*board)[move.row + j][move.col + j] = player_piece;
+				}
+				break;
+			}
+		}
+	}
+
+	// checks the S direction
+	if (!(move.row == 7) && ((*board)[move.row + 1][move.col] == opponent_piece)) {
+		for (int r = move.row + 1; r <= 7; r++) {
+			if ((*board)[r][move.col] == '-') {
+				break;
+			} else if ((*board)[r][move.col] == player_piece) {
+				for (int i = move.row + 1; i <= r; i++) {
+					(*board)[r][move.col] = player_piece;
+				}
+				break;
+			}
+		}
+	}
+
+	// checks the SW direction
+	if (!(move.row == 7) && !(move.col == 0) \
+			&& ((*board)[move.row + 1][move.col - 1] = opponent_piece)) {
+		for (int i = 1; (move.row + i) <= 7 || (move.col - i) >= 0; i++) {
+			if ((*board)[move.row + i][move.col - i] == '-') {
+				break;
+			} else if ((*board)[move.row + i][move.col - i] == player_piece) {
+				for (int j = 1; j <= i; j++) {
+					(*board)[move.row + j][move.col - j] = player_piece;
+				}
+				break;
+			}
+		}
+	}
+
+	// checks the W direction
+	if (!(move.col == 0) && ((*board)[move.row][move.col - 1] == opponent_piece)) {
+		for (int c = move.col - 1; c >= 0; c--) {
+			if ((*board)[move.row][c] == '-') {
+				break;
+			} else if ((*board)[move.row][c] == player_piece) {
+				for (int i = move.col -1; i >= c; i--) {
+					(*board)[move.row][i] = player_piece;
+				}
+				break;
+			}
+		}
+	}
+
+	// checks the NW direction
+	if (!(move.col == 0) && !(move.row == 0) \
+			&& ((*board)[move.row - 1][move.col - 1] = opponent_piece)) {
+		for (int i = 1; (move.row - 1) >= 0 || (move.col - 1) >= 0; i++) {
+			if ((*board)[move.row - i][move.col - i] == '-') {
+				break;
+			} else if ((*board)[move.row - i][move.col - i] == player_piece) {
+				for (int j = 1; j <= i; j++) {
+					(*board)[move.row - j][move.col - j] = player_piece;
+				}
+				break;
+			}
+		}
+	}
 }
 
 // determines the winning player or if it is a draw
