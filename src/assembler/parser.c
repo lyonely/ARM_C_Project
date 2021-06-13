@@ -195,9 +195,9 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
   char **sections = args->array;
   if ('#' == sections[0][0]) {
     // In the form <#expression>
+    token->DataP.operand2.is_imm = 1;
     char *imm_addr = &token->DataP.operand2.imm_operand.immediate;
     int *rotation = &token->DataP.operand2.imm_operand.rotation;
-    token->DataP.operand2.is_imm = 1;
     
     *imm_addr = parse_immediate_value(&sections[0][1]);
     uint16_t shift = WORD_SIZE;
@@ -209,8 +209,8 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
     }
     *rotation = shift;
   } else if ('r' == sections[0][0]) {
-    token->DataP.operand2.is_imm = 0;
     // In the form Rm{,<shift>}
+    token->DataP.operand2.is_imm = 0;
     token->DataP.operand2.reg_operand.rm = string_to_reg_address(sections[0]);
 
     if (args->size >= 2) {
@@ -234,9 +234,9 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
   }
 }				
 
-void parse_operand_data_transfer(StringArray *args, Token *token) {
+void parse_offset_data_transfer(StringArray *args, Token *token) {
   char **sections = args->array;
-  if ('=' == sections[0][0]) {
+  if ('#' == sections[0][0]) {
     // In the form <#expression>, 12 bits unsigned
     token->SDT.offset.is_imm = 0;
     token->SDT.offset.expression = parse_immediate_value(&sections[0][1]);
@@ -244,7 +244,7 @@ void parse_operand_data_transfer(StringArray *args, Token *token) {
   } else if ('r' == sections[0][0]) {
     // In the form Rm{,<shift>}
     token->SDT.offset.is_imm = 1;
-    token->SDT.rn = string_to_reg_address(sections[0]);
+    token->SDT.offset.ShiftedReg.rm = string_to_reg_address(sections[0]);
 
     if (args->size >= 2) {
       // Has shift

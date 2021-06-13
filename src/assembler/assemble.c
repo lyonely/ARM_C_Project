@@ -9,6 +9,7 @@
 #include "functions.h"
 #include "symboltable.h"
 #include "parser.h"
+#include "tokeniser.h"
 
 void assemble(StringArray *source) {
   // Converted instructions stored here
@@ -18,74 +19,32 @@ void assemble(StringArray *source) {
   SymbolTable *symboltable = create_symboltable(source);
   
   // TODO: read mnemonic and operands (tokeniser)
+  TokenArray* tokens = tokenise(source, symboltable);
 
-  int current_line = 0;
-  
-  while(current_line < source->size) {
+  int current_token = 0;
+  Token* token;
+
+  while(current_token < tokens->size) {
     Instruction *instr = malloc(sizeof(Instruction));
-    Operation op; // TODO: get operation
+    token = tokens->array[current_token];
     
-    DataProcessingInstruction *datap_instr;
-    MultiplyInstruction *mul_instr;
-    BranchInstruction *branch_instr;
-    DataTransferInstruction *sdt_instr;
-
-    switch(op) {
-      // Data Processing
-      case AND:
-      case EOR:
-      case SUB:
-      case RSB:
-      case ADD:
-      case ORR:
-      case MOV:
-      case TST:
-      case TEQ:
-      case CMP: 
-      case LSL:
-      case ANDEQ:
-        datap_instr = malloc(sizeof(DataProcessingInstruction));
-        // TODO: Populate datap_instr with the correct fields
-        build_datap_instr(datap_instr, instr);
-        free(datap_instr);
+    // TODO: set up instruction building for additional stored bytes
+    switch(get_type(token->opcode)) {
+      case DATA_P:
+        // build_datap_instr(token, instr);
         break;
-
-      // Multiply
-      case MUL:
-      case MLA:
-        mul_instr = malloc(sizeof(MultiplyInstruction));
-        // TODO: Populate mul_instr with correct fields
-        build_multiply_instr(mul_instr, instr);
-        free(mul_instr);
+      case MULTIPLY:
+        // build_multiply_instr(token, instr);
         break;
-      
-      // Single Data Transfer
-      case LDR:
-      case STR:
-        sdt_instr = malloc(sizeof(DataTransferInstruction));
-        build_sdt_instr(sdt_instr, instr);
-        free(sdt_instr);
+      case SDT:
+        // build_sdt_instr(token, instr);
         break;
-
-      // Branch
-      case BEQ:
-      case BNE:
-      case BGE:
-      case BLT:
-      case BGT:
-      case BLE:
-      case B:
-        branch_instr = malloc(sizeof(BranchInstruction));
-        // build_branch_instr(branch_instr, instr, curr_addr, symboltable);
-        free(branch_instr);
-        break;
-
       default:
+        // build_branch_instr(token, instr);
         break;
     }
-
-    instructions[current_line] = *instr;
-    current_line++;
+    instructions[current_token] = *instr;
+    current_token++;
   }
   
   // Writes instruction array to binary file

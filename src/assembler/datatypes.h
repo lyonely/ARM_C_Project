@@ -175,7 +175,7 @@ typedef struct {
 } Op2;
 
 typedef struct {
-  int is_imm; // = 1 if offset is interpreted as shifted register
+  int is_imm; // = 1 if offset is interpreted as a shifted register (rn)
 
   union {
     int expression; // offset by <#expression> bytes
@@ -220,6 +220,11 @@ typedef struct {
     } SDT;
   };
 } Token;
+
+typedef struct {
+  Token** array;
+  int size;
+} TokenArray;
 
 #endif
 

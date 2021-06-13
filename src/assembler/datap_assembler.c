@@ -33,24 +33,24 @@ void set_op2imm_imm_field(int imm, Instruction* i) {
 	*i |= imm;
 }
 
-void build_datap_instr(DataProcessingInstruction* instr, Instruction* i) {
+void build_datap_instr(Token* token, Instruction* i) {
   set_cond_field(i);
-  set_opcode_field(instr->opcode, i);
-  set_flag_field(instr->opcode, i);
-  set_rn_field(instr->rn, i);
-  set_rd_field(instr->rd, i);
+  set_opcode_field(token->opcode, i);
+  set_flag_field(token->opcode, i);
+  set_rn_field(token->DataP.rn, i);
+  set_rd_field(token->DataP.rd, i);
   
-  if (instr->is_imm) {
+  if (token->DataP.operand2.is_imm) {
     set_imm_field(i);
-    set_op2imm_rotate_field(instr->rotation, i);
-    set_op2imm_imm_field(instr->imm, i);
+    set_op2imm_rotate_field(token->DataP.operand2.imm_operand.rotation, i);
+    set_op2imm_imm_field(token->DataP.operand2.imm_operand.immediate, i);
   } else {
-    set_op2reg_rm_field(instr->rm, i);
-    set_op2reg_shifttype_field(instr->shift_type, i);
-    if (instr->shift_by_reg) { 
-      set_op2reg_shiftreg_field(instr->rs, i);
+    set_op2reg_rm_field(token->DataP.operand2.reg_operand.rm, i);
+    set_op2reg_shifttype_field(token->DataP.operand2.reg_operand.shift_type, i);
+    if (token->DataP.operand2.reg_operand.shift_by_reg) { 
+      set_op2reg_shiftreg_field(token->DataP.operand2.reg_operand.shift.rs, i);
     } else {
-      set_op2reg_shiftamt_field(instr->shift_amount, i);
+      set_op2reg_shiftamt_field(token->DataP.operand2.reg_operand.shift.immediate_shift, i);
     }
   }
 }

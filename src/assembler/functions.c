@@ -70,6 +70,11 @@ unsigned int get_num_args(Operation opcode) {
   }
 }
 
+void free_tokenarray(TokenArray* t_array) {
+  free(t_array->array);
+  free(t_array);
+}
+
 // Sets bit 25
 void set_imm_field(Instruction* i) {
 	*i |= 0x02000000;
@@ -91,7 +96,7 @@ void set_op2reg_shiftamt_field(int amt, Instruction* i) {
 }
 
 // Sets bits 6-5 to shift type
-void set_op2reg_shifttype_field(Shift type, Instruction* i) {
+void set_op2reg_shifttype_field(ShiftType type, Instruction* i) {
 	*i |= (type << 5);
 }
 

@@ -16,6 +16,9 @@ Type get_type(Operation opcode);
 // Gets expected number of arguments for operation
 unsigned int get_num_args(Operation opcode);
 
+// Frees TokenArray struct
+void free_tokenarray(TokenArray* t_array);
+
 // Sets bit 25 of instruction
 void set_imm_field(Instruction* i);
 
@@ -29,7 +32,7 @@ void set_rd_field(int rd, Instruction* i);
 void set_op2reg_shiftamt_field(int amt, Instruction* i);
 
 // Sets bits 6-5 to shift type
-void set_op2reg_shifttype_field(Shift type, Instruction* i);
+void set_op2reg_shifttype_field(ShiftType type, Instruction* i);
 
 // Sets bits 11-8 to rs number, sets bit 7 = 0 and sets bit 4
 // (register specified shift)

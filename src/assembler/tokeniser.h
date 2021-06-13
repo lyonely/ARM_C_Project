@@ -19,5 +19,5 @@ void tokenise_multiply(char* str, Token *token);
 void tokenise_branch(char* str, Token *token, SymbolTable *symboltable);
 
 // Tokenises assembly code into array of Tokens
-Token **tokenise(StringArray *code, SymbolTable *symboltable);
+TokenArray *tokenise(StringArray *code, SymbolTable *symboltable);
 

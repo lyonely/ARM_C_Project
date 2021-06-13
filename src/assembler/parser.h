@@ -23,14 +23,14 @@ RegAddress string_to_reg_address(char *str);
 ShiftType string_to_shift(char *str);
 
 //Parses the shift and adds it to the given instruction
-void parse_shift_data_processing(StringArray *tokens, Token *token);
+void parse_shift_data_processing(StringArray *args, Token *token);
 
-void parse_shift_data_transfer(StringArray *tokens, Token *token);
+void parse_shift_data_transfer(StringArray *args, Token *token);
 
 //Parses operand and adds it to the given instruction
-void parse_operand_data_processing(StringArray *tokens, Token *token);
+void parse_operand_data_processing(StringArray *args, Token *token);
 
-void parse_operand_data_transfer(StringArray *tokens, Token *token);
+void parse_offset_data_transfer(StringArray *args, Token *token);
 
 //Returns the immediate value given by the string
 uint32_t parse_immediate_value(char *str);

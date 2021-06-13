@@ -4,7 +4,7 @@
 #include "datatypes.h"
 
 // Converts data processing struct into Instruction
-void build_datap_instr(DataProcessingInstruction* instr, Instruction* i);
+void build_datap_instr(Token* token, Instruction* i);
 
 #endif
 
