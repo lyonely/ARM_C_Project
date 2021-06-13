@@ -51,7 +51,7 @@ int main(void) {
 	if (ans == 'y') {
 		human_player = false;
 		printf("Choose your opponent!\n");
-		printf("1 - Greedy Gregory, 2 - Random Ralph, 3 - Minimax Matt\n");
+		printf("1 - Greedy Gregory, 2 - Random Ralph, 3 - Minimax Matt, 4 - Lousy Louis\n");
 		int choice;
 		scanf("%d", &choice);
 		if (choice == 1) {
@@ -60,6 +60,8 @@ int main(void) {
 			generate_move = &randomize;
 		} else if (choice == 3) {
 			generate_move = &minimax;
+		} else if (choice == 4) {
+			generate_move = &lousy;
 		}
 		printf("Would you like to be the first or second player?\n");
 		printf("1 - first player, 2 - second player\n");

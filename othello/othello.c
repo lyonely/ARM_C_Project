@@ -377,3 +377,5 @@ void greedy(board_t board, move_t* move, Player player, legalmoves_t* legalmoves
 void randomize(board_t board, move_t* move, Player player, legalmoves_t* legalmoves) {}
 
 void minimax(board_t board, move_t* move, Player player, legalmoves_t* legalmoves) {}
+
+void lousy(board_t board, move_t* move, Player player, legalmoves_t* legalmoves) {}
