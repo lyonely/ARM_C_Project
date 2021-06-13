@@ -372,3 +372,4 @@ void get_move(Player player, move_t* move) {
 	}
 }
 
+
