@@ -47,15 +47,4 @@ bool endgame(board_t board);
 // returns the move from player input
 void get_move(Player player, move_t* move);
 
-// greedy implementation
-void greedy(board_t board, move_t* move, Player player, legalmoves_t* legalmoves);
-
-// random implementation
-void randomize(board_t board, move_t* move, Player player, legalmoves_t* legalmoves);
-
-// minimax implementation
-void minimax(board_t board, move_t* move, Player player, legalmoves_t* legalmoves);
-
-//lousy implementation
-void lousy(board_t board, move_t* moev, Player player, legalmoves_t* legalmoves);
 #endif
