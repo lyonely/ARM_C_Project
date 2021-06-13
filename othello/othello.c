@@ -52,24 +52,27 @@ bool is_legal(move_t move, board_t board){
     if ((*board)[move.row][move.col] != '-'){
         return false;
     }
+	
+//	printf("checking row: %d, col %d\n", move.row, move.col);
 
     char player_piece;
 	char opponent_piece;
 
-    if(move.player == BLACK){
+    if(move.player == 1){
         player_piece = 'X';
 		opponent_piece = 'O';
-    } else if (move.player == WHITE){
+    } else if (move.player == 2){
         player_piece = 'O';
 		opponent_piece = 'X';
     }
-    
+
 	// checks the N direction
 	if (!(move.row == 0) && ((*board)[move.row - 1][move.col] == opponent_piece)) {
 		for (int r = move.row - 1; r >= 0; r--) {
 			if ((*board)[r][move.col] == '-') {
 				break;
 			} else if ((*board)[r][move.col] == player_piece) {
+				printf("row: %d, col: %d is legal\n", move.row, move.col);
 				return true;
 			}
 		}
@@ -78,10 +81,11 @@ bool is_legal(move_t move, board_t board){
 	// checks the NE direction
 	if (!(move.row == 0) && !(move.col == 7) \
 			&& ((*board)[move.row - 1][move.col + 1] == opponent_piece)) {
-		for (int i = 1; (move.row - i) >= 0 || (move.col + i) <= 7; i++) {
+		for (int i = 1; ((move.row - i) >= 0) && ((move.col + i) <= 7); i++) {
 			if ((*board)[move.row - i][move.col + i] == '-') {
 				break;
 			} else if ((*board)[move.row - i][move.col + i] == player_piece) {
+				printf("row: %d, col: %d is legal\n", move.row, move.col);
 				return true;
 			}
 		}
@@ -93,6 +97,7 @@ bool is_legal(move_t move, board_t board){
 			if ((*board)[move.row][c] == '-') {
 				break;
 			} else if ((*board)[move.row][c] == player_piece) {
+				printf("row: %d, col: %d is legal\n", move.row, move.col);
 				return true;
 			}
 		}
@@ -101,10 +106,11 @@ bool is_legal(move_t move, board_t board){
 	// checks the SE direction
 	if (!(move.row == 7) && !(move.col == 7) \
 			&& ((*board)[move.row + 1][move.col + 1] == opponent_piece)) {
-		for (int i = 1; (move.row + i) <= 7 || (move.col + i) <= 7; i++) {
+		for (int i = 1; ((move.row + i) <= 7) && ((move.col + i) <= 7); i++) {
 			if ((*board)[move.row + i][move.col + i] == '-') {
 				break;
 			} else if ((*board)[move.row + i][move.col + i] == player_piece) {
+				printf("row: %d, col: %d is legal\n", move.row, move.col);
 				return true;
 			}
 		}
@@ -116,6 +122,7 @@ bool is_legal(move_t move, board_t board){
 			if ((*board)[r][move.col] == '-') {
 				break;
 			} else if ((*board)[r][move.col] == player_piece) {
+				printf("row: %d, col: %d is legal\n", move.row, move.col);
 				return true;
 			}
 		}
@@ -124,10 +131,11 @@ bool is_legal(move_t move, board_t board){
 	// checks the SW direction
 	if (!(move.row == 7) && !(move.col == 0) \
 			&& ((*board)[move.row + 1][move.col - 1] == opponent_piece)) {
-		for (int i = 1; (move.row + i) <= 7 || (move.col - i) >= 0; i++) {
+		for (int i = 1; ((move.row + i) <= 7) && ((move.col - i) >= 0); i++) {
 			if ((*board)[move.row + i][move.col - i] == '-') {
 				break;
 			} else if ((*board)[move.row + i][move.col - i] == player_piece) {
+				printf("row: %d, col: %d is legal\n", move.row, move.col);
 				return true;
 			}
 		}
@@ -139,6 +147,7 @@ bool is_legal(move_t move, board_t board){
 			if ((*board)[move.row][c] == '-') {
 				break;
 			} else if ((*board)[move.row][c] == player_piece) {
+				printf("row: %d, col: %d is legal\n", move.row, move.col);
 				return true;
 			}
 		}
@@ -147,10 +156,11 @@ bool is_legal(move_t move, board_t board){
 	// checks the NW direction
 	if (!(move.col == 0) && !(move.row == 0) \
 			&& ((*board)[move.row - 1][move.col - 1] == opponent_piece)) {
-		for (int i = 1; (move.row - 1) >= 0 || (move.col - 1) >= 0; i++) {
+		for (int i = 1; ((move.row - i) >= 0) && ((move.col - i) >= 0); i++) {
 			if ((*board)[move.row - i][move.col - i] == '-') {
 				break;
 			} else if ((*board)[move.row - i][move.col - i] == player_piece) {
+				printf("row: %d, col: %d is legal\n", move.row, move.col);
 				return true;
 			}
 		}
@@ -172,19 +182,8 @@ bool endgame(board_t board){
     return true;
 }
 
-legalmoves_t* legalmove(board_t board, Player player) {
-	legalmoves_t* legalmoves = malloc(sizeof(legalmoves_t));
-	if (legalmoves == NULL) {
-		perror("Failed to allocate memory for legalmoves_t");
-		exit(EXIT_FAILURE);
-	}
+void legalmove(board_t board, Player player, legalmoves_t* legalmoves) {
 	legalmoves->size = 0;
-	legalmoves->moves = calloc(HEIGHT*WIDTH, sizeof(move_t));
-	if (legalmoves->moves == NULL) {
-		perror("Failed to allocate memory for moves array");
-		exit(EXIT_FAILURE);
-	}
-
 	move_t move;
 	(&move)->player = player;
 	
@@ -198,13 +197,6 @@ legalmoves_t* legalmove(board_t board, Player player) {
 			}
 		}
 	}
-
-	legalmoves->moves = realloc(legalmoves->moves, legalmoves->size * sizeof(move_t));
-	if (legalmoves->moves == NULL) {
-		perror("Failed to reallocate memory for moves array");
-		exit(EXIT_FAILURE);
-	}
-	return legalmoves;
 }
 
 // PRE: input move is legal
@@ -214,10 +206,10 @@ void make_move(move_t move, board_t board) {
 	char player_piece;
 	char opponent_piece;
 
-    if(move.player == BLACK){
+    if(move.player == 1){
         player_piece = 'X';
 		opponent_piece = 'O';
-    } else if (move.player == WHITE){
+    } else if (move.player == 2){
         player_piece = 'O';
 		opponent_piece = 'X';
     }
@@ -238,8 +230,8 @@ void make_move(move_t move, board_t board) {
 
 	// checks the NE direction
 	if (!(move.row == 0) && !(move.col == 7) \
-			&& ((*board)[move.row - 1][move.col + 1] = opponent_piece)) {
-		for (int i = 1; (move.row - i) >= 0 || (move.col + i) <= 7; i++) {
+			&& ((*board)[move.row - 1][move.col + 1] == opponent_piece)) {
+		for (int i = 1; (move.row - i) >= 0 && (move.col + i) <= 7; i++) {
 			if ((*board)[move.row - i][move.col + i] == '-') {
 				break;
 			} else if ((*board)[move.row - i][move.col + i] == player_piece) {
@@ -267,8 +259,8 @@ void make_move(move_t move, board_t board) {
 
 	// checks the SE direction
 	if (!(move.row == 7) && !(move.col == 7) \
-			&& ((*board)[move.row + 1][move.col + 1] = opponent_piece)) {
-		for (int i = 1; (move.row + i) <= 7 || (move.col + i) <= 7; i++) {
+			&& ((*board)[move.row + 1][move.col + 1] == opponent_piece)) {
+		for (int i = 1; (move.row + i) <= 7 && (move.col + i) <= 7; i++) {
 			if ((*board)[move.row + i][move.col + i] == '-') {
 				break;
 			} else if ((*board)[move.row + i][move.col + i] == player_piece) {
@@ -287,7 +279,7 @@ void make_move(move_t move, board_t board) {
 				break;
 			} else if ((*board)[r][move.col] == player_piece) {
 				for (int i = move.row; i <= r; i++) {
-					(*board)[r][move.col] = player_piece;
+					(*board)[i][move.col] = player_piece;
 				}
 				break;
 			}
@@ -296,8 +288,8 @@ void make_move(move_t move, board_t board) {
 
 	// checks the SW direction
 	if (!(move.row == 7) && !(move.col == 0) \
-			&& ((*board)[move.row + 1][move.col - 1] = opponent_piece)) {
-		for (int i = 1; (move.row + i) <= 7 || (move.col - i) >= 0; i++) {
+			&& ((*board)[move.row + 1][move.col - 1] == opponent_piece)) {
+		for (int i = 1; (move.row + i) <= 7 && (move.col - i) >= 0; i++) {
 			if ((*board)[move.row + i][move.col - i] == '-') {
 				break;
 			} else if ((*board)[move.row + i][move.col - i] == player_piece) {
@@ -311,11 +303,11 @@ void make_move(move_t move, board_t board) {
 
 	// checks the W direction
 	if (!(move.col == 0) && ((*board)[move.row][move.col - 1] == opponent_piece)) {
-		for (int c = move.col; c >= 0; c--) {
+		for (int c = move.col - 1; c >= 0; c--) {
 			if ((*board)[move.row][c] == '-') {
 				break;
 			} else if ((*board)[move.row][c] == player_piece) {
-				for (int i = move.col -1; i >= c; i--) {
+				for (int i = move.col; i >= c; i--) {
 					(*board)[move.row][i] = player_piece;
 				}
 				break;
@@ -325,8 +317,8 @@ void make_move(move_t move, board_t board) {
 
 	// checks the NW direction
 	if (!(move.col == 0) && !(move.row == 0) \
-			&& ((*board)[move.row - 1][move.col - 1] = opponent_piece)) {
-		for (int i = 1; (move.row - 1) >= 0 || (move.col - 1) >= 0; i++) {
+			&& ((*board)[move.row - 1][move.col - 1] == opponent_piece)) {
+		for (int i = 1; (move.row - i) >= 0 && (move.col - i) >= 0; i++) {
 			if ((*board)[move.row - i][move.col - i] == '-') {
 				break;
 			} else if ((*board)[move.row - i][move.col - i] == player_piece) {
@@ -365,37 +357,14 @@ int outcome(board_t board){
 }
 
 // returns a move from player input
-move_t* get_move(Player player) {
+void get_move(Player player, move_t* move) {
 	printf("Player %d please choose the position to place your piece: \n", player);
-	move_t* move;
-	move = malloc(sizeof(move_t));
-	if (move == NULL) {
-		perror("Failed to allocate memory for moves");
-		exit(EXIT_FAILURE);
-	}
-	char p_pos[2];
-	scanf("%s", p_pos);
-	move->row = p_pos[0];
-	move->col = p_pos[2];
+	printf("(Enter row then column)\n");
+	int row;
+	char col;
+	scanf("%d%c", &row, &col);
+	move->row = row - 1;
+	move->col = col - 'A';
 	move->player = player;
-
-	return move;
 }
-/*
-// temporary main function for testing
-int main(void){
-    board_t board = initial_board();
-    print_board(board);
-    printf("endgame: %i\n",endgame(board));
 
-    move_t move;
-    move.row = 2;
-    move.col = 3;
-    move.player = BLACK;
-    printf("is legal: %i\n", is_legal(move,board));
-
-    printf("***************** Welcome to our game of OTHELLO! *****************\n\n");
-    printf("Flip your opponent's pieces by trapping them between 2 of your own.\n");
-    printf("Your aim is to own more pieces than your opponent when the game is over.\n");
-}
-*/

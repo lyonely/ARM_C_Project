@@ -23,28 +23,39 @@ int main(void) {
     board_t board = initial_board();
     	
 	Player curr = 1;
-	legalmoves_t* legalmoves;
-	move_t* move = NULL;
+	legalmoves_t* legalmoves = malloc(sizeof(legalmoves_t));
+	if (legalmoves == NULL) {
+		perror("failed to allocate memory for legalmoves");
+		exit(EXIT_FAILURE);
+	}
+	legalmoves->moves = calloc(HEIGHT*WIDTH, sizeof(move_t));
+	if (legalmoves->moves == NULL) {
+		perror("Failed to allocate memory for moves array");
+		exit(EXIT_FAILURE);
+	}
+	move_t* move = malloc(sizeof(move_t));
+	if (move == NULL) {
+		perror("failed to allocate memory for move");
+		exit(EXIT_FAILURE);
+	}
 	int tracker = 0; //keeps track of number of players who do not have legal moves left
-
+		
 	while (1) {
 		print_board(board);
-    	legalmoves = legalmove(board, curr);
+    	legalmove(board, curr, legalmoves);
 		if (legalmoves->size > 0) {
 			tracker = 0;
 			do {
-				if (move != NULL) {
-					free(move);
+				get_move(curr, move);
+				if (!is_legal(*move, board)) {
+					printf("Illegal move detected.\n");
 				}
-				move = get_move(curr);
-			} while (is_legal(*move, board));
+			} while (!is_legal(*move, board));
 			make_move(*move, board);
-			free(move);
 		} else {
+			printf("No available moves, passing on the next player...\n");
 			tracker++;
 		}
-		free(legalmoves->moves);
-		free(legalmoves);
 		curr = abs(3 - curr);
 		if (endgame(board) || tracker == 2) {
 			break;
@@ -55,6 +66,10 @@ int main(void) {
 	if (result == 0) {
 		printf("The game ended in a draw...\n");
 	} else {
-		printf("Player %d has won!", result);
+		printf("Player %d has won!\n", result);
 	}
+	free(board);
+	free(legalmoves->moves);
+	free(legalmoves);
+	free(move);
 }
