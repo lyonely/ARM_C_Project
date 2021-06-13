@@ -228,7 +228,7 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[r][move.col] == '-') {
 				break;
 			} else if ((*board)[r][move.col] == player_piece) {
-				for (int i = move.row - 1; i >= r; i--) {
+				for (int i = move.row; i >= r; i--) {
 					(*board)[i][move.col] = player_piece;
 				}
 				break;
@@ -243,7 +243,7 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[move.row - i][move.col + i] == '-') {
 				break;
 			} else if ((*board)[move.row - i][move.col + i] == player_piece) {
-				for (int j = 1; j <= i; j++) {
+				for (int j = 0; j <= i; j++) {
 					(*board)[move.row - j][move.col + j] = player_piece;
 				}
 				break;
@@ -257,7 +257,7 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[move.row][c] == '-') {
 				break;
 			} else if ((*board)[move.row][c] == player_piece) {
-				for (int i = move.col + 1; i <= c; i++) {
+				for (int i = move.col; i <= c; i++) {
 					(*board)[move.row][i] = player_piece;
 				}
 				break;
@@ -272,7 +272,7 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[move.row + i][move.col + i] == '-') {
 				break;
 			} else if ((*board)[move.row + i][move.col + i] == player_piece) {
-				for (int j = 1; j <= i; j++) {
+				for (int j = 0; j <= i; j++) {
 					(*board)[move.row + j][move.col + j] = player_piece;
 				}
 				break;
@@ -286,7 +286,7 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[r][move.col] == '-') {
 				break;
 			} else if ((*board)[r][move.col] == player_piece) {
-				for (int i = move.row + 1; i <= r; i++) {
+				for (int i = move.row; i <= r; i++) {
 					(*board)[r][move.col] = player_piece;
 				}
 				break;
@@ -301,7 +301,7 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[move.row + i][move.col - i] == '-') {
 				break;
 			} else if ((*board)[move.row + i][move.col - i] == player_piece) {
-				for (int j = 1; j <= i; j++) {
+				for (int j = 0; j <= i; j++) {
 					(*board)[move.row + j][move.col - j] = player_piece;
 				}
 				break;
@@ -311,7 +311,7 @@ void make_move(move_t move, board_t board) {
 
 	// checks the W direction
 	if (!(move.col == 0) && ((*board)[move.row][move.col - 1] == opponent_piece)) {
-		for (int c = move.col - 1; c >= 0; c--) {
+		for (int c = move.col; c >= 0; c--) {
 			if ((*board)[move.row][c] == '-') {
 				break;
 			} else if ((*board)[move.row][c] == player_piece) {
@@ -330,7 +330,7 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[move.row - i][move.col - i] == '-') {
 				break;
 			} else if ((*board)[move.row - i][move.col - i] == player_piece) {
-				for (int j = 1; j <= i; j++) {
+				for (int j = 0; j <= i; j++) {
 					(*board)[move.row - j][move.col - j] = player_piece;
 				}
 				break;
@@ -364,6 +364,23 @@ int outcome(board_t board){
     return 0;
 }
 
+// returns a move from player input
+move_t* get_move(Player player) {
+	printf("Player %d please choose the position to place your piece: \n", player);
+	move_t* move;
+	move = malloc(sizeof(move_t));
+	if (move == NULL) {
+		perror("Failed to allocate memory for moves");
+		exit(EXIT_FAILURE);
+	}
+	char p_pos[2];
+	scanf("%s", p_pos);
+	move->row = p_pos[0];
+	move->col = p_pos[2];
+	move->player = player;
+
+	return move;
+}
 /*
 // temporary main function for testing
 int main(void){

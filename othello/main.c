@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "othello.h"
 
 /*  FLOW
@@ -16,15 +17,44 @@ int main(void) {
     printf("***************** Welcome to our game of OTHELLO! *****************\n\n");
     printf("RULES:\n");
     printf("- Flip your opponent's pieces by trapping them between 2 of your own.\n");
-    printf("- Your aim is to own more pieces than your opponent when the game is over.\n\n");
+    printf("- Your aim is to own more pieces than your opponent when the game is over.\n");
+	printf("- Player 1 is represented by X while player 2 is represented by O.\n\n");
 
     board_t board = initial_board();
-    print_board(board);
+    	
+	Player curr = 1;
+	legalmoves_t* legalmoves;
+	move_t* move = NULL;
+	int tracker = 0; //keeps track of number of players who do not have legal moves left
 
-    printf("Player1 please choose the position to place your piece: \n");
-
-    char p1_pos[2];
-    scanf("%s", p1_pos);
-    printf("%s\n", p1_pos);
-
+	while (1) {
+		print_board(board);
+    	legalmoves = legalmove(board, curr);
+		if (legalmoves->size > 0) {
+			tracker = 0;
+			do {
+				if (move != NULL) {
+					free(move);
+				}
+				move = get_move(curr);
+			} while (is_legal(*move, board));
+			make_move(*move, board);
+			free(move);
+		} else {
+			tracker++;
+		}
+		free(legalmoves->moves);
+		free(legalmoves);
+		curr = abs(3 - curr);
+		if (endgame(board) || tracker == 2) {
+			break;
+		}
+	}
+	print_board(board);
+	int result = outcome(board);
+	if (result == 0) {
+		printf("The game ended in a draw...\n");
+	} else {
+		printf("Player %d has won!", result);
+	}
 }
