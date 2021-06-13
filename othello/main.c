@@ -39,18 +39,52 @@ int main(void) {
 		exit(EXIT_FAILURE);
 	}
 	int tracker = 0; //keeps track of number of players who do not have legal moves left
-		
+	bool human_player = true; //true if you're playing against a human player, false if you're against a bot
+	Player turn; // 1 if you're playing first, 2 if you're playing second (applicable only for playing against bots)
+
+	printf("Would you like to play against an AI? (y/n)\n");
+	char ans;
+	scanf("%c", &ans);
+
+	void (*generate_move)(board_t board, move_t*, Player, legalmoves_t*);
+
+	if (ans == 'y') {
+		human_player = false;
+		printf("Choose your opponent!\n");
+		printf("1 - Greedy Gregory, 2 - Random Ralph, 3 - Minimax Matt\n");
+		int choice;
+		scanf("%d", &choice);
+		if (choice == 1) {
+			generate_move = &greedy;
+		} else if (choice == 2) {
+			generate_move = &randomize;
+		} else if (choice == 3) {
+			generate_move = &minimax;
+		}
+		printf("Would you like to be the first or second player?\n");
+		printf("1 - first player, 2 - second player\n");
+		scanf("%d", &choice);
+		turn = choice;
+	} else if (ans == 'n') {
+		printf("Proceeding with normal 2-player game\n");
+	}
+	
 	while (1) {
 		print_board(board);
     	legalmove(board, curr, legalmoves);
 		if (legalmoves->size > 0) {
 			tracker = 0;
-			do {
-				get_move(curr, move);
-				if (!is_legal(*move, board)) {
-					printf("Illegal move detected.\n");
-				}
-			} while (!is_legal(*move, board));
+			if (!human_player && turn != curr) {
+				printf("Bot is now making its move.\n");
+				generate_move(board, move, curr, legalmoves);
+			} else {
+				do {
+					get_move(curr, move);
+					if (!is_legal(*move, board)) {
+						printf("Illegal move detected.\n");
+					}
+				} while (!is_legal(*move, board));
+			}
 			make_move(*move, board);
 		} else {
 			printf("No available moves, passing on the next player...\n");
