@@ -8,6 +8,11 @@
 typedef uint32_t Instruction;
 
 typedef struct {
+  Instruction* array;
+  uint16_t size;
+} InstructionArray;
+
+typedef struct {
     char ** array;
     uint16_t size;
 } StringArray;    
@@ -206,11 +211,6 @@ typedef struct {
     } SDT;
   };
 } Token;
-
-typedef struct {
-  Token** array;
-  int size;
-} TokenArray;
 
 #endif
 

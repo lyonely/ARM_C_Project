@@ -5,7 +5,7 @@
 #include "datatypes.h"
 
 // Writes an array of instructions into a binary file (/out/program.bin)
-void write_to_file(Instruction *instructions, int num_instructions);
+void write_to_file(InstructionArray *instructions);
 
 // Converts instruction from big-endian to little-endian format
 void get_little_endian(Instruction *i);
@@ -15,9 +15,6 @@ Type get_type(Operation opcode);
 
 // Gets expected number of arguments for operation
 unsigned int get_num_args(Operation opcode);
-
-// Frees TokenArray struct
-void free_tokenarray(TokenArray* t_array);
 
 // Sets bit 25 of instruction
 void set_imm_field(Instruction* i);

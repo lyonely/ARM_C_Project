@@ -3,9 +3,9 @@
 #include "datatypes.h"
 
 // Writes an array of instructions into a binary file
-void write_to_file(Instruction *instructions, int num_instructions) {
+void write_to_file(InstructionArray *instructions) {
   FILE *fp = fopen("../../out/program.bin", "wb");
-  fwrite(instructions, sizeof(Instruction), num_instructions, fp);
+  fwrite(instructions->array, sizeof(Instruction), instructions->size, fp);
   fclose(fp);
 }
 
@@ -68,11 +68,6 @@ unsigned int get_num_args(Operation opcode) {
     default:
       return 2;
   }
-}
-
-void free_tokenarray(TokenArray* t_array) {
-  free(t_array->array);
-  free(t_array);
 }
 
 // Sets bit 25

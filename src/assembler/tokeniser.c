@@ -45,7 +45,6 @@ void tokenise_dataprocessing(char* str, Token *token) {
   free(operand2);
 }
 
-// TODO tokenise address into [rn, rm, shift], set up bit and pre/postindex
 void tokenise_datatransfer(char* str, Token *token) {
   char* arg = strcpy(malloc(strlen(str) + 1), str);
   StringArray* offset = malloc(sizeof(StringArray));
@@ -65,9 +64,8 @@ void tokenise_datatransfer(char* str, Token *token) {
       token->opcode = MOV;
       token->num_args = 2;
     } else {
-      // TODO: set PC as base reg
-      token->SDT.rn = 15; 
-      
+      // TODO: offset thing
+      token->SDT.rn = 15;     
     }
   } else {
     // address in the form [Rn] / [Rn, <offset>] / [Rn], <offset>
@@ -164,61 +162,44 @@ void tokenise_branch(char* str, Token *token, SymbolTable *symboltable) {
   }
 }
 
-// Tokenises assembly code into array of Tokens
-TokenArray *tokenise(StringArray *code, SymbolTable *symboltable) {
-  Token **tokens = calloc(code->size, sizeof(Token*));
-  if (tokens == NULL) {
-    perror("Failed memory allocation in tokenise");
-    exit(EXIT_FAILURE);
+// Tokenises assembly code and parses into Instruction
+int tokenise(char *line, int address, SymbolTable *symboltable, Token *token) {
+  char *opcode = strtok(line, " ");
+  char *args = strtok(NULL, " ");
+ 
+  // Label reached, skip line
+  if (!args) {
+    free(token);
+    return 0;
   }
 
-  // Loop to tokenise each line
-  int current_line = 0;
-  int token_pos = 0;
-  while (current_line < code->size) {
-    Token *token = malloc(sizeof(token));
+  token->opcode = string_to_operation(opcode);
+  token->address = address * sizeof(Instruction);
+  token->num_args = get_num_args(token->opcode);
 
-    if (token == NULL) {
-      perror("failed memory allocation in tokenise");
-      exit(EXIT_FAILURE);
-    }
+  // Condition for branch instructions
+  if (opcode[0] == 'b' && opcode[1]) {
+    char cond[2];
+    memcpy(cond, &opcode[1], 2);
+    token->cond = string_to_condition(cond);
+  } else {
+    token->cond = AL;
+  }
+  
+  switch(get_type(token->opcode)) {
+    case DATA_P:
+      tokenise_dataprocessing(line, token);
+    case MULTIPLY:
+      tokenise_multiply(line, token);
+    case SDT:
+      tokenise_datatransfer(line, token);
+    default:
+      tokenise_branch(line, token, symboltable);
+  }
+  return 1;
+}
 
-    char *line = code->array[current_line];
-
-    // Opcode
-    char *opcode = strtok(line, " ");
-    char *args = strtok(NULL, " ");
-   
-    // Label reached, skip line
-    if (!args) {
-      free(token);
-      current_line++;
-      continue;
-    }
-
-    token->opcode = string_to_operation(opcode);
-    token->address = token_pos * sizeof(Instruction);
-    token->num_args = get_num_args(token->opcode);
-
-    // Condition for branch instructions
-    if (opcode[0] == 'b' && opcode[1]) {
-      char cond[2];
-      memcpy(cond, &opcode[1], 2);
-      token->cond = string_to_condition(cond);
-    } else {
-      token->cond = AL;
-    }
-    
-    switch(get_type(token->opcode)) {
-      case DATA_P:
-        tokenise_dataprocessing(line, token);
-      case MULTIPLY:
-        tokenise_multiply(line, token);
-      case SDT:
-        tokenise_datatransfer(line, token);
-      default:
-        tokenise_branch(line, token, symboltable);
-    }
+  /*
     tokens[token_pos] = token;
     current_line++;
     token_pos++;
@@ -227,5 +208,5 @@ TokenArray *tokenise(StringArray *code, SymbolTable *symboltable) {
   t_array->array = tokens;
   t_array->size = token_pos;
   return t_array;
-}
+ */
 
