@@ -108,20 +108,6 @@ typedef enum {
 } Condition;  
 
 typedef struct {
-  Opcode opcode;
-  int rd;
-  int rn;
-  int is_imm;
-  int rotation; // set when is_imm = 1
-  int imm; // set when is_imm = 1
-  ShiftType shift_type; // set when is_imm = 0
-  int shift_by_reg; // is_imm = 0
-  int shift_amount; // is_imm = 0, shift_by_reg = 0
-  int rs; // is_imm = 0, shift_by_reg = 1
-  int rm; // is_imm = 0 
-} DataProcessingInstruction;
-
-typedef struct {
   int acc;
   int rd;
   int rn;
