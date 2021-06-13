@@ -366,5 +366,9 @@ void get_move(Player player, move_t* move) {
 	move->row = row - 1;
 	move->col = col - 'A';
 	move->player = player;
+	if (move->row < 0 || move->row > 7 || move->col < 0 || move->col > 7) {
+		printf("Incorrect input. Please try again.\n");
+		get_move(player, move);
+	}
 }
 
