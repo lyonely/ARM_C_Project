@@ -8,7 +8,7 @@
 
 void parse_shift_data_processing(StringArray *args, Token *token) {
 	token->DataP.operand2.reg_operand.shift_type = string_to_shift(args->array[0]); // Shift type stored
-
+  
   if ('#' == args->array[1][0]) {
     // Shift by immediate
     char *number = &args->array[1][1];
@@ -44,6 +44,7 @@ void parse_shift_data_transfer(StringArray *args, Token *token) {
 void parse_operand_data_processing(StringArray *args, Token *token) {
   char **sections = args->array;
   if ('#' == sections[0][0]) {
+<<<<<<< HEAD
     // Operand2 in the form <#expression>
     if (token->opcode == LSL) {
       // Convert to mov rd, rd, lsl <#expression>
@@ -64,16 +65,31 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
             *imm_addr >>= 2;
             shift--;
         }
+=======
+    instruction->imm = parse_immediate_value(&sections[0][1]);
+
+    uint16_t shift = WORD_SIZE;
+    if (instruction->imm > 0xFF) {
+      while (!(instruction->imm & 0x3)) {
+          instruction->imm >>= 2;
+          shift--;
+>>>>>>> master
       }
       *rotation = shift;
     }
   } else if ('r' == sections[0][0]) {
+<<<<<<< HEAD
     // Operand2 in the form Rm{,<shift>}
     token->DataP.operand2.is_imm = 0;
     token->DataP.operand2.reg_operand.rm = string_to_reg_address(sections[0]);
 
     if (args->size >= 2) {
       // Rm has shift
+=======
+    instruction->rm = string_to_reg_address(sections[0]);
+
+    if (tokens->size >= 2) {
+>>>>>>> master
       StringArray *shift_tokens = malloc(sizeof(StringArray));
 
       if (!shift_tokens) {
@@ -81,7 +97,6 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
         exit(EXIT_FAILURE);
       }
 
-      // Pass the <shift> section into parse_shift
       shift_tokens->array = &sections[1];
       shift_tokens->size = args->size - 1;
       parse_shift_data_processing(shift_tokens, token);
@@ -96,6 +111,7 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
 void parse_offset_data_transfer(StringArray *args, Token *token) {
   char **sections = args->array;
   if ('#' == sections[0][0]) {
+<<<<<<< HEAD
     // Offset in the form <#expression>, 12 bits unsigned
     token->SDT.offset.is_imm = 0;
     token->SDT.offset.expression = parse_immediate_value(&sections[0][1]);
@@ -107,6 +123,24 @@ void parse_offset_data_transfer(StringArray *args, Token *token) {
 
     if (args->size >= 2) {
       // Rm has shift
+=======
+    instruction->imm_offset = parse_immediate_value(&sections[0][1]);
+
+    uint16_t shift = WORD_SIZE;
+    if (instruction->imm_offset > 0xFF) {
+      while (!(instruction->imm_offset & 0x3)) {
+          instruction->imm_offset >>= 2;
+          shift--;
+      }
+    }
+
+    instruction->shift_amount = shift;
+
+  } else if ('r' == sections[0][0]) {
+    instruction->rm = string_to_reg_address(sections[0]);
+
+    if (tokens->size >= 2) {
+>>>>>>> master
       StringArray *shift_tokens = malloc(sizeof(StringArray));
 
       if (!shift_tokens) {
@@ -114,7 +148,6 @@ void parse_offset_data_transfer(StringArray *args, Token *token) {
         exit(EXIT_FAILURE);
       }
 
-      // Pass the <shift> section into parse_shift
       shift_tokens->array = &sections[1];
       shift_tokens->size = args->size - 1;
       parse_shift_data_transfer(shift_tokens, token);
