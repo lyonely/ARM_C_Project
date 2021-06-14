@@ -60,11 +60,6 @@ SymbolTable* create_symboltable(StringArray* source){
         } else {
             // if line is not address corresponding to a label, add to source_without_labels
             if(skip == 0){
-                array_no_labels[no_labels_size] = malloc(sizeof(Instruction));
-                if(array_no_labels[no_labels_size] == NULL){
-                    perror("Memory couldn't be allocated for line in new StringArray.");
-                    exit(EXIT_FAILURE);
-                }
                 array_no_labels[no_labels_size] = line;
                 no_labels_size ++;
             } else {
@@ -84,7 +79,6 @@ SymbolTable* create_symboltable(StringArray* source){
    }
 
     /* Reassign source array to array without labels, only instructions */
-    array_no_labels = realloc(array_no_labels, no_labels_size * sizeof(Instruction));
     source -> array = array_no_labels;
     source -> size = no_labels_size;
 

@@ -108,12 +108,11 @@ typedef struct {
 /* Struct representing SDT instruction offset */
 typedef struct {
   int is_imm; // = 1 if offset is interpreted as a shifted register (rn)
-
+  int preindex;
   union {
     int expression; // offset by <#expression> bytes
 
     struct {
-      int preindex;
       ShiftType shift_type;
       int rm;
       int up_bit; // =1 if offset is added, =0 if offset is subtracted

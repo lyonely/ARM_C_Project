@@ -44,7 +44,6 @@ void parse_shift_data_transfer(StringArray *args, Token *token) {
 void parse_operand_data_processing(StringArray *args, Token *token) {
   char **sections = args->array;
   if ('#' == sections[0][0]) {
-<<<<<<< HEAD
     // Operand2 in the form <#expression>
     if (token->opcode == LSL) {
       // Convert to mov rd, rd, lsl <#expression>
@@ -62,34 +61,19 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
       uint16_t shift = WORD_SIZE;
       if (*imm_addr > 0xFF) {
         while (!(*imm_addr & 0x3)) {
-            *imm_addr >>= 2;
-            shift--;
-        }
-=======
-    instruction->imm = parse_immediate_value(&sections[0][1]);
-
-    uint16_t shift = WORD_SIZE;
-    if (instruction->imm > 0xFF) {
-      while (!(instruction->imm & 0x3)) {
-          instruction->imm >>= 2;
+          *imm_addr >>= 2;
           shift--;
->>>>>>> master
+        }
+        *rotation = shift;
       }
-      *rotation = shift;
     }
   } else if ('r' == sections[0][0]) {
-<<<<<<< HEAD
     // Operand2 in the form Rm{,<shift>}
     token->DataP.operand2.is_imm = 0;
     token->DataP.operand2.reg_operand.rm = string_to_reg_address(sections[0]);
 
     if (args->size >= 2) {
       // Rm has shift
-=======
-    instruction->rm = string_to_reg_address(sections[0]);
-
-    if (tokens->size >= 2) {
->>>>>>> master
       StringArray *shift_tokens = malloc(sizeof(StringArray));
 
       if (!shift_tokens) {
@@ -111,7 +95,6 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
 void parse_offset_data_transfer(StringArray *args, Token *token) {
   char **sections = args->array;
   if ('#' == sections[0][0]) {
-<<<<<<< HEAD
     // Offset in the form <#expression>, 12 bits unsigned
     token->SDT.offset.is_imm = 0;
     token->SDT.offset.expression = parse_immediate_value(&sections[0][1]);
@@ -123,24 +106,6 @@ void parse_offset_data_transfer(StringArray *args, Token *token) {
 
     if (args->size >= 2) {
       // Rm has shift
-=======
-    instruction->imm_offset = parse_immediate_value(&sections[0][1]);
-
-    uint16_t shift = WORD_SIZE;
-    if (instruction->imm_offset > 0xFF) {
-      while (!(instruction->imm_offset & 0x3)) {
-          instruction->imm_offset >>= 2;
-          shift--;
-      }
-    }
-
-    instruction->shift_amount = shift;
-
-  } else if ('r' == sections[0][0]) {
-    instruction->rm = string_to_reg_address(sections[0]);
-
-    if (tokens->size >= 2) {
->>>>>>> master
       StringArray *shift_tokens = malloc(sizeof(StringArray));
 
       if (!shift_tokens) {
@@ -198,7 +163,7 @@ void tokenise_dataprocessing(char* str, Token *token) {
   free(operand2);
 }
 
-void tokenise_datatransfer(char* str, Token *token) {
+void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Instruction *instructions) {
   char* arg = strcpy(malloc(strlen(str) + 1), str);
   StringArray* offset = malloc(sizeof(StringArray));
   offset->size = 0;
@@ -217,20 +182,25 @@ void tokenise_datatransfer(char* str, Token *token) {
       token->opcode = MOV;
       token->num_args = 2;
     } else {
-      // TODO: offset thing
-      token->SDT.rn = 15; // rn = PC 
+      token->SDT.rn = 15; // rn = PC
+      token->SDT.offset.preindex = 1;
+      token->SDT.offset.is_imm = 1;
+      token->SDT.offset.expression = *memory_address - token->address;
+      flip_endian(&exp);
+      instructions[*memory_address / 4] = exp; // Store value in memory
+      *memory_address += 4;
     }
   } else {
     // address in the form [Rn] / [Rn, <offset>] / [Rn], <offset>
     char* bracket_end = strchr(arg, ']');
     if (bracket_end) {
       // address in the form [Rn], <offset>; arg = [Rn]
-      token->SDT.offset.ShiftedReg.preindex = 0;
+      token->SDT.offset.preindex = 0;
       memcpy(arg, &arg[1], bracket_end - &arg[1]);
       token->SDT.rn = string_to_reg_address(arg);
     } else {
       // address in the form [Rn, <offset>]; arg = [Rn
-      token->SDT.offset.ShiftedReg.preindex = 1; 
+      token->SDT.offset.preindex = 1; 
     }
 
     arg = strtok(NULL, ",");
@@ -316,11 +286,11 @@ void tokenise_branch(char* str, Token *token, SymbolTable *symboltable) {
 }
 
 // Tokenises assembly code and parses into Instruction
-int tokenise(char *line, Address address, SymbolTable *symboltable, Token *token) {
+int tokenise(char *line, Address address, SymbolTable *symboltable, 
+    Instruction *instructions, Address *memory_address, Token *token) {
   char *opcode = strtok(line, " ");
   char *args = strtok(NULL, " ");
  
-  // Label reached, skip line
   if (!args) {
     return 0;
   }
@@ -342,13 +312,13 @@ int tokenise(char *line, Address address, SymbolTable *symboltable, Token *token
   
   switch(get_type(token->opcode)) {
     case DATA_P:
-      tokenise_dataprocessing(line, token);
+      tokenise_dataprocessing(line, token); break;
     case MULTIPLY:
-      tokenise_multiply(line, token);
+      tokenise_multiply(line, token); break;
     case SDT:
-      tokenise_datatransfer(line, token);
+      tokenise_datatransfer(line, token, memory_address, instructions); break;
     default:
-      tokenise_branch(line, token, symboltable);
+      tokenise_branch(line, token, symboltable); break;
   }
   return 1;
 }

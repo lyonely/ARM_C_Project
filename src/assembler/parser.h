@@ -7,7 +7,7 @@
 void tokenise_dataprocessing(char *str, Token *token);
 
 // Parses data transfer instruction into Token struct
-void tokenise_datatransfer(char *str, Token *token);
+void tokenise_datatransfer(char *str, Token *token, Address *memory_address, Instruction *instructions);
 
 // Parses multiply instruction into Token struct
 void tokenise_multiply(char *str, Token *token);
@@ -16,7 +16,7 @@ void tokenise_multiply(char *str, Token *token);
 void tokenise_branch(char *str, Token *token, SymbolTable *symboltable);
 
 // Parses assembly code into array of Tokens
-int tokenise(char *line, Address address, SymbolTable *symboltable, Token *token);
+int tokenise(char *line, Address address, SymbolTable *symboltable, Address *memory_address, Instruction *instructions, Token *token);
 
 #endif
 

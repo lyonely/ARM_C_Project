@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdint.h>
 #include "assemble.h"
 #include "datatypes.h"
@@ -25,8 +26,7 @@ void build_datap_instr(Token *token, Instruction *i) {
       case TST:
       case TEQ:
       case CMP: *i |= 0x00100000; break;
-      default: *i &= 0xffefffff; break;
-    }
+      default: *i &= 0xffefffff; break; }
 
     // Set rn and rd fields
     *i |= (token->DataP.rn << 16);
@@ -70,7 +70,7 @@ void build_sdt_instr(Token *token, Instruction *i) {
   *i |= (token->SDT.rd << 12);
 
   // Set preindex field
-  if (token->SDT.offset.ShiftedReg.preindex) {
+  if (token->SDT.offset.preindex) {
     *i |= 0x01000000;
   }
 
@@ -156,20 +156,21 @@ void build_branch_instr(Token *token, Instruction *i) {
 
 void assemble(StringArray *source) {
   // Instruction words stored here
-  Instruction instructions[2 * source->size];
+  Instruction instructions[2 * source->size]; // Allocate enough memory for LDR instructions
 
-  // First pass - symboltable
+  // First pass - symboltable, labels removed from source
   SymbolTable *symboltable = create_symboltable(source);
 
   // Second pass - tokenise and build instructions
   Address address = 0;
+  Address next_memory_address = source->size;
   int current_line = 0;
   while (current_line < source->size) {
     Token token;
     
     char *line = source->array[current_line];
     
-    if (tokenise(line, address, symboltable, &token)) {
+    if (tokenise(line, address, symboltable, &next_memory_address, instructions, &token)) {
       Instruction instr = 0;
       switch(get_type(token.opcode)) {
         case DATA_P:
@@ -188,13 +189,14 @@ void assemble(StringArray *source) {
       flip_endian(&instr);
       instructions[address / 4] = instr;
       address += 4;
+    } else {
+      perror("Error tokenising instruction in assemble");
+      exit(EXIT_FAILURE);
     }
     current_line++;
   }
 
-  // TODO add on stored memory
-
-  // Writes instruction array to binary file
-  write_to_file(instructions, address / 4);
+  // Writes instruction array + memory bytes to binary file
+  write_to_file(instructions, next_memory_address / 4);
 }
 
