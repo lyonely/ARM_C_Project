@@ -372,6 +372,7 @@ void get_move(Player player, move_t* move) {
 	}
 }
 
+// returns score of the player
 int score(board_t board, char player) {
 	int total = 0;
 	for(int x = 0; x < 8; x++)
