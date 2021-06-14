@@ -72,7 +72,7 @@ bool is_legal(move_t move, board_t board){
 			if ((*board)[r][move.col] == '-') {
 				break;
 			} else if ((*board)[r][move.col] == player_piece) {
-				printf("row: %d, col: %c is legal\n", move.row, 'A' + move.col);
+				printf("row: %d, col: %c is legal\n", move.row + 1, 'A' + move.col);
 				return true;
 			}
 		}
@@ -85,7 +85,7 @@ bool is_legal(move_t move, board_t board){
 			if ((*board)[move.row - i][move.col + i] == '-') {
 				break;
 			} else if ((*board)[move.row - i][move.col + i] == player_piece) {
-				printf("row: %d, col: %c is legal\n", move.row, 'A' + move.col);
+				printf("row: %d, col: %c is legal\n", move.row + 1, 'A' + move.col);
 				return true;
 			}
 		}
@@ -97,7 +97,7 @@ bool is_legal(move_t move, board_t board){
 			if ((*board)[move.row][c] == '-') {
 				break;
 			} else if ((*board)[move.row][c] == player_piece) {
-				printf("row: %d, col: %c is legal\n", move.row, 'A' + move.col);
+				printf("row: %d, col: %c is legal\n", move.row + 1, 'A' + move.col);
 				return true;
 			}
 		}
@@ -110,7 +110,7 @@ bool is_legal(move_t move, board_t board){
 			if ((*board)[move.row + i][move.col + i] == '-') {
 				break;
 			} else if ((*board)[move.row + i][move.col + i] == player_piece) {
-				printf("row: %d, col: %c is legal\n", move.row, 'A' + move.col);
+				printf("row: %d, col: %c is legal\n", move.row + 1, 'A' + move.col);
 				return true;
 			}
 		}
@@ -122,7 +122,7 @@ bool is_legal(move_t move, board_t board){
 			if ((*board)[r][move.col] == '-') {
 				break;
 			} else if ((*board)[r][move.col] == player_piece) {
-				printf("row: %d, col: %c is legal\n", move.row, 'A' + move.col);
+				printf("row: %d, col: %c is legal\n", move.row + 1, 'A' + move.col);
 				return true;
 			}
 		}
@@ -135,7 +135,7 @@ bool is_legal(move_t move, board_t board){
 			if ((*board)[move.row + i][move.col - i] == '-') {
 				break;
 			} else if ((*board)[move.row + i][move.col - i] == player_piece) {
-				printf("row: %d, col: %c is legal\n", move.row, 'A' + move.col);
+				printf("row: %d, col: %c is legal\n", move.row + 1, 'A' + move.col);
 				return true;
 			}
 		}
@@ -147,7 +147,7 @@ bool is_legal(move_t move, board_t board){
 			if ((*board)[move.row][c] == '-') {
 				break;
 			} else if ((*board)[move.row][c] == player_piece) {
-				printf("row: %d, col: %c is legal\n", move.row, 'A' + move.col);
+				printf("row: %d, col: %c is legal\n", move.row + 1, 'A' + move.col);
 				return true;
 			}
 		}
@@ -160,7 +160,7 @@ bool is_legal(move_t move, board_t board){
 			if ((*board)[move.row - i][move.col - i] == '-') {
 				break;
 			} else if ((*board)[move.row - i][move.col - i] == player_piece) {
-				printf("row: %d, col: %c is legal\n", move.row, 'A' + move.col);
+				printf("row: %d, col: %c is legal\n", move.row + 1, 'A' + move.col);
 				return true;
 			}
 		}
@@ -359,7 +359,7 @@ int outcome(board_t board){
 // returns a move from player input
 void get_move(Player player, move_t* move) {
 	printf("Player %d please choose the position to place your piece: \n", player);
-	printf("(Enter row then column (Eg. \"3D\"):\n");
+	printf("(Enter row then column (Eg. \"3D\")):\n");
 	int row;
 	char col;
 	scanf("%d%c", &row, &col);
