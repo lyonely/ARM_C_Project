@@ -4,10 +4,11 @@
 #include "playerbot.h"
 #include "othello.h"
 
-void make_move(move_t move, board_t board) {
+int pieces_earned(move_t move, board_t board) {
 
 	char player_piece;
 	char opponent_piece;
+	int counter = 0;
 
     if(move.player == 1){
         player_piece = 'X';
@@ -23,9 +24,7 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[r][move.col] == '-') {
 				break;
 			} else if ((*board)[r][move.col] == player_piece) {
-				for (int i = move.row; i >= r; i--) {
-					(*board)[i][move.col] = player_piece;
-				}
+				counter += (move.row - r);
 				break;
 			}
 		}
@@ -38,9 +37,7 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[move.row - i][move.col + i] == '-') {
 				break;
 			} else if ((*board)[move.row - i][move.col + i] == player_piece) {
-				for (int j = 0; j <= i; j++) {
-					(*board)[move.row - j][move.col + j] = player_piece;
-				}
+				counter += i;
 				break;
 			}
 		}
@@ -52,9 +49,7 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[move.row][c] == '-') {
 				break;
 			} else if ((*board)[move.row][c] == player_piece) {
-				for (int i = move.col; i <= c; i++) {
-					(*board)[move.row][i] = player_piece;
-				}
+				counter += (c - move.col);
 				break;
 			}
 		}
@@ -67,9 +62,7 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[move.row + i][move.col + i] == '-') {
 				break;
 			} else if ((*board)[move.row + i][move.col + i] == player_piece) {
-				for (int j = 0; j <= i; j++) {
-					(*board)[move.row + j][move.col + j] = player_piece;
-				}
+				counter += i;
 				break;
 			}
 		}
@@ -81,9 +74,7 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[r][move.col] == '-') {
 				break;
 			} else if ((*board)[r][move.col] == player_piece) {
-				for (int i = move.row; i <= r; i++) {
-					(*board)[i][move.col] = player_piece;
-				}
+				counter += (r - move.row);
 				break;
 			}
 		}
@@ -96,9 +87,7 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[move.row + i][move.col - i] == '-') {
 				break;
 			} else if ((*board)[move.row + i][move.col - i] == player_piece) {
-				for (int j = 0; j <= i; j++) {
-					(*board)[move.row + j][move.col - j] = player_piece;
-				}
+				counter += i;
 				break;
 			}
 		}
@@ -110,9 +99,7 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[move.row][c] == '-') {
 				break;
 			} else if ((*board)[move.row][c] == player_piece) {
-				for (int i = move.col; i >= c; i--) {
-					(*board)[move.row][i] = player_piece;
-				}
+				counter += (move.col - c);
 				break;
 			}
 		}
@@ -125,13 +112,12 @@ void make_move(move_t move, board_t board) {
 			if ((*board)[move.row - i][move.col - i] == '-') {
 				break;
 			} else if ((*board)[move.row - i][move.col - i] == player_piece) {
-				for (int j = 0; j <= i; j++) {
-					(*board)[move.row - j][move.col - j] = player_piece;
-				}
+				counter += i;
 				break;
 			}
 		}
 	}
+	return counter;
 }
 
 // greedy implementation
