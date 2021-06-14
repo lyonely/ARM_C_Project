@@ -123,12 +123,12 @@ int pieces_earned(move_t move, board_t board) {
 
 // greedy implementation
 void greedy(board_t board, move_t* move, Player player, legalmoves_t* legalmoves) {
-    legalmoves_t* greedymoves = malloc(sizeof(legalmoves_t*));
+    legalmoves_t* greedymoves = malloc(sizeof(legalmoves_t));
 	if (greedymoves == NULL) {
 		perror("Failed to allocate memory for greedy moves");
 		exit(EXIT_FAILURE);
 	}
-	greedymoves->moves = calloc(legalmoves->size, sizeof(move_t*));
+	greedymoves->moves = calloc(HEIGHT*WIDTH, sizeof(move_t));
 	if (greedymoves->moves == NULL) {
 		perror("Failed to allocate memory for greedy moves array");
 		exit(EXIT_FAILURE);
@@ -188,7 +188,37 @@ void minimax(board_t board, move_t* move, Player player, legalmoves_t* legalmove
 }
 
 //lousy implementation
-void lousy(board_t board, move_t* moev, Player player, legalmoves_t* legalmoves) {
-    // TODO
+void lousy(board_t board, move_t* move, Player player, legalmoves_t* legalmoves) {
+    legalmoves_t* lousymoves = malloc(sizeof(legalmoves_t));
+	if (lousymoves == NULL) {
+		perror("Failed to allocate memory for greedy moves");
+		exit(EXIT_FAILURE);
+	}
+	lousymoves->moves = calloc(HEIGHT*WIDTH, sizeof(move_t));
+	if (lousymoves->moves == NULL) {
+		perror("Failed to allocate memory for greedy moves array");
+		exit(EXIT_FAILURE);
+	}
+	lousymoves->size = 0;
+	
+	int least_pieces;
+	least_pieces = pieces_earned(legalmoves->moves[0], board);
+	lousymoves->moves[0] = legalmoves->moves[0];
+	lousymoves->size++;
+
+	for (int i = 0; i < legalmoves->size; i++) {
+		if (pieces_earned(legalmoves->moves[i], board) < least_pieces) {
+			lousymoves->moves[0] = legalmoves->moves[i];
+			lousymoves->size = 1;
+		} else if (pieces_earned(legalmoves->moves[i], board) == least_pieces) {
+			lousymoves->moves[lousymoves->size] = legalmoves->moves[i];
+			lousymoves->size++;
+		}
+	}
+
+	int r = rand() % (lousymoves->size);
+	*move = lousymoves->moves[r];
+	free(lousymoves->moves);
+	free(lousymoves);
 }
 
