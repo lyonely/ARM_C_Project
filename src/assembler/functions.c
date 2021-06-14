@@ -6,10 +6,17 @@
 #include "datatypes.h"
 
 // Writes an array of instructions into a binary file
-void write_to_file(Instruction *instructions, int size) {
-  FILE *fp = fopen("../../out/program.bin", "wb");
+void write_to_file(Instruction *instructions, int size, char *filename) {
+  FILE *fp = fopen(filename, "wb");
   fwrite(instructions, sizeof(Instruction), size, fp);
   fclose(fp);
+}
+
+void delete_string_array(StringArray *string_array) {
+  for (int i = 0; i < string_array->size; i++) {
+    free(string_array->array[i]);
+  }
+  free(string_array->array);
 }
 
 // Converts Instruction from big-endian to little-endian

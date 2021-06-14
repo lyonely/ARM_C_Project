@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include "symboltable.h"
 #include "datatypes.h"
+#include "functions.h"
 
 /* Helper function to check if given line is a label */
 int is_label(char* line);
@@ -79,6 +80,7 @@ SymbolTable* create_symboltable(StringArray* source){
    }
 
     /* Reassign source array to array without labels, only instructions */
+    delete_string_array(source);
     source -> array = array_no_labels;
     source -> size = no_labels_size;
 

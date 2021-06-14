@@ -5,8 +5,11 @@
 #include <stdint.h>
 #include "datatypes.h"
 
-// Writes an array of instructions into a binary file (/out/program.bin)
-void write_to_file(Instruction *instructions, int size);
+// Writes an array of instructions into a binary file
+void write_to_file(Instruction *instructions, int size, char *filename);
+
+// Frees members of StringArray struct
+void delete_string_array(StringArray *string_array);
 
 // Converts instruction from big-endian to little-endian format
 void flip_endian(Instruction *i);

@@ -15,8 +15,8 @@ void build_multiply_instr(Token *token, Instruction *i);
 // Builds branch instruction word from token
 void build_branch_instr(Token *token, Instruction *i);
 
-// Two-pass assembly implementation
-void assemble(StringArray *source);
+// Two-pass assembly implementation, writes to file with (filename)
+void assemble(StringArray *source, char *filename);
 
 #endif
 

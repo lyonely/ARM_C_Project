@@ -154,7 +154,7 @@ void build_branch_instr(Token *token, Instruction *i) {
 	*i |= (offset >> 2);
 }
 
-void assemble(StringArray *source) {
+void assemble(StringArray *source, char *filename) {
   // Instruction words stored here
   Instruction instructions[2 * source->size]; // Allocate enough memory for LDR instructions
 
@@ -197,6 +197,6 @@ void assemble(StringArray *source) {
   }
 
   // Writes instruction array + memory bytes to binary file
-  write_to_file(instructions, next_memory_address / 4);
+  write_to_file(instructions, next_memory_address / 4, filename);
 }
 

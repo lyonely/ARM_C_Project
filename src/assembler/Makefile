@@ -5,7 +5,7 @@ BUILD: main
 main: main.o assemble.o parser.o symboltable.o functions.o
 	$(CC) -o main main.o assemble.o parser.o symboltable.o functions.o -o ../../out/assemble
 
-main.o: main.c assemble.h datatypes.h
+main.o: main.c assemble.h datatypes.h functions.h
 	$(CC) $(CFLAGS) -c main.c
 
 assemble.o: assemble.c assemble.h datatypes.h parser.h symboltable.h
