@@ -2,8 +2,8 @@ CC = gcc
 CFLAGS = -Wall -g -D_POSIX_SOURCE -D_BSD_SOURCE -D_DEFAULT_SOURCE -std=c99 -Werror -pedantic
 BUILD: main
 
-main: main.o
-	$(CC) main.o -o ../../out/assemble
+main: main.o assemble.o parser.o symboltable.o functions.o
+	$(CC) -o main main.o assemble.o parser.o symboltable.o functions.o -o ../../out/assemble
 
 main.o: main.c assemble.h datatypes.h
 	$(CC) $(CFLAGS) -c main.c
