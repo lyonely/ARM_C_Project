@@ -18,8 +18,8 @@ void set_bits_seven_to_four(Instruction* i) {
 	*i |= 0x00000090;
 }
 
-void set_acc_field(int acc, Instruction* i) {
-	if (acc) {
+void set_acc_field(Operation opcode, Instruction* i) {
+	if (opcode == MLA) {
 		*i |= 0x00200000;
 	} else {
 		*i &= 0xffdfffff;
@@ -37,19 +37,19 @@ void set_rs_field(int rs, Instruction* i) {
 	*i |= (rs << 8);
 }
 
-void set_rn_field(int acc, int rn, Instruction* i) {
-	if (acc) {
+void set_rn_field(Operation opcode, int rn, Instruction* i) {
+	if (opcode == MLA) {
 		*i |= (rn << 12);
 	}
 }
 
-void build_multiply_instr(MultiplyInstruction* instr, Instruction* i) {
+void build_multiply_instr(Token *token, Instruction *i) {
 	set_cond_field(i);
 	set_flag_field(i);
 	set_bits_seven_to_four(i);
-	set_rd_field(instr->rd, i);
-	set_rm_field(instr->rm, i);
-	set_rs_field(instr->rs, i);
-	set_acc_field(instr->acc, i);
-	set_rn_field(instr->acc, instr->rn, i);
+	set_rd_field(token->Multiply.rd, i);
+	set_rm_field(token->Multiply.rm, i);
+	set_rs_field(token->Multiply.rs, i);
+	set_acc_field(token->opcode, i);
+	set_rn_field(token->opcode, token->Multiply.rn, i);
 }

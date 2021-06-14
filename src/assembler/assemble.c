@@ -12,52 +12,46 @@
 #include "tokeniser.h"
 
 void assemble(StringArray *source) {
-  // Converted instructions stored here
-  InstructionArray *instructions = malloc(sizeof(InstructionArray));
-  instructions->array = calloc(source->size, sizeof(Instruction));
-  instructions->size = 0;
+  // Instruction words stored here
+  Instruction instructions[2 * source->size];
 
-  // Symbol Table
+  // First pass - symboltable
   SymbolTable *symboltable = create_symboltable(source);
- 
-  int address = 0;
+
+  // Second pass - tokenise and build instructions
+  Address address = 0;
   int current_line = 0;
   while (current_line < source->size) {
-    Token *token = malloc(sizeof(Token));
-    if (token == NULL) {
-      perror("Failed memory allocation in assemble");
-      exit(EXIT_FAILURE);
-    }
+    Token token;
     
     char *line = source->array[current_line];
     
-    if (tokenise(line, address, symboltable, token)) {
-      Instruction instr;
-      switch(get_type(token->opcode)) {
+    if (tokenise(line, address, symboltable, &token)) {
+      Instruction instr = 0;
+      switch(get_type(token.opcode)) {
         case DATA_P:
-          // build_datap_instr
+          build_datap_instr(&token, &instr);
           break;
         case MULTIPLY:
-          // build_multiply_instr
+          build_multiply_instr(&token, &instr);
           break;
         case SDT:
-          // build_sdt_instr
+          build_sdt_instr(&token, &instr);
           break;
         default:
-          // build_branch_instr
+          build_branch_instr(&token, &instr);
           break;
       }
-      instructions->array[instructions->size] = instr;
-      instructions->size++;
-      address += sizeof(Instruction);
+      flip_endian(&instr);
+      instructions[address / 4] = instr;
+      address += 4;
     }
     current_line++;
   }
 
-  // TODO add on stored memory?
+  // TODO add on stored memory
 
   // Writes instruction array to binary file
-  write_to_file(instructions);
-  free(instructions->array);
-  free(instructions);
+  write_to_file(instructions, address / 4);
 }
+

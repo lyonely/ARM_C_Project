@@ -5,10 +5,10 @@
 #include "datatypes.h"
 
 // Writes an array of instructions into a binary file (/out/program.bin)
-void write_to_file(InstructionArray *instructions);
+void write_to_file(Instruction *instructions, int size);
 
 // Converts instruction from big-endian to little-endian format
-void get_little_endian(Instruction *i);
+void flip_endian(Instruction *i);
 
 // Gets instruction type of operation
 Type get_type(Operation opcode);

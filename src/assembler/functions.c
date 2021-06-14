@@ -3,14 +3,14 @@
 #include "datatypes.h"
 
 // Writes an array of instructions into a binary file
-void write_to_file(InstructionArray *instructions) {
+void write_to_file(Instruction *instructions, int size) {
   FILE *fp = fopen("../../out/program.bin", "wb");
-  fwrite(instructions->array, sizeof(Instruction), instructions->size, fp);
+  fwrite(instructions, sizeof(Instruction), size, fp);
   fclose(fp);
 }
 
 // Converts Instruction from big-endian to little-endian
-void get_little_endian(Instruction *i) {
+void flip_endian(Instruction *i) {
   Instruction byte1 = *i & 0xFF000000;
   Instruction byte2 = *i & 0x00FF0000;
   Instruction byte3 = *i & 0x0000FF00;
@@ -58,6 +58,7 @@ unsigned int get_num_args(Operation opcode) {
     case B:
       return 1;
     case AND:
+    case ANDEQ:
     case EOR:
     case SUB:
     case RSB:

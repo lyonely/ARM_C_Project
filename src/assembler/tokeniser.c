@@ -15,13 +15,13 @@ void tokenise_dataprocessing(char* str, Token *token) {
   token->DataP.rd = string_to_reg_address(arg);
   
   if (token->num_args == 3) { 
-    // ADD, EOR, SUB, RSB, ADD, ORR
+    // ADD, ANDEQ, EOR, SUB, RSB, ADD, ORR
     arg = strtok(NULL, ",");
     token->DataP.rd = string_to_reg_address(arg);
     token->DataP.rn = string_to_reg_address(arg);
   } else {
-    if (token->opcode == MOV) { 
-      // MOV
+    if (token->opcode == MOV || token->opcode == LSL) { 
+      // MOV, LSL
       token->DataP.rd = string_to_reg_address(arg);
     } else {
       // TST, TEQ, CMP
@@ -32,7 +32,7 @@ void tokenise_dataprocessing(char* str, Token *token) {
   arg = strtok(NULL, ",");
   operand2->array[0] = arg; // constant or rm
   operand2->size++;
-  
+ 
   arg = strtok(NULL, " ,");
   if (arg) {
     operand2->array[1] = arg; // shift type
@@ -65,7 +65,7 @@ void tokenise_datatransfer(char* str, Token *token) {
       token->num_args = 2;
     } else {
       // TODO: offset thing
-      token->SDT.rn = 15;     
+      token->SDT.rn = 15; // rn = PC 
     }
   } else {
     // address in the form [Rn] / [Rn, <offset>] / [Rn], <offset>
@@ -163,25 +163,26 @@ void tokenise_branch(char* str, Token *token, SymbolTable *symboltable) {
 }
 
 // Tokenises assembly code and parses into Instruction
-int tokenise(char *line, int address, SymbolTable *symboltable, Token *token) {
+int tokenise(char *line, Address address, SymbolTable *symboltable, Token *token) {
   char *opcode = strtok(line, " ");
   char *args = strtok(NULL, " ");
  
   // Label reached, skip line
   if (!args) {
-    free(token);
     return 0;
   }
 
   token->opcode = string_to_operation(opcode);
-  token->address = address * sizeof(Instruction);
+  token->address = address;
   token->num_args = get_num_args(token->opcode);
 
-  // Condition for branch instructions
+  // Condition setting
   if (opcode[0] == 'b' && opcode[1]) {
     char cond[2];
     memcpy(cond, &opcode[1], 2);
     token->cond = string_to_condition(cond);
+  } else if (token->opcode == ANDEQ) {
+    token->cond = EQ;
   } else {
     token->cond = AL;
   }
@@ -198,15 +199,4 @@ int tokenise(char *line, int address, SymbolTable *symboltable, Token *token) {
   }
   return 1;
 }
-
-  /*
-    tokens[token_pos] = token;
-    current_line++;
-    token_pos++;
-  }
-  TokenArray *t_array = malloc(sizeof(TokenArray));
-  t_array->array = tokens;
-  t_array->size = token_pos;
-  return t_array;
- */
 

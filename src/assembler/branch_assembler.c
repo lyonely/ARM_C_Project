@@ -16,21 +16,15 @@ void set_bits_27_to_24(Instruction* i) {
 	*i |= 0x0a000000;
 }
 
-void build_branch_instr(BranchInstruction* instr, Instruction* i, \
-		Address curr, SymbolTable* symboltable) {
-	set_cond_field(instr->cond, i);
+void build_branch_instr(Token *token, Instruction* i) {
+	set_cond_field(token->cond, i);
 	set_bits_27_to_24(i);
-	Address label_address;
-	for (int i = 0; i < symboltable->size; i++) {
-		Symbol* label = &symboltable->table[i];
-		if (strcmp(label->symbol, instr->symbol)) {
-			label_address = label->address;
-			break;
-		}
-	}
+
+  Address curr = token->address;
 	curr += 8;
-	int32_t offset = BRANCH_OFFSET_MASK & (label_address - curr);
-	if (label_address < curr) {
+
+	int32_t offset = BRANCH_OFFSET_MASK & (token->Branch.target_address - curr);
+	if (token->Branch.target_address < curr) {
 		offset |= 0x2000000;
 	} else {
 		offset &= 0x0ffffff;

@@ -13,8 +13,8 @@ typedef struct {
 } InstructionArray;
 
 typedef struct {
-    char ** array;
-    uint16_t size;
+  char ** array;
+  uint16_t size;
 } StringArray;    
 
 typedef uint8_t RegAddress;

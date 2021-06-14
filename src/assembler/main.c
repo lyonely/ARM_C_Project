@@ -29,18 +29,13 @@ int main(int argc, char **argv) {
   
   fclose(fp);
   
-  StringArray *source = malloc(sizeof(StringArray));
-
-  source->array = assembly_code;
-  source->size = size;
-  /* TEXT FILE HAS BEEN READ INTO SOURCE STRINGARRAY */
-
-  // assemble(source);
-
-  // assemble(assembly_code, size);
-
+  StringArray source;
+  source.array = assembly_code;
+  source.size = size;
+  
+  assemble(&source);
   free(assembly_code);
-  free(source);
+  
   return 0;
 }
 

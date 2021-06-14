@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "datatypes.h"
 
-void build_branch_instr(BranchInstruction* instr, Instruction* i, \
-		Address curr, SymbolTable* symboltable);
+void build_branch_instr(Token *token, Instruction *i);
 	
 #endif
+
