@@ -36,7 +36,7 @@ bool is_legal(move_t move, board_t board);
 void make_move(move_t move, board_t board);
 
 // determines an array of legal moves
-legalmoves_t* legalmoves(board_t board);
+void legalmove(board_t board, Player player, legalmoves_t* legalmoves);
 
 // returns 1 if player1 (X) wins, 2 if player2 (O) wins, or 0 otherwise
 int outcome(board_t board);
@@ -44,5 +44,7 @@ int outcome(board_t board);
 // returns 1 if game has ended (i.e. if all spaces are either an X or O)
 bool endgame(board_t board);
 
-#endif
+// returns the move from player input
+void get_move(Player player, move_t* move);
 
+#endif

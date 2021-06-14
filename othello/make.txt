@@ -1,0 +1,3 @@
+To make, type:
+	gcc -g -o main main.c othello.c playerbot.c
+

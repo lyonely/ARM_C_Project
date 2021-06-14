@@ -39,14 +39,39 @@ SymbolTable* create_symboltable(StringArray* source){
     int current_table_size = 0;
     char* line;
 
-   for(int i = 0; i < source_num_lines; i ++){
+    // Allocate memory for new array (StringArray) to store only instructions
+    char ** array_no_labels = malloc(source_num_lines);
+    if(array_no_labels == NULL){
+        perror("Memory couldn't be allocated for array (source without labels). Create_symboltable failed.");
+        exit(EXIT_FAILURE);
+    }
+    int no_labels_size = 0;
+    int skip = 0;
+
+    // stores symbols (labels) in the symbol table;
+    // adds line to source_no_labels if it isnt a label
+    for(int i = 0; i < source_num_lines; i ++){
        line = source->array[i];
 
        if(is_label(line)){
             // line is a label, remove the last ':' character
             line[strlen(line) - 1] = '\0';
+            skip = 1;
         } else {
-            // line is not a label, increment address;
+            // if line is not address corresponding to a label, add to source_without_labels
+            if(skip == 0){
+                array_no_labels[no_labels_size] = malloc(sizeof(Instruction));
+                if(array_no_labels[no_labels_size] == NULL){
+                    perror("Memory couldn't be allocated for line in new StringArray.");
+                    exit(EXIT_FAILURE);
+                }
+                array_no_labels[no_labels_size] = line;
+                no_labels_size ++;
+            } else {
+                skip = 0;
+            }
+            
+            // increment address;
             address += sizeof(line);
         }
 
@@ -57,6 +82,11 @@ SymbolTable* create_symboltable(StringArray* source){
         symbol_table -> table[current_table_size] = new_symbol;
         current_table_size++;
    }
+
+    /* Reassign source array to array without labels, only instructions */
+    array_no_labels = realloc(array_no_labels, no_labels_size * sizeof(Instruction));
+    source -> array = array_no_labels;
+    source -> size = no_labels_size;
 
     /* Reallocate memory to match actual number of symbols stored */
     symbol_table -> table = realloc(symbol_table -> table, current_table_size * sizeof(Symbol));
