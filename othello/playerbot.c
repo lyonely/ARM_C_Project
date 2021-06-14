@@ -180,11 +180,32 @@ int heuristic(board_t board, Player player) {
 // a copy board function
 void copy_board(board_t src, board_t dest) {
 	memcpy(dest, src, 8 * 8 * sizeof(char));
-}	
+}
+
+// minimax value implementation
+int minimax_value(board_t board, Player player, Player opponent, int search) {
+  return 0;
+}				
 
 // minimax implementation
 void minimax(board_t board, move_t* move, Player player, legalmoves_t* legalmoves) {
-    // TODO
+	Player opponent = 1;
+	if(player == 1) {
+		opponent = 2;
+	}
+	move_t best_move = legalmoves->moves[0];
+	int best_move_val = -9000;
+	for(int i = 0; i < legalmoves->size; i++) {
+		board_t temp_board;
+		copy_board(board, temp_board);
+		make_move(legalmoves->moves[i], temp_board);
+		int val = minimax_value(temp_board, player, opponent, 1);
+		if(val > best_move_val) {
+			best_move_val = val;
+			best_move = legalmoves->moves[i];
+		}
+	}
+	*move = best_move;	
 }
 
 //lousy implementation
