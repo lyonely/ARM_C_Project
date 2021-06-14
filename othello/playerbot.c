@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "playerbot.h"
 #include "othello.h"
 
@@ -122,7 +123,37 @@ int pieces_earned(move_t move, board_t board) {
 
 // greedy implementation
 void greedy(board_t board, move_t* move, Player player, legalmoves_t* legalmoves) {
-    // TODO
+    legalmoves_t* greedymoves = malloc(sizeof(legalmoves_t*));
+	if (greedymoves == NULL) {
+		perror("Failed to allocate memory for greedy moves");
+		exit(EXIT_FAILURE);
+	}
+	greedymoves->moves = calloc(legalmoves->size, sizeof(move_t*));
+	if (greedymoves->moves == NULL) {
+		perror("Failed to allocate memory for greedy moves array");
+		exit(EXIT_FAILURE);
+	}
+	greedymoves->size = 0;
+	
+	int most_pieces;
+	most_pieces = pieces_earned(legalmoves->moves[0], board);
+	greedymoves->moves[0] = legalmoves->moves[0];
+	greedymoves->size++;
+
+	for (int i = 0; i < legalmoves->size; i++) {
+		if (pieces_earned(legalmoves->moves[i], board) > most_pieces) {
+			greedymoves->moves[0] = legalmoves->moves[i];
+			greedymoves->size = 1;
+		} else if (pieces_earned(legalmoves->moves[i], board) == most_pieces) {
+			greedymoves->moves[greedymoves->size] = legalmoves->moves[i];
+			greedymoves->size++;
+		}
+	}
+
+	int r = rand() % (greedymoves->size);
+	*move = greedymoves->moves[r];
+	free(greedymoves->moves);
+	free(greedymoves);
 }
 
 // random implementation
@@ -131,7 +162,7 @@ void randomize(board_t board, move_t* move, Player player, legalmoves_t* legalmo
     srand(time(NULL));  
     
     // Pick a random number legalmove from the array and store it in the move ptr
-    int index = rand() % sizeof(legalmoves -> moves);
+    int index = rand() % (legalmoves->size);
     *move = legalmoves -> moves[index];
 }
 
