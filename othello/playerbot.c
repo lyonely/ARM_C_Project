@@ -127,7 +127,12 @@ void greedy(board_t board, move_t* move, Player player, legalmoves_t* legalmoves
 
 // random implementation
 void randomize(board_t board, move_t* move, Player player, legalmoves_t* legalmoves) {
-    // TODO
+    // Initializes random number generator
+    srand(time(NULL));  
+    
+    // Pick a random number legalmove from the array and store it in the move ptr
+    int index = rand() % sizeof(legalmoves -> moves);
+    *move = legalmoves -> moves[index];
 }
 
 // heuristic function for minimax
