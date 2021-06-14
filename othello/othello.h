@@ -47,4 +47,7 @@ bool endgame(board_t board);
 // returns the move from player input
 void get_move(Player player, move_t* move);
 
+//returns number of tiles of player
+int score(board_t board, char player);
+
 #endif
