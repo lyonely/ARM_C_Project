@@ -102,7 +102,7 @@ typedef struct {
       int rm;
       Shift shift;
     } reg_operand;
-  };
+  } Op2Type;
 } Op2;
 
 /* Struct representing SDT instruction offset */
@@ -118,7 +118,7 @@ typedef struct {
       int up_bit; // =1 if offset is added, =0 if offset is subtracted
       Shift shift;
     } ShiftedReg;
-  };
+  } OffsetType;
 } Offset;
 
 /* Struct for storing tokenised assembly code */
@@ -150,7 +150,7 @@ typedef struct {
       int rn;
       Offset offset;
     } SDT;
-  };
+  } TokenType;
 } Token;
 
 #endif

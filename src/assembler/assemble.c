@@ -11,8 +11,8 @@
 
 void build_datap_instr(Token *token, Instruction *i) {
   // Sets instruction bits if opcode is not ANDEQ (all-zero)
-  if (!(token->opcode == ANDEQ && token->DataP.rd == 0 
-        && token->DataP.rn == 0 && token->DataP.operand2.reg_operand.rm == 0)) {
+  if (!(token->opcode == ANDEQ && token->TokenType.DataP.rd == 0 
+        && token->TokenType.DataP.rn == 0 && token->TokenType.DataP.operand2.Op2Type.reg_operand.rm == 0)) {
     
     // Set cond field
     *i &= 0x0fffffff;
@@ -29,26 +29,26 @@ void build_datap_instr(Token *token, Instruction *i) {
       default: *i &= 0xffefffff; break; }
 
     // Set rn and rd fields
-    *i |= (token->DataP.rn << 16);
-    *i |= (token->DataP.rd << 12);
+    *i |= (token->TokenType.DataP.rn << 16);
+    *i |= (token->TokenType.DataP.rd << 12);
 
-    if (token->DataP.operand2.is_imm) {
+    if (token->TokenType.DataP.operand2.is_imm) {
       // Set imm field and immediate operand2
       *i |= 0x02000000; // I bit
-      *i |= (token->DataP.operand2.imm_operand.rotation << 8); // Rotation
-      *i |= token->DataP.operand2.imm_operand.immediate; // Immediate operand
+      *i |= (token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation << 8); // Rotation
+      *i |= token->TokenType.DataP.operand2.Op2Type.imm_operand.immediate; // Immediate operand
     } else {
       // Set shifted register operand2 fields
-      *i |= token->DataP.operand2.reg_operand.rm; // Rm
-      *i |= (token->DataP.operand2.reg_operand.shift_type << 5); // Shift type
-      if (token->DataP.operand2.reg_operand.shift.is_imm) {
+      *i |= token->TokenType.DataP.operand2.Op2Type.reg_operand.rm; // Rm
+      *i |= (token->TokenType.DataP.operand2.Op2Type.reg_operand.shift_type << 5); // Shift type
+      if (token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.is_imm) {
         // Set shift by immediate fields
-        *i |= (token->DataP.operand2.reg_operand.shift.immediate_shift << 7);
+        *i |= (token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.immediate_shift << 7);
       } else {
         // Set shift by register fields
         *i |= 0x10; // Shift by register value field
         *i &= 0xFFFFFF7F;
-        *i |= (token->DataP.operand2.reg_operand.shift.rs << 8); // Rs
+        *i |= (token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.rs << 8); // Rs
       }
     }
   } else {
@@ -66,16 +66,16 @@ void build_sdt_instr(Token *token, Instruction *i) {
   *i |= (token->cond << 28);
 
   // Set rn and rd fields
-  *i |= (token->SDT.rn << 16);
-  *i |= (token->SDT.rd << 12);
+  *i |= (token->TokenType.SDT.rn << 16);
+  *i |= (token->TokenType.SDT.rd << 12);
 
   // Set preindex field
-  if (token->SDT.offset.preindex) {
+  if (token->TokenType.SDT.offset.preindex) {
     *i |= 0x01000000;
   }
 
   // Set upbit field
-  if (token->SDT.offset.ShiftedReg.up_bit) {
+  if (token->TokenType.SDT.offset.OffsetType.ShiftedReg.up_bit) {
     *i |= 0x00800000;
   }
 
@@ -84,25 +84,25 @@ void build_sdt_instr(Token *token, Instruction *i) {
     *i |= 0x00100000;
   }
 
-  if (token->SDT.offset.is_imm) {
+  if (token->TokenType.SDT.offset.is_imm) {
     // Set fields for register offset
     *i |= 0x02000000; // I bit
-    *i |= (token->SDT.offset.ShiftedReg.shift_type << 5); // Shift type
-    *i |= token->SDT.offset.ShiftedReg.rm; // Rm
+    *i |= (token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift_type << 5); // Shift type
+    *i |= token->TokenType.SDT.offset.OffsetType.ShiftedReg.rm; // Rm
 
-    if (token->SDT.offset.ShiftedReg.shift.is_imm) {
+    if (token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.is_imm) {
       // Shift by immediate
-      *i |= (token->SDT.offset.ShiftedReg.shift.immediate_shift << 7);
+      *i |= (token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.immediate_shift << 7);
     } else {
       // Shift by register value
       *i |= 0x10;
       *i &= 0xFFFFFF7F;
-      *i |= (token->SDT.offset.ShiftedReg.shift.rs << 8); // Rs
+      *i |= (token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.rs << 8); // Rs
     }
   } else {
     // Set fields for immediate offset
     *i &= 0xfffff000;
-    *i |= token->SDT.offset.expression;
+    *i |= token->TokenType.SDT.offset.OffsetType.expression;
   }
 }
 
@@ -119,14 +119,14 @@ void build_multiply_instr(Token *token, Instruction *i) {
 	*i |= 0x00000090;
 
   // Set rd, rs, rm fields
-	*i |= (token->Multiply.rd << 16);
-	*i |= (token->Multiply.rs << 8);
-	*i |= token->Multiply.rm;
+	*i |= (token->TokenType.Multiply.rd << 16);
+	*i |= (token->TokenType.Multiply.rs << 8);
+	*i |= token->TokenType.Multiply.rm;
 
   // Set accumulate and rn fields for MLA
   if (token->opcode == MLA) {
 		*i |= 0x00200000;
-		*i |= (token->Multiply.rn << 12);
+		*i |= (token->TokenType.Multiply.rn << 12);
 	} else {
 		*i &= 0xffdfffff;
 	}
@@ -144,8 +144,8 @@ void build_branch_instr(Token *token, Instruction *i) {
   Address curr = token->address;
 	curr += 8;
 
-	int32_t offset = BRANCH_OFFSET_MASK & (token->Branch.target_address - curr);
-	if (token->Branch.target_address < curr) {
+	int32_t offset = BRANCH_OFFSET_MASK & (token->TokenType.Branch.target_address - curr);
+	if (token->TokenType.Branch.target_address < curr) {
 		offset |= 0x2000000;
 	} else {
 		offset &= 0x0ffffff;

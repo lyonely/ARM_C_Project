@@ -7,16 +7,16 @@
 #include "symboltable.h"
 
 void parse_shift_data_processing(StringArray *args, Token *token) {
-	token->DataP.operand2.reg_operand.shift_type = string_to_shift(args->array[0]); // Shift type stored
+	token->TokenType.DataP.operand2.Op2Type.reg_operand.shift_type = string_to_shift(args->array[0]); // Shift type stored
   
   if ('#' == args->array[1][0]) {
     // Shift by immediate
     char *number = &args->array[1][1];
-    token->DataP.operand2.reg_operand.shift.is_imm = 1;
-    token->DataP.operand2.reg_operand.shift.immediate_shift = parse_immediate_value(number);
+    token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.is_imm = 1;
+    token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.immediate_shift = parse_immediate_value(number);
   } else if ('r' == args->array[1][0]) {
     // Shift by register
-    token->DataP.operand2.reg_operand.shift.is_imm = 0; token->DataP.operand2.reg_operand.shift.rs = string_to_reg_address(args->array[1]);
+    token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.is_imm = 0; token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.rs = string_to_reg_address(args->array[1]);
   } else {
     fprintf(stderr, "Shift not number or register");
     exit(EXIT_FAILURE);
@@ -24,17 +24,17 @@ void parse_shift_data_processing(StringArray *args, Token *token) {
 }
 
 void parse_shift_data_transfer(StringArray *args, Token *token) {
-	token->SDT.offset.ShiftedReg.shift_type = string_to_shift(args->array[0]);
+	token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift_type = string_to_shift(args->array[0]);
   
   if ('#' == args->array[1][0]) {
     // Shift by immediate
     char *number = &args->array[1][1];
-    token->SDT.offset.ShiftedReg.shift.is_imm = 1;
-    token->SDT.offset.ShiftedReg.shift.immediate_shift = parse_immediate_value(number);
+    token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.is_imm = 1;
+    token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.immediate_shift = parse_immediate_value(number);
   } else if ('r' == args->array[1][0]) {
     // Shift by register
-    token->SDT.offset.ShiftedReg.shift.is_imm = 0;
-    token->SDT.offset.ShiftedReg.shift.rs = string_to_reg_address(args->array[1]);
+    token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.is_imm = 0;
+    token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.rs = string_to_reg_address(args->array[1]);
   } else {
     fprintf(stderr, "Shift not number or register");
     exit(EXIT_FAILURE);
@@ -47,15 +47,15 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
     // Operand2 in the form <#expression>
     if (token->opcode == LSL) {
       // Convert to mov rd, rd, lsl <#expression>
-      token->DataP.operand2.is_imm = 0;
-      token->DataP.operand2.reg_operand.rm = token->DataP.rd;
-      token->DataP.operand2.reg_operand.shift_type = LSL_S;
-      token->DataP.operand2.reg_operand.shift.is_imm = 1;
-      token->DataP.operand2.reg_operand.shift.immediate_shift = parse_immediate_value(&sections[0][1]);
+      token->TokenType.DataP.operand2.is_imm = 0;
+      token->TokenType.DataP.operand2.Op2Type.reg_operand.rm = token->TokenType.DataP.rd;
+      token->TokenType.DataP.operand2.Op2Type.reg_operand.shift_type = LSL_S;
+      token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.is_imm = 1;
+      token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.immediate_shift = parse_immediate_value(&sections[0][1]);
     } else {
-      token->DataP.operand2.is_imm = 1;
-      char *imm_addr = &token->DataP.operand2.imm_operand.immediate;
-      int *rotation = &token->DataP.operand2.imm_operand.rotation;
+      token->TokenType.DataP.operand2.is_imm = 1;
+      char *imm_addr = &token->TokenType.DataP.operand2.Op2Type.imm_operand.immediate;
+      int *rotation = &token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation;
       
       *imm_addr = parse_immediate_value(&sections[0][1]);
       uint16_t shift = WORD_SIZE;
@@ -69,8 +69,8 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
     }
   } else if ('r' == sections[0][0]) {
     // Operand2 in the form Rm{,<shift>}
-    token->DataP.operand2.is_imm = 0;
-    token->DataP.operand2.reg_operand.rm = string_to_reg_address(sections[0]);
+    token->TokenType.DataP.operand2.is_imm = 0;
+    token->TokenType.DataP.operand2.Op2Type.reg_operand.rm = string_to_reg_address(sections[0]);
 
     if (args->size >= 2) {
       // Rm has shift
@@ -96,13 +96,13 @@ void parse_offset_data_transfer(StringArray *args, Token *token) {
   char **sections = args->array;
   if ('#' == sections[0][0]) {
     // Offset in the form <#expression>, 12 bits unsigned
-    token->SDT.offset.is_imm = 0;
-    token->SDT.offset.expression = parse_immediate_value(&sections[0][1]);
+    token->TokenType.SDT.offset.is_imm = 0;
+    token->TokenType.SDT.offset.OffsetType.expression = parse_immediate_value(&sections[0][1]);
  
   } else if ('r' == sections[0][0]) {
     // Offset in the form Rm{,<shift>}
-    token->SDT.offset.is_imm = 1;
-    token->SDT.offset.ShiftedReg.rm = string_to_reg_address(sections[0]);
+    token->TokenType.SDT.offset.is_imm = 1;
+    token->TokenType.SDT.offset.OffsetType.ShiftedReg.rm = string_to_reg_address(sections[0]);
 
     if (args->size >= 2) {
       // Rm has shift
@@ -130,20 +130,20 @@ void tokenise_dataprocessing(char* str, Token *token) {
   operand2->size = 0;
 
   arg = strtok(str, ","); 
-  token->DataP.rd = string_to_reg_address(arg);
+  token->TokenType.DataP.rd = string_to_reg_address(arg);
   
   if (token->num_args == 3) { 
     // ADD, ANDEQ, EOR, SUB, RSB, ADD, ORR
     arg = strtok(NULL, ",");
-    token->DataP.rd = string_to_reg_address(arg);
-    token->DataP.rn = string_to_reg_address(arg);
+    token->TokenType.DataP.rd = string_to_reg_address(arg);
+    token->TokenType.DataP.rn = string_to_reg_address(arg);
   } else {
     if (token->opcode == MOV || token->opcode == LSL) { 
       // MOV, LSL
-      token->DataP.rd = string_to_reg_address(arg);
+      token->TokenType.DataP.rd = string_to_reg_address(arg);
     } else {
       // TST, TEQ, CMP
-      token->DataP.rn = string_to_reg_address(arg);
+      token->TokenType.DataP.rn = string_to_reg_address(arg);
     }
   }
  
@@ -169,7 +169,7 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
   offset->size = 0;
 
   arg = strtok(str, ","); 
-  token->SDT.rd = string_to_reg_address(arg); // rd
+  token->TokenType.SDT.rd = string_to_reg_address(arg); // rd
  
   arg = strtok(NULL, ",");
   char* constant_offset = strchr(arg, '=');
@@ -178,14 +178,14 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
     uint32_t exp = parse_immediate_value(&arg[1]);
     if (exp <= 0xFF) {
       // convert to mov instruction
-      token->DataP.rd = token->SDT.rd;
+      token->TokenType.DataP.rd = token->TokenType.SDT.rd;
       token->opcode = MOV;
       token->num_args = 2;
     } else {
-      token->SDT.rn = 15; // rn = PC
-      token->SDT.offset.preindex = 1;
-      token->SDT.offset.is_imm = 1;
-      token->SDT.offset.expression = *memory_address - token->address;
+      token->TokenType.SDT.rn = 15; // rn = PC
+      token->TokenType.SDT.offset.preindex = 1;
+      token->TokenType.SDT.offset.is_imm = 1;
+      token->TokenType.SDT.offset.OffsetType.expression = *memory_address - token->address;
       flip_endian(&exp);
       instructions[*memory_address / 4] = exp; // Store value in memory
       *memory_address += 4;
@@ -195,12 +195,12 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
     char* bracket_end = strchr(arg, ']');
     if (bracket_end) {
       // address in the form [Rn], <offset>; arg = [Rn]
-      token->SDT.offset.preindex = 0;
+      token->TokenType.SDT.offset.preindex = 0;
       memcpy(arg, &arg[1], bracket_end - &arg[1]);
-      token->SDT.rn = string_to_reg_address(arg);
+      token->TokenType.SDT.rn = string_to_reg_address(arg);
     } else {
       // address in the form [Rn, <offset>]; arg = [Rn
-      token->SDT.offset.preindex = 1; 
+      token->TokenType.SDT.offset.preindex = 1; 
     }
 
     arg = strtok(NULL, ",");
@@ -221,9 +221,9 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
         
         // Set up bit
         if (arg[0] == '+') {
-          token->SDT.offset.ShiftedReg.up_bit = 1;
+          token->TokenType.SDT.offset.OffsetType.ShiftedReg.up_bit = 1;
         } else {
-          token->SDT.offset.ShiftedReg.up_bit = 0;
+          token->TokenType.SDT.offset.OffsetType.ShiftedReg.up_bit = 0;
         }
 
         // Store Rm or <#expression> into offset array
@@ -256,15 +256,15 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
 void tokenise_multiply(char* str, Token *token) {
   char* args = strcpy(malloc(strlen(str) + 1), str);
   char* operand = strtok(args, ",");
-  token->Multiply.rd = string_to_reg_address(operand);
+  token->TokenType.Multiply.rd = string_to_reg_address(operand);
   operand = strtok(NULL, ",");
-  token->Multiply.rm = string_to_reg_address(operand);
+  token->TokenType.Multiply.rm = string_to_reg_address(operand);
   operand = strtok(NULL, ",");
-  token->Multiply.rs = string_to_reg_address(operand);
+  token->TokenType.Multiply.rs = string_to_reg_address(operand);
 
   if (token->opcode == MLA) {
     operand = strtok(NULL, ",");
-    token->Multiply.rn = string_to_reg_address(operand);
+    token->TokenType.Multiply.rn = string_to_reg_address(operand);
   }
   free(args);
 }
@@ -279,9 +279,9 @@ void tokenise_branch(char* str, Token *token, SymbolTable *symboltable) {
     size_t arg_len = strlen(str);
     char addr[arg_len];
     memcpy(addr, &str[1], arg_len);
-    token->Branch.target_address = (Address) parse_immediate_value(addr);
+    token->TokenType.Branch.target_address = (Address) parse_immediate_value(addr);
   } else {
-    token->Branch.target_address = lookup_symbol(symboltable, str); 
+    token->TokenType.Branch.target_address = lookup_symbol(symboltable, str); 
   }
 }
 
