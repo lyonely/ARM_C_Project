@@ -372,3 +372,12 @@ void get_move(Player player, move_t* move) {
 	}
 }
 
+int score(board_t board, char player) {
+	int total = 0;
+	for(int x = 0; x < 8; x++)
+		for(int y = 0; y < 8; y++) {
+			if((*board)[x][y] == player)
+				total++;
+		}
+	return total;
+}
