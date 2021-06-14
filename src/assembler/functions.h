@@ -2,6 +2,7 @@
 #define FUNCTIONS_H
 
 #include <stdio.h>
+#include <stdint.h>
 #include "datatypes.h"
 
 // Writes an array of instructions into a binary file (/out/program.bin)
@@ -16,27 +17,20 @@ Type get_type(Operation opcode);
 // Gets expected number of arguments for operation
 unsigned int get_num_args(Operation opcode);
 
-// Sets bit 25 of instruction
-void set_imm_field(Instruction* i);
+// Returns opcode from string
+Operation string_to_operation(char *str);
 
-// Sets bits 19-16 to rn number
-void set_rn_field(int rn, Instruction* i);
+// Returns condition code from string
+Condition string_to_condition(char *str);
 
-// Sets bits 15-12 to rd number
-void set_rd_field(int rd, Instruction* i);
+// Returns register address from string
+unsigned int string_to_reg_address(char *str);
 
-// Sets bits 11-7 to shift amount
-void set_op2reg_shiftamt_field(int amt, Instruction* i);
+// Returns ShiftType from string
+ShiftType string_to_shift(char *str);
 
-// Sets bits 6-5 to shift type
-void set_op2reg_shifttype_field(ShiftType type, Instruction* i);
-
-// Sets bits 11-8 to rs number, sets bit 7 = 0 and sets bit 4
-// (register specified shift)
-void set_op2reg_shiftreg_field(int rs, Instruction* i);
-
-// Sets bits 3-0 to rm number
-void set_op2reg_rm_field(int rm, Instruction* i);
+// Returns immediate value from string
+uint32_t parse_immediate_value(char *str);
 
 #endif
 

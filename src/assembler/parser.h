@@ -1,39 +1,22 @@
 #ifndef PARSER_H
 #define PARSER_H
+
 #include "datatypes.h"
 
+// Parses data processing instruction into Token struct
+void tokenise_dataprocessing(char *str, Token *token);
 
-//Returns operation for a given string
-Operation string_to_operation(char *str);
+// Parses data transfer instruction into Token struct
+void tokenise_datatransfer(char *str, Token *token);
 
+// Parses multiply instruction into Token struct
+void tokenise_multiply(char *str, Token *token);
 
-//Returns the condition for a given string
-Condition string_to_condition(char *str);
+// Parses branch instruction into Token struct
+void tokenise_branch(char *str, Token *token, SymbolTable *symboltable);
 
-
-//Returns opcode for a given operation 
-Opcode mnemonic_to_opcode(Operation operation);
-
-
-//Returns register address (number) given by the string
-RegAddress string_to_reg_address(char *str);
-
-
-//Returns the shift for a given shift string
-ShiftType string_to_shift(char *str);
-
-//Parses the shift and adds it to the given instruction
-void parse_shift_data_processing(StringArray *args, Token *token);
-
-void parse_shift_data_transfer(StringArray *args, Token *token);
-
-//Parses operand and adds it to the given instruction
-void parse_operand_data_processing(StringArray *args, Token *token);
-
-void parse_offset_data_transfer(StringArray *args, Token *token);
-
-//Returns the immediate value given by the string
-uint32_t parse_immediate_value(char *str);
+// Parses assembly code into array of Tokens
+int tokenise(char *line, Address address, SymbolTable *symboltable, Token *token);
 
 #endif
 

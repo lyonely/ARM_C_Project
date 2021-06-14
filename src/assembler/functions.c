@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+#include "functions.h"
 #include "datatypes.h"
 
 // Writes an array of instructions into a binary file
@@ -71,41 +74,133 @@ unsigned int get_num_args(Operation opcode) {
   }
 }
 
-// Sets bit 25
-void set_imm_field(Instruction* i) {
-	*i |= 0x02000000;
+Operation string_to_operation(char *str) {
+  if (!strcmp(str, "add")) {
+    return ADD;
+  }
+  if (!strcmp(str, "sub")) {
+    return SUB;
+  }
+  if (!strcmp(str, "rsb")) {
+    return RSB;
+  }
+  if (!strcmp(str, "and")) {
+    return AND;
+  }
+  if (!strcmp(str, "eor")) {
+    return EOR;
+  }
+  if (!strcmp(str, "orr")) {
+    return ORR;
+  }
+  if (!strcmp(str, "mov")) {
+    return MOV;
+  }
+  if (!strcmp(str, "tst")) {
+    return TST;
+  }
+  if (!strcmp(str, "teq")) {
+    return TEQ;
+  }
+  if (!strcmp(str, "cmp")) {
+    return CMP;
+  }
+  if (!strcmp(str, "mul")) {
+    return MUL;
+  }
+  if (!strcmp(str, "mla")) {
+    return MLA;
+  }
+  if (!strcmp(str, "ldr")) {
+    return LDR;
+  }
+  if (!strcmp(str, "str")) {
+    return STR;
+  }
+  if (!strcmp(str, "beq")) {
+    return BEQ;
+  }
+  if (!strcmp(str, "bne")) {
+    return BNE;
+  }
+  if (!strcmp(str, "bge")) {
+    return BGE;
+  }
+  if (!strcmp(str, "blt")) {
+    return BLT;
+  }
+  if (!strcmp(str, "bgt")) {
+    return BGT;
+  }
+  if (!strcmp(str, "ble")) {
+    return BLE;
+  }
+  if (!strcmp(str, "b")) {
+    return B;
+  }
+  if (!strcmp(str, "lsl")) {
+    return LSL;
+  }
+  if (!strcmp(str, "andeq")) {
+    return ANDEQ;
+  }
+
+  fprintf(stderr, "No such mnemonic found.\n");
+  exit(EXIT_FAILURE);
 }
 
-// Sets bits 19-16 to rn number
-void set_rn_field(int rn, Instruction* i) {
-	*i |= (rn << 16); 
+Condition string_to_condition(char *str) {
+  if (!strcmp(str, "eq")) {
+    return EQ;
+  }
+  if (!strcmp(str, "ne")) {
+    return NE;
+  }
+  if (!strcmp(str, "ge")) {
+    return GE;
+  }
+  if (!strcmp(str, "lt")) {
+    return LT;
+  }
+  if (!strcmp(str, "gt")) {
+    return GT;
+  }
+  if (!strcmp(str, "le")) {
+    return LE;
+  }
+  if (!strcmp(str, "al") || 0 == strlen(str)) {
+    return AL;
+  }
+  fprintf(stderr, "No such condition found.\n");
+  exit(EXIT_FAILURE);
 }
 
-// Sets bits 15-12 to rd number
-void set_rd_field(int rd, Instruction* i) {
-	*i |= (rd << 12);
+unsigned int string_to_reg_address(char *str) {
+	return strtol(&str[1], (char **) NULL, 10);
+}	
+
+ShiftType string_to_shift(char *str) {
+	if (!strcmp(str, "lsl")) {
+		return LSL_S;
+	}
+	if (!strcmp(str, "lsr")) {
+    return LSR_S;
+	}
+	if (!strcmp(str, "asr")) {
+    return ASR_S;
+	}
+	if (!strcmp(str, "ror")) {
+    return ROR_S;
+	}
+	fprintf(stderr, "No such shift found.\n");
+  exit(EXIT_FAILURE);
 }
 
-// Sets bits 11-7 to shift amount
-void set_op2reg_shiftamt_field(int amt, Instruction* i) {
-	*i |= (amt << 7);
+uint32_t parse_immediate_value(char *str) {
+	if(strstr(str, "0x")) {
+		return strtol(str, (char **)NULL, 16);
+	} else {
+		return strtol(str, (char **)NULL, 10);
+	}
 }
-
-// Sets bits 6-5 to shift type
-void set_op2reg_shifttype_field(ShiftType type, Instruction* i) {
-	*i |= (type << 5);
-}
-
-// Sets bits 11-8 to rs number, sets bit 7 = 0 and sets bit 4
-// (register specified shift)
-void set_op2reg_shiftreg_field(int rs, Instruction* i) {
-	*i |= 0x10;
-	*i &= 0xFFFFFF7F;
-	*i |= (rs << 8);
-}
-
-// Sets bits 3-0 to rm number
-void set_op2reg_rm_field(int rm, Instruction* i) {
-	*i |= rm;
-}
-
+	
