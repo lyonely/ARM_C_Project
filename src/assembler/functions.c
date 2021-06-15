@@ -16,6 +16,14 @@ void write_to_file(Instruction *instructions, int size, char *filename) {
   fclose(fp);
 }
 
+void remove_spaces(char *str) {
+  for (int i = 0; str[i]; i++) {
+    if (str[i] == ' ') {
+      memmove(&str[i], &str[i+1], strlen(str) - i);
+    }
+  }
+}
+
 void delete_string_array(StringArray *string_array) {
   for (int i = 0; i < string_array->size; i++) {
     free(string_array->array[i]);
@@ -250,11 +258,13 @@ ShiftType string_to_shift(char *str) {
 }
 
 uint32_t parse_immediate_value(char *str) {
+  long result;
 	if(strstr(str, "0x")) {
-		return strtol(str, (char **)NULL, 16);
+		result = strtol(str, (char**)NULL, 16);
 	} else {
-		return strtol(str, (char **)NULL, 10);
+		result = strtol(str, (char**)NULL, 10);
 	}
+	return result;
 }
 
 char *opcode_to_string(Operation opcode) {

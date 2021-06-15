@@ -7,8 +7,10 @@
 #include "symboltable.h"
 
 void parse_shift_data_processing(StringArray *args, Token *token) {
+	printf("Parsing shift: %s %s\n", args->array[0], args->array[1]);
 	token->TokenType.DataP.operand2.Op2Type.reg_operand.shift_type = string_to_shift(args->array[0]); // Shift type stored
-  
+
+
   if ('#' == args->array[1][0]) {
     // Shift by immediate
     char *number = &args->array[1][1];
@@ -44,6 +46,8 @@ void parse_shift_data_transfer(StringArray *args, Token *token) {
 void parse_operand_data_processing(StringArray *args, Token *token) {
   //printf("Parsing operands for %s instruction:\n", opcode_to_string(token->opcode));
   char **sections = args->array;
+  printf("First arg: %s\n", sections[0]);
+  printf("Checking first character: %c\n", sections[0][0]);
   if ('#' == sections[0][0]) {
     //printf("<#expression> argument detected.\n");
     // Operand2 in the form <#expression>
@@ -56,17 +60,18 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
       token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.immediate_shift = parse_immediate_value(&sections[0][1]);
     } else {
       token->TokenType.DataP.operand2.is_imm = 1;
-      char *imm_addr = &token->TokenType.DataP.operand2.Op2Type.imm_operand.immediate;
+      uint32_t *imm_addr = &token->TokenType.DataP.operand2.Op2Type.imm_operand.immediate;
       *imm_addr = parse_immediate_value(&sections[0][1]);
-      
+      printf("Immediate %s stored: %x\n", sections[0], *imm_addr);
+
       int *rotation = &token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation;
       *rotation = 0;
 
-      uint16_t shift = WORD_SIZE;
+      uint16_t shift = 0;
       if (*imm_addr > 0xFF) {
         while (!(*imm_addr & 0x3)) {
           *imm_addr >>= 2;
-          shift--;
+          shift++;
         }
         *rotation = shift;
       }
@@ -89,6 +94,11 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
       shift_tokens->size = args->size - 1;
       parse_shift_data_processing(shift_tokens, token);
       free(shift_tokens);
+    } else {
+      // Rm has no shift
+      token->TokenType.DataP.operand2.Op2Type.reg_operand.shift_type = 0;
+      token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.is_imm = 1;
+      token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.immediate_shift = 0;
     }
   } else {
     fprintf(stderr, "Operand not number or register");
@@ -121,6 +131,12 @@ void parse_offset_data_transfer(StringArray *args, Token *token) {
       shift_tokens->size = args->size - 1;
       parse_shift_data_transfer(shift_tokens, token);
       free(shift_tokens);
+    } else {
+      // Rm has no shift
+      token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift_type = 0;
+      token->TokenType.SDT.offset.OffsetType.ShiftedReg.up_bit = 0;
+      token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.is_imm = 1;
+      token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.immediate_shift = 0;
     }
   } else {
     fprintf(stderr, "Operand not number or register");
@@ -308,7 +324,8 @@ int tokenise(char *line, Address address, SymbolTable *symboltable,
   //printf("Tokenising line %s:\n", line);
   char *opcode = strtok(line, " ");
   char *args = strtok(NULL, "");
-  
+  remove_spaces(args);
+
   //printf("Opcode: %s\n", opcode);
   //printf("Args: %s\n", args);
 

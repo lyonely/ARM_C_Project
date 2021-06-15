@@ -8,6 +8,9 @@
 // Writes an array of instructions into a binary file
 void write_to_file(Instruction *instructions, int size, char *filename);
 
+// Removes whitespace in a string
+void remove_spaces(char *str);
+
 // Frees members of StringArray struct
 void delete_string_array(StringArray *string_array);
 

@@ -93,7 +93,7 @@ typedef struct {
   
   union {
     struct {
-      char immediate;
+      uint32_t immediate;
       int rotation;
     } imm_operand;
 
