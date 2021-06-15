@@ -11,14 +11,20 @@ void write_to_file(Instruction *instructions, int size, char *filename);
 // Frees members of StringArray struct
 void delete_string_array(StringArray *string_array);
 
+// Initialises values of Token struct
+void initialise_token(Token *token);
+
 // Converts instruction from big-endian to little-endian format
 void flip_endian(Instruction *i);
 
 // Gets instruction type of operation
-Type get_type(Operation opcode);
+Type get_type(Operation op);
+
+// Gets opcode of data processing instruction
+unsigned int get_opcode(Operation op);
 
 // Gets expected number of arguments for operation
-unsigned int get_num_args(Operation opcode);
+unsigned int get_num_args(Operation op);
 
 // Returns opcode from string
 Operation string_to_operation(char *str);

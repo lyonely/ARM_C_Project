@@ -9,6 +9,10 @@
 void write_to_file(Instruction *instructions, int size, char *filename) {
   FILE *fp = fopen(filename, "wb");
   fwrite(instructions, sizeof(Instruction), size, fp);
+  printf("instructions written to file %s:\n", filename);
+  for (int i = 0; i < size; i++)  {
+    printf("Instruction %d: %x\n", i, instructions[i]);
+  }
   fclose(fp);
 }
 
@@ -16,6 +20,30 @@ void delete_string_array(StringArray *string_array) {
   for (int i = 0; i < string_array->size; i++) {
     free(string_array->array[i]);
   }
+}
+
+// Initialises values for Token struct
+void initialise_token(Token *token) {
+  token->address = 0;
+  token->opcode = 0;
+  token->cond = 0;
+  token->num_args = 0;
+  
+  token->TokenType.DataP.rd = 0;
+  token->TokenType.DataP.rn = 0;
+  token->TokenType.DataP.operand2.is_imm = 0;
+ 
+  token->TokenType.Multiply.rd = 0;
+  token->TokenType.Multiply.rm = 0;
+  token->TokenType.Multiply.rs = 0;
+  token->TokenType.Multiply.rn = 0;
+
+  token->TokenType.Branch.target_address = 0;
+
+  token->TokenType.SDT.rd = 0;
+  token->TokenType.SDT.rn = 0;
+  token->TokenType.SDT.offset.is_imm = 0;
+  token->TokenType.SDT.offset.preindex = 0;
 }
 
 // Converts Instruction from big-endian to little-endian
@@ -51,6 +79,25 @@ Type get_type(Operation opcode) {
       return BRANCH; break;
     default:
       return DATA_P; break;
+  }
+}
+
+unsigned int get_opcode(Operation op) {
+  if (get_type(op) != DATA_P) {
+    perror("Wrong instruction type passed into get_opcode\n");
+    exit(EXIT_FAILURE);
+  }
+  switch(op) {
+    case AND: return 0;
+    case EOR: return 1;
+    case SUB: return 2;
+    case RSB: return 3;
+    case ADD: return 4;
+    case ORR: return 12;
+    case MOV: return 13;
+    case TST: return 8;
+    case TEQ: return 9;
+    default: return 10;
   }
 }
 

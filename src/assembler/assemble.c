@@ -10,50 +10,79 @@
 #define BRANCH_OFFSET_MASK 0x3ffffff
 
 void build_datap_instr(Token *token, Instruction *i) {
+  printf("assemble.c: entered build_datap_instr with instruction %x\n", *i);
   // Sets instruction bits if opcode is not ANDEQ (all-zero)
   if (!(token->opcode == ANDEQ && token->TokenType.DataP.rd == 0 
         && token->TokenType.DataP.rn == 0 && token->TokenType.DataP.operand2.Op2Type.reg_operand.rm == 0)) {
-    
+     
     // Set cond field
     *i &= 0x0fffffff;
-	  *i |= (token->cond << 28);
+	  *i |= (token->cond << 28);    
+    printf("cond field set to %d, instruction = %x\n", token->cond, *i);
 
     // Set opcode field
-    *i |= (token->opcode << 21);
-    
+    *i |= (get_opcode(token->opcode) << 21);
+    printf("opcode field set to %d, instruction = %x\n", token->opcode, *i);
+
     // Set flags field
     switch(token->opcode) {
       case TST:
       case TEQ:
-      case CMP: *i |= 0x00100000; break;
-      default: *i &= 0xffefffff; break; }
+      case CMP: 
+        *i |= 0x00100000; 
+        printf("flag field set to 1, instruction = %x\n", *i);
+        break;
+      default: 
+        *i &= 0xffefffff; 
+        printf("flag field set to 0, instruction = %x\n", *i);
+        break; }
 
     // Set rn and rd fields
-    *i |= (token->TokenType.DataP.rn << 16);
-    *i |= (token->TokenType.DataP.rd << 12);
+      *i |= (token->TokenType.DataP.rn << 16);
+      printf("rn field set to %d, instruction = %x\n", token->TokenType.DataP.rn, *i);
+      *i |= (token->TokenType.DataP.rd << 12);
+      printf("rd field set to %d, instruction = %x\n", token->TokenType.DataP.rd, *i);
 
     if (token->TokenType.DataP.operand2.is_imm) {
+      printf("setting operand2 (immediate) fields:\n");
       // Set imm field and immediate operand2
       *i |= 0x02000000; // I bit
       *i |= (token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation << 8); // Rotation
+      printf("rotation set to %d, instruction = %x\n", 
+          token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation, *i);
       *i |= token->TokenType.DataP.operand2.Op2Type.imm_operand.immediate; // Immediate operand
+      printf("immediate set to %d, instruction = %x\n",
+          token->TokenType.DataP.operand2.Op2Type.imm_operand.immediate, *i);
+
     } else {
       // Set shifted register operand2 fields
       *i |= token->TokenType.DataP.operand2.Op2Type.reg_operand.rm; // Rm
       *i |= (token->TokenType.DataP.operand2.Op2Type.reg_operand.shift_type << 5); // Shift type
+      printf("operand2 field set (register), rm = %d, shift type = %d, instruction = %x\n",
+          token->TokenType.DataP.operand2.Op2Type.reg_operand.rm,
+          token->TokenType.DataP.operand2.Op2Type.reg_operand.shift_type,
+          *i);
+
       if (token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.is_imm) {
         // Set shift by immediate fields
         *i |= (token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.immediate_shift << 7);
+        printf("immediate shift set to %d, instruction = %x\n",
+            token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.immediate_shift, *i);
       } else {
         // Set shift by register fields
         *i |= 0x10; // Shift by register value field
         *i &= 0xFFFFFF7F;
         *i |= (token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.rs << 8); // Rs
+        printf("register shift rs set to %d, instruction = %x\n",
+            token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.rs,
+            *i);
       }
     }
   } else {
+    printf("assemble.c: termination instruction built.\n");
     *i &= 0x0;
   } 
+  printf("assemble.c: Instruction built - %x\n", *i);
 }
 
 void build_sdt_instr(Token *token, Instruction *i) {
@@ -163,13 +192,14 @@ void assemble(StringArray *source, char *filename) {
   
   // Second pass - tokenise and build instructions
   Address address = 0;
-  Address next_memory_address = source->size;
+  Address next_memory_address = source->size * 4;
   int current_line = 0;
   while (current_line < source->size) {
     Token token;
-    
+    initialise_token(&token);
+
     char *line = source->array[current_line];
-    //printf("\nGet line: %s\n", line); 
+    printf("\nGet line: %s\n", line); 
     if (tokenise(line, address, symboltable, &next_memory_address, instructions, &token)) {
       Instruction instr = 0;
       switch(get_type(token.opcode)) {
@@ -186,7 +216,7 @@ void assemble(StringArray *source, char *filename) {
           build_branch_instr(&token, &instr);
           break;
       }
-      flip_endian(&instr);
+      //flip_endian(&instr);
       instructions[address / 4] = instr;
       address += 4;
     } else {

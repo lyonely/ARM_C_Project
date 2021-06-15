@@ -57,9 +57,11 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
     } else {
       token->TokenType.DataP.operand2.is_imm = 1;
       char *imm_addr = &token->TokenType.DataP.operand2.Op2Type.imm_operand.immediate;
-      int *rotation = &token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation;
-      
       *imm_addr = parse_immediate_value(&sections[0][1]);
+      
+      int *rotation = &token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation;
+      *rotation = 0;
+
       uint16_t shift = WORD_SIZE;
       if (*imm_addr > 0xFF) {
         while (!(*imm_addr & 0x3)) {
@@ -134,13 +136,11 @@ void tokenise_dataprocessing(char *str, Token *token) {
   operand2->size = 0;
 
   char *arg = strtok(str, ",");
-  //printf("Got argument for rd: %s\n", arg);
-  token->TokenType.DataP.rd = string_to_reg_address(arg);
   
   if (token->num_args == 3) { 
     // ADD, ANDEQ, EOR, SUB, RSB, ADD, ORR
-    arg = strtok(NULL, ",");
     token->TokenType.DataP.rd = string_to_reg_address(arg);
+    arg = strtok(NULL, ",");
     token->TokenType.DataP.rn = string_to_reg_address(arg);
   } else {
     if (token->opcode == MOV || token->opcode == LSL) { 
