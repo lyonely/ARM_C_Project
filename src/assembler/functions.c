@@ -96,13 +96,15 @@ unsigned int get_opcode(Operation op) {
     exit(EXIT_FAILURE);
   }
   switch(op) {
-    case AND: return 0;
+    case AND: 
+    case ANDEQ: return 0;
     case EOR: return 1;
     case SUB: return 2;
     case RSB: return 3;
     case ADD: return 4;
     case ORR: return 12;
-    case MOV: return 13;
+    case MOV: 
+    case LSL: return 13;
     case TST: return 8;
     case TEQ: return 9;
     default: return 10;
