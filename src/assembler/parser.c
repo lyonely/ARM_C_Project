@@ -44,8 +44,6 @@ void parse_shift_data_transfer(StringArray *args, Token *token) {
 void parse_operand_data_processing(StringArray *args, Token *token) {
   //printf("Parsing operands for %s instruction:\n", opcode_to_string(token->opcode));
   char **sections = args->array;
-  printf("First arg: %s\n", sections[0]);
-  printf("Checking first character: %c\n", sections[0][0]);
   if ('#' == sections[0][0]) {
     //printf("<#expression> argument detected.\n");
     // Operand2 in the form <#expression>
@@ -58,9 +56,9 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
       token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.immediate_shift = parse_immediate_value(&sections[0][1]);
     } else {
       token->TokenType.DataP.operand2.is_imm = 1;
+      
       uint32_t *imm_addr = &token->TokenType.DataP.operand2.Op2Type.imm_operand.immediate;
       *imm_addr = parse_immediate_value(&sections[0][1]);
-      printf("Immediate %s stored: %x\n", sections[0], *imm_addr);
 
       int *rotation = &token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation;
       *rotation = 0;
@@ -188,6 +186,8 @@ void tokenise_dataprocessing(char *str, Token *token) {
 }
 
 void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Instruction *instructions) {
+
+  printf("Next available memory address %d passed to tokeniser\n", *memory_address);
   StringArray* offset = malloc(sizeof(StringArray));
   offset->array = malloc(token->num_args * sizeof(char*));
   offset->size = 0;
@@ -213,9 +213,8 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
     } else {
       token->TokenType.SDT.rn = 15; // rn = PC
       token->TokenType.SDT.offset.preindex = 1;
-      token->TokenType.SDT.offset.is_imm = 1;
-      token->TokenType.SDT.offset.OffsetType.expression = *memory_address - token->address;
-      flip_endian(&exp);
+      token->TokenType.SDT.offset.is_imm = 0;
+      token->TokenType.SDT.offset.OffsetType.expression = *memory_address - (token->address + 8);
       instructions[*memory_address / 4] = exp; // Store value in memory
       *memory_address += 4;
     }
@@ -231,7 +230,6 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
     } else {
       // address in the form [Rn, <offset>]; arg = [Rn
       token->TokenType.SDT.offset.preindex = 1;
-      printf("Preindex field set in token.\n");
       token->TokenType.SDT.rn = string_to_reg_address(&arg[1]);
     }
 
@@ -325,6 +323,9 @@ void tokenise_branch(char* str, Token *token, SymbolTable *symboltable) {
 // Tokenises assembly code and parses into Instruction
 int tokenise(char *line, Address address, SymbolTable *symboltable, 
     Instruction *instructions, Address *memory_address, Token *token) {
+
+  printf("Next memory address: %d\n", *memory_address);
+
   printf("Tokenising line %s:\n", line);
   char *opcode = strtok(line, " ");
   char *args = strtok(NULL, "");
@@ -334,7 +335,8 @@ int tokenise(char *line, Address address, SymbolTable *symboltable,
   printf("Args: %s\n", args);
 
   if (!args) {
-    return 0;
+    perror("Error getting arguments");
+    exit(EXIT_FAILURE);
   }
 
   token->opcode = string_to_operation(opcode);

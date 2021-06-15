@@ -80,6 +80,7 @@ void build_sdt_instr(Token *token, Instruction *i) {
   *i |= (token->TokenType.SDT.rn << 16);
   printf("rn field set to %d, instruction = %x\n", token->TokenType.SDT.rn, *i);
   *i |= (token->TokenType.SDT.rd << 12);
+  printf("rd field set to %d, instruction = %x\n", token->TokenType.SDT.rd, *i);
 
   // Set preindex field
   if (token->TokenType.SDT.offset.preindex) {
@@ -169,6 +170,10 @@ void build_branch_instr(Token *token, Instruction *i) {
 void assemble(StringArray *source, char *filename) {
   // Instruction words stored here
   Instruction instructions[2 * source->size]; // Allocate enough memory for LDR instructions
+  printf("Source size: %d\n", source->size);
+  for (int i = 0; i < source->size; i++) {
+    printf("Line %d: %s\n", i, source->array[i]);
+  }
 
   // First pass - symboltable, labels removed from source
   SymbolTable *symboltable = create_symboltable(source);
@@ -176,6 +181,7 @@ void assemble(StringArray *source, char *filename) {
   // Second pass - tokenise and build instructions
   Address address = 0;
   Address next_memory_address = source->size * 4;
+
   int current_line = 0;
   while (current_line < source->size) {
     Token token;
@@ -183,7 +189,7 @@ void assemble(StringArray *source, char *filename) {
 
     char *line = source->array[current_line];
     printf("\nGet line: %s\n", line); 
-    if (tokenise(line, address, symboltable, &next_memory_address, instructions, &token)) {
+    if (tokenise(line, address, symboltable, instructions, &next_memory_address, &token)) {
       Instruction instr = 0;
       switch(get_type(token.opcode)) {
         case DATA_P:
