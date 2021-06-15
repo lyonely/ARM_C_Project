@@ -196,6 +196,7 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
   token->TokenType.SDT.rd = string_to_reg_address(arg); // rd
 
   arg = strtok(NULL, ",");
+  printf("Next argument grabbed: %s\n", arg);
   char* constant_offset = strchr(arg, '=');
   if (constant_offset) {
     // address in the form <=expression>
@@ -229,7 +230,9 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
       token->TokenType.SDT.rn = string_to_reg_address(arg);
     } else {
       // address in the form [Rn, <offset>]; arg = [Rn
-      token->TokenType.SDT.offset.preindex = 1; 
+      token->TokenType.SDT.offset.preindex = 1;
+      printf("Preindex field set in token.\n");
+      token->TokenType.SDT.rn = string_to_reg_address(&arg[1]);
     }
 
     arg = strtok(NULL, ",");
