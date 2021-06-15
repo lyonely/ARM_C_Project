@@ -24,8 +24,12 @@ board_t initial_board(void) {
     return board;
 }
 
-// prints the current state of the board
+// prints the current state of the board &
+// the number of pieces owned by each player
 void print_board(board_t board) {
+	int black = 0;
+	int white = 0;
+
     printf("  A   B   C   D   E   F   G   H\n");
     for(int row = 0; row < HEIGHT; row ++) {
         printf("%d", row + 1);
@@ -35,8 +39,17 @@ void print_board(board_t board) {
             } else {
                 printf(" %c |", (*board)[row][col]);
             }
+
+			if((*board)[row][col] == 'X'){
+				black ++;
+			} else if ((*board)[row][col] == 'O'){
+				white ++;
+			}
         }
     }
+
+	printf("Player1 (X) has: %d pieces.\n", black);
+	printf("Player2 (O) has: %d pieces.\n", white);
 };
 
 // determines if the move is legal 
