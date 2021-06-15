@@ -192,9 +192,9 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
   offset->array = malloc(token->num_args * sizeof(char*));
   offset->size = 0;
 
-  char* arg = strtok(str, ","); 
+  char* arg = strtok(str, ",");
   token->TokenType.SDT.rd = string_to_reg_address(arg); // rd
- 
+
   arg = strtok(NULL, ",");
   char* constant_offset = strchr(arg, '=');
   if (constant_offset) {
@@ -224,7 +224,8 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
     if (bracket_end) {
       // address in the form [Rn], <offset>; arg = [Rn]
       token->TokenType.SDT.offset.preindex = 0;
-      memcpy(arg, &arg[1], bracket_end - &arg[1]);
+      memmove(arg, &arg[1], bracket_end - arg);
+      arg[(int) (bracket_end - arg)] = '\0';
       token->TokenType.SDT.rn = string_to_reg_address(arg);
     } else {
       // address in the form [Rn, <offset>]; arg = [Rn
@@ -321,13 +322,13 @@ void tokenise_branch(char* str, Token *token, SymbolTable *symboltable) {
 // Tokenises assembly code and parses into Instruction
 int tokenise(char *line, Address address, SymbolTable *symboltable, 
     Instruction *instructions, Address *memory_address, Token *token) {
-  //printf("Tokenising line %s:\n", line);
+  printf("Tokenising line %s:\n", line);
   char *opcode = strtok(line, " ");
   char *args = strtok(NULL, "");
   remove_spaces(args);
 
-  //printf("Opcode: %s\n", opcode);
-  //printf("Args: %s\n", args);
+  printf("Opcode: %s\n", opcode);
+  printf("Args: %s\n", args);
 
   if (!args) {
     return 0;
