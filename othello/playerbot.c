@@ -231,6 +231,7 @@ int minimax_value(board_t board, Player player, Player current, int search) {
 				best_move_val = val;
 			}
 		}
+		free(temp_board);
 	}	
 	free(legalmoves->moves);
 	free(legalmoves);
@@ -258,6 +259,7 @@ void minimax(board_t board, move_t* move, Player player, legalmoves_t* legalmove
 			best_move_val = val;
 			best_move = legalmoves->moves[i];
 		}
+		free(temp_board);
 	}
 	*move = best_move;	
 }
