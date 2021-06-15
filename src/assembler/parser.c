@@ -67,13 +67,13 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
       int *rotation = &token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation;
       *rotation = 0;
 
-      uint16_t shift = 0;
+      uint16_t shift = WORD_SIZE;
       if (*imm_addr > 0xFF) {
         while (!(*imm_addr & 0x3)) {
           *imm_addr >>= 2;
-          shift++;
+          shift -= 2;
         }
-        *rotation = shift;
+        *rotation = shift / 2;
       }
     }
   } else if ('r' == sections[0][0]) {
