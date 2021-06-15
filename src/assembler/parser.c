@@ -10,7 +10,6 @@ void parse_shift_data_processing(StringArray *args, Token *token) {
 	printf("Parsing shift: %s %s\n", args->array[0], args->array[1]);
 	token->TokenType.DataP.operand2.Op2Type.reg_operand.shift_type = string_to_shift(args->array[0]); // Shift type stored
 
-
   if ('#' == args->array[1][0]) {
     // Shift by immediate
     char *number = &args->array[1][1];
@@ -26,8 +25,7 @@ void parse_shift_data_processing(StringArray *args, Token *token) {
 }
 
 void parse_shift_data_transfer(StringArray *args, Token *token) {
-	token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift_type = string_to_shift(args->array[0]);
-  
+	token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift_type = string_to_shift(args->array[0]);  
   if ('#' == args->array[1][0]) {
     // Shift by immediate
     char *number = &args->array[1][1];
@@ -184,19 +182,17 @@ void tokenise_dataprocessing(char *str, Token *token) {
     operand2->size += 2;
   }
   parse_operand_data_processing(operand2, token);
-  free(arg);
   delete_string_array(operand2);
   free(operand2->array);
   free(operand2);
 }
 
 void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Instruction *instructions) {
-  char* arg = strcpy(malloc(strlen(str) + 1), str);
   StringArray* offset = malloc(sizeof(StringArray));
   offset->array = malloc(token->num_args * sizeof(char*));
   offset->size = 0;
 
-  arg = strtok(str, ","); 
+  char* arg = strtok(str, ","); 
   token->TokenType.SDT.rd = string_to_reg_address(arg); // rd
  
   arg = strtok(NULL, ",");
@@ -209,6 +205,10 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
       token->TokenType.DataP.rd = token->TokenType.SDT.rd;
       token->opcode = MOV;
       token->num_args = 2;
+      token->TokenType.DataP.operand2.is_imm = 1;
+      token->TokenType.DataP.operand2.Op2Type.imm_operand.immediate = exp;
+      token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation = 0;
+
     } else {
       token->TokenType.SDT.rn = 15; // rn = PC
       token->TokenType.SDT.offset.preindex = 1;
@@ -234,6 +234,7 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
     arg = strtok(NULL, ",");
     if (!arg) {
       // no offset, address is [Rn]
+      token->TokenType.SDT.offset.preindex = 1;
       offset->array[0] = "#0";
       offset->size++;
     } else {
@@ -282,7 +283,6 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
     }
     parse_offset_data_transfer(offset, token);
   }
-  free(arg);
   free(offset);
 }
 
