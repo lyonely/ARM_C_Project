@@ -47,7 +47,7 @@ void build_datap_instr(Token *token, Instruction *i) {
       printf("setting operand2 (immediate) fields:\n");
       // Set imm field and immediate operand2
       *i |= 0x02000000; // I bit
-      *i |= (token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation / 2 << 8); // Rotation
+      *i |= (token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation << 8); // Rotation
       printf("rotation set to %d, instruction = %x\n", 
           token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation, *i);
       *i |= token->TokenType.DataP.operand2.Op2Type.imm_operand.immediate; // Immediate operand
