@@ -42,10 +42,10 @@ void parse_shift_data_transfer(StringArray *args, Token *token) {
 }	
 
 void parse_operand_data_processing(StringArray *args, Token *token) {
-  printf("Parsing operands for %s instruction:\n", opcode_to_string(token->opcode));
+  //printf("Parsing operands for %s instruction:\n", opcode_to_string(token->opcode));
   char **sections = args->array;
   if ('#' == sections[0][0]) {
-    printf("<#expression> argument detected.\n");
+    //printf("<#expression> argument detected.\n");
     // Operand2 in the form <#expression>
     if (token->opcode == LSL) {
       // Convert to mov rd, rd, lsl <#expression>
@@ -127,14 +127,14 @@ void parse_offset_data_transfer(StringArray *args, Token *token) {
 }
 
 void tokenise_dataprocessing(char *str, Token *token) {
-  printf("Tokenising %s instruction:\n", opcode_to_string(token->opcode));
+  //printf("Tokenising %s instruction:\n", opcode_to_string(token->opcode));
 
   StringArray *operand2 = malloc(sizeof(StringArray));
   operand2->array = malloc(token->num_args * sizeof(char*));
   operand2->size = 0;
 
   char *arg = strtok(str, ",");
-  printf("Got argument for rd: %s\n", arg);
+  //printf("Got argument for rd: %s\n", arg);
   token->TokenType.DataP.rd = string_to_reg_address(arg);
   
   if (token->num_args == 3) { 
@@ -153,18 +153,18 @@ void tokenise_dataprocessing(char *str, Token *token) {
   }
  
   arg = strtok(NULL, ",");
-  printf("Argument get: %s\n", arg);
+  //printf("Argument get: %s\n", arg);
   strcpy(operand2->array[0] = malloc(strlen(arg) + 1), arg);
-  printf("Arg 0 stored in op2 array: %s\n", operand2->array[0]);
+  //printf("Arg 0 stored in op2 array: %s\n", operand2->array[0]);
   operand2->size++;
  
   arg = strtok(NULL, " ,");
   if (arg) {
     strcpy(operand2->array[1] = malloc(strlen(arg) + 1), arg); // rm
-    printf("Arg 1 stored in op2 array: %s\n", operand2->array[1]);
+    //printf("Arg 1 stored in op2 array: %s\n", operand2->array[1]);
     arg = strtok(NULL, "");
     strcpy(operand2->array[2] = malloc(strlen(arg) + 1), arg); // rs or constant shift amt
-    printf("Arg 2 stored in op2 array: %s\n", operand2->array[2]);
+    //printf("Arg 2 stored in op2 array: %s\n", operand2->array[2]);
     operand2->size += 2;
   }
   parse_operand_data_processing(operand2, token);
@@ -305,12 +305,12 @@ void tokenise_branch(char* str, Token *token, SymbolTable *symboltable) {
 // Tokenises assembly code and parses into Instruction
 int tokenise(char *line, Address address, SymbolTable *symboltable, 
     Instruction *instructions, Address *memory_address, Token *token) {
-  printf("Tokenising line %s:\n", line);
+  //printf("Tokenising line %s:\n", line);
   char *opcode = strtok(line, " ");
   char *args = strtok(NULL, "");
   
-  printf("Opcode: %s\n", opcode);
-  printf("Args: %s\n", args);
+  //printf("Opcode: %s\n", opcode);
+  //printf("Args: %s\n", args);
 
   if (!args) {
     return 0;

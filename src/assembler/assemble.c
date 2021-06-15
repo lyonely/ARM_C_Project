@@ -169,7 +169,7 @@ void assemble(StringArray *source, char *filename) {
     Token token;
     
     char *line = source->array[current_line];
-    printf("\nGet line: %s\n", line); 
+    //printf("\nGet line: %s\n", line); 
     if (tokenise(line, address, symboltable, &next_memory_address, instructions, &token)) {
       Instruction instr = 0;
       switch(get_type(token.opcode)) {
