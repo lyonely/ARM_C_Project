@@ -238,6 +238,63 @@ int minimax_value(board_t board, Player player, Player current, int search) {
 	return best_move_val;		
 }				
 
+int minimax_value_1(board_t board, Player player, Player current, int search) {
+	Player opponent = 1;
+	if (current == 1) {
+		opponent = 2;
+	}			
+	if(search == 15 || endgame(board)) {
+		return heuristic(board, player);
+	}
+	legalmoves_t* legalmoves = malloc(sizeof(legalmoves_t));
+	if(legalmoves == NULL) {
+		perror("failed to allocate memory for minimax values");
+		exit(EXIT_FAILURE);
+	}
+	legalmoves->moves = calloc(HEIGHT*WIDTH, sizeof(move_t));
+	if(legalmoves->moves == NULL) {
+		perror("failed to allocate memory for minimax array");
+		exit(EXIT_FAILURE);
+	}
+	legalmoves->size = 0;
+	legalmove(board, current, legalmoves);
+	if(legalmoves->size == 0) {
+		free(legalmoves->moves);			
+		free(legalmoves);			
+		return minimax_value(board, player, opponent, search + 1);
+	}		
+	int best_move_val = -9999;
+	if(player != current) {
+		best_move_val = 9999;
+	}
+	for(int i = 0; i < legalmoves->size; i++) {
+		board_t temp_board = calloc(1, sizeof(board_t));
+		if(temp_board == NULL) {
+			perror("failed to allocate memory for temp in minimax value");
+			exit(EXIT_FAILURE);
+		}
+		copy_board(board, temp_board);
+		make_move(legalmoves->moves[i], temp_board);
+		int val = minimax_value(temp_board, player, opponent, search + 1);
+		if(player == current) {
+			if(val > best_move_val) {
+				best_move_val = val;
+			}
+		}
+		else {
+			if (val < best_move_val) {
+				best_move_val = val;
+			}
+		}
+		free(temp_board);
+	}	
+	free(legalmoves->moves);
+	free(legalmoves);
+	return best_move_val;		
+}				
+
+
+
 // minimax implementation
 void minimax(board_t board, move_t* move, Player player, legalmoves_t* legalmoves) {
 	Player opponent = 1;
@@ -255,6 +312,32 @@ void minimax(board_t board, move_t* move, Player player, legalmoves_t* legalmove
 		copy_board(board, temp_board);
 		make_move(legalmoves->moves[i], temp_board);
 		int val = minimax_value(temp_board, player, opponent, 1);
+		if(val > best_move_val) {
+			best_move_val = val;
+			best_move = legalmoves->moves[i];
+		}
+		free(temp_board);
+	}
+	*move = best_move;	
+}
+
+
+void minimax_1(board_t board, move_t* move, Player player, legalmoves_t* legalmoves) {
+	Player opponent = 1;
+	if(player == 1) {
+		opponent = 2;
+	}
+	move_t best_move = legalmoves->moves[0];
+	int best_move_val = -9000;
+	for(int i = 0; i < legalmoves->size; i++) {
+		board_t temp_board = calloc(1, sizeof(board_t));
+		if(temp_board == NULL) {
+			perror("failed to allocate memory for temp_board in minimax");
+			exit(EXIT_FAILURE);
+		}	
+		copy_board(board, temp_board);
+		make_move(legalmoves->moves[i], temp_board);
+		int val = minimax_value_1(temp_board, player, opponent, 1);
 		if(val > best_move_val) {
 			best_move_val = val;
 			best_move = legalmoves->moves[i];
