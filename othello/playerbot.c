@@ -179,7 +179,7 @@ int heuristic(board_t board, Player player) {
 
 // a copy board function
 void copy_board(board_t src, board_t dest) {
-	memcpy(dest, src, 8 * 8 * sizeof(char));
+	memcpy(dest, src, sizeof(board_t) + 1);
 }
 
 // minimax value implementation
