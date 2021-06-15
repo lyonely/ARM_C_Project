@@ -191,7 +191,7 @@ int minimax_value(board_t board, Player player, Player current, int search) {
 	if(search == 5 || endgame(board)) {
 		return heuristic(board, player);
 	}
-	legalmoves_t* legalmoves = malloc(sizeof(legalmoves_t));
+	legalmoves_t* legalmoves = malloc(HEIGHT * WIDTH * sizeof(legalmoves_t));
 	if(legalmoves == NULL) {
 		perror("failed to allocate memory for minimax values");
 		exit(EXIT_FAILURE);
