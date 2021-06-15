@@ -160,7 +160,7 @@ void assemble(StringArray *source, char *filename) {
 
   // First pass - symboltable, labels removed from source
   SymbolTable *symboltable = create_symboltable(source);
-
+  
   // Second pass - tokenise and build instructions
   Address address = 0;
   Address next_memory_address = source->size;
@@ -169,7 +169,7 @@ void assemble(StringArray *source, char *filename) {
     Token token;
     
     char *line = source->array[current_line];
-    
+    printf("\nGet line: %s\n", line); 
     if (tokenise(line, address, symboltable, &next_memory_address, instructions, &token)) {
       Instruction instr = 0;
       switch(get_type(token.opcode)) {
@@ -196,6 +196,7 @@ void assemble(StringArray *source, char *filename) {
     current_line++;
   }
 
+  free_symboltable(symboltable);
   // Writes instruction array + memory bytes to binary file
   write_to_file(instructions, next_memory_address / 4, filename);
 }

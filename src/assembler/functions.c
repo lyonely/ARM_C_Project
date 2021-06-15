@@ -16,7 +16,6 @@ void delete_string_array(StringArray *string_array) {
   for (int i = 0; i < string_array->size; i++) {
     free(string_array->array[i]);
   }
-  free(string_array->array);
 }
 
 // Converts Instruction from big-endian to little-endian
@@ -210,4 +209,32 @@ uint32_t parse_immediate_value(char *str) {
 		return strtol(str, (char **)NULL, 10);
 	}
 }
-	
+
+char *opcode_to_string(Operation opcode) {
+  switch(opcode) {
+    case ADD: return "add";
+    case SUB: return "sub";
+    case RSB: return "rsb";
+    case AND: return "and";
+    case EOR: return "eor";
+    case ORR: return "orr";
+    case MOV: return "mov";
+    case TST: return "tst";
+    case TEQ: return "teq";
+    case CMP: return "cmp";
+    case MUL: return "mul";
+    case MLA: return "mla";
+    case LDR: return "ldr";
+    case STR: return "str";
+    case BEQ: return "beq";
+    case BNE: return "bne";
+    case BGE: return "bge";
+    case BLT: return "blt";
+    case BLE: return "ble";
+    case BGT: return "bgt";
+    case B: return "b";
+    case LSL: return "lsl";
+    default: return "andeq";
+  }
+}
+

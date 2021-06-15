@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
   char *filename = argv[2];
 
   if (fp == NULL) {
-    perror("Error opening file.\n");
+    perror("Error opening file in main\n");
     exit(EXIT_FAILURE);
   }
   
@@ -18,25 +18,36 @@ int main(int argc, char **argv) {
   int size = ftell(fp) + 1;
   rewind(fp);  
   
-  StringArray source;
-  source.array = malloc(sizeof(char*) * size);
-  source.size = 0;
- 
+  StringArray *source = malloc(sizeof(StringArray));
+  source->array = calloc(size, sizeof(char*));
+  if (!source->array) {
+    perror("Error allocating memory for source->array in main\n");
+    exit(EXIT_FAILURE);
+  }
+
+  source->size = 0;
   char *line = malloc(MAX_CHARS_PER_LINE + 1);
 
   while (fgets(line, MAX_CHARS_PER_LINE + 1, fp)) {
-    source.array[size] = malloc(MAX_CHARS_PER_LINE + 1);
-    strcpy(source.array[size], line);
-    source.size++;
+    source->array[source->size] = malloc(MAX_CHARS_PER_LINE + 1);
+    if (!source->array[source->size]) {
+      perror("Error allocating memory for source->array[size] in main\n");
+      exit(EXIT_FAILURE);
+    }
+    // Remove newline character
+    if (line[strlen(line) - 1] == '\n') {
+      line[strlen(line) - 1] = '\0';
+    }
+    strcpy(source->array[source->size], line);
+    source->size++;
   }
 
   fclose(fp);
   free(line);
-  source.array = realloc(source.array, source.size);
    
-  assemble(&source, filename);
+  assemble(source, filename);
 
-  delete_string_array(&source);
+  free(source);
   return 0;
 }
 

@@ -35,5 +35,7 @@ ShiftType string_to_shift(char *str);
 // Returns immediate value from string
 uint32_t parse_immediate_value(char *str);
 
+char *opcode_to_string(Operation opcode);
+
 #endif
 

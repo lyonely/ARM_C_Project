@@ -41,8 +41,8 @@ SymbolTable* create_symboltable(StringArray* source){
     char* line;
 
     // Allocate memory for new array (StringArray) to store only instructions
-    char ** array_no_labels = malloc(source_num_lines);
-    if(array_no_labels == NULL){
+    char** array_no_labels = malloc(source_num_lines * sizeof(char*));
+    if(array_no_labels == NULL) {
         perror("Memory couldn't be allocated for array (source without labels). Create_symboltable failed.");
         exit(EXIT_FAILURE);
     }
@@ -51,7 +51,7 @@ SymbolTable* create_symboltable(StringArray* source){
 
     // stores symbols (labels) in the symbol table;
     // adds line to source_no_labels if it isnt a label
-    for(int i = 0; i < source_num_lines; i ++){
+    for(int i = 0; i < source_num_lines; i++){
        line = source->array[i];
 
        if(is_label(line)){
@@ -62,7 +62,7 @@ SymbolTable* create_symboltable(StringArray* source){
             // if line is not address corresponding to a label, add to source_without_labels
             if(skip == 0){
                 array_no_labels[no_labels_size] = line;
-                no_labels_size ++;
+                no_labels_size++;
             } else {
                 skip = 0;
             }
@@ -75,18 +75,16 @@ SymbolTable* create_symboltable(StringArray* source){
         new_symbol.address = address;
         new_symbol.symbol = line;
 
-        symbol_table -> table[current_table_size] = new_symbol;
+        symbol_table->table[current_table_size] = new_symbol;
         current_table_size++;
    }
-
     /* Reassign source array to array without labels, only instructions */
-    delete_string_array(source);
-    source -> array = array_no_labels;
-    source -> size = no_labels_size;
-
-    /* Reallocate memory to match actual number of symbols stored */
-    symbol_table -> table = realloc(symbol_table -> table, current_table_size * sizeof(Symbol));
-    symbol_table -> size = current_table_size;
+    source->size = no_labels_size;
+    memcpy(source->array, array_no_labels, no_labels_size * sizeof(char*));
+    
+    free(array_no_labels);
+    
+    symbol_table->size = current_table_size;
     return symbol_table;
 }
 
@@ -127,7 +125,6 @@ void free_symboltable(SymbolTable *table){
     for(int i = 0; i < size; i ++){
         free(table -> table[i].symbol);
     }
-
     free(table);
 }
 

@@ -42,8 +42,10 @@ void parse_shift_data_transfer(StringArray *args, Token *token) {
 }	
 
 void parse_operand_data_processing(StringArray *args, Token *token) {
+  printf("Parsing operands for %s instruction:\n", opcode_to_string(token->opcode));
   char **sections = args->array;
   if ('#' == sections[0][0]) {
+    printf("<#expression> argument detected.\n");
     // Operand2 in the form <#expression>
     if (token->opcode == LSL) {
       // Convert to mov rd, rd, lsl <#expression>
@@ -124,12 +126,15 @@ void parse_offset_data_transfer(StringArray *args, Token *token) {
   }
 }
 
-void tokenise_dataprocessing(char* str, Token *token) {
-  char* arg = strcpy(malloc(strlen(str) + 1), str);
-  StringArray* operand2 = malloc(sizeof(StringArray));
+void tokenise_dataprocessing(char *str, Token *token) {
+  printf("Tokenising %s instruction:\n", opcode_to_string(token->opcode));
+
+  StringArray *operand2 = malloc(sizeof(StringArray));
+  operand2->array = malloc(token->num_args * sizeof(char*));
   operand2->size = 0;
 
-  arg = strtok(str, ","); 
+  char *arg = strtok(str, ",");
+  printf("Got argument for rd: %s\n", arg);
   token->TokenType.DataP.rd = string_to_reg_address(arg);
   
   if (token->num_args == 3) { 
@@ -148,24 +153,31 @@ void tokenise_dataprocessing(char* str, Token *token) {
   }
  
   arg = strtok(NULL, ",");
-  operand2->array[0] = arg; // constant or rm
+  printf("Argument get: %s\n", arg);
+  strcpy(operand2->array[0] = malloc(strlen(arg) + 1), arg);
+  printf("Arg 0 stored in op2 array: %s\n", operand2->array[0]);
   operand2->size++;
  
   arg = strtok(NULL, " ,");
   if (arg) {
-    operand2->array[1] = arg; // shift type
+    strcpy(operand2->array[1] = malloc(strlen(arg) + 1), arg); // rm
+    printf("Arg 1 stored in op2 array: %s\n", operand2->array[1]);
     arg = strtok(NULL, "");
-    operand2->array[2] = arg; // rs or constant shift amount
+    strcpy(operand2->array[2] = malloc(strlen(arg) + 1), arg); // rs or constant shift amt
+    printf("Arg 2 stored in op2 array: %s\n", operand2->array[2]);
     operand2->size += 2;
   }
   parse_operand_data_processing(operand2, token);
   free(arg);
+  delete_string_array(operand2);
+  free(operand2->array);
   free(operand2);
 }
 
 void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Instruction *instructions) {
   char* arg = strcpy(malloc(strlen(str) + 1), str);
   StringArray* offset = malloc(sizeof(StringArray));
+  offset->array = malloc(token->num_args * sizeof(char*));
   offset->size = 0;
 
   arg = strtok(str, ","); 
@@ -214,7 +226,8 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
 
         // Store #expression into offset array
         // address in the form [Rn, <#expression>], arg = <#expression>]
-        memcpy(offset->array[0], arg, bracket_end - arg);
+        memcpy(offset->array[0] = malloc(bracket_end - arg + 1), arg, bracket_end - arg);
+        offset->array[0][bracket_end - arg + 1] = '\0';
         offset->size++;
       } else {
         arg = strtok(NULL, ","); // arg = {+/-}Rm or <#expression>
@@ -227,21 +240,25 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
         }
 
         // Store Rm or <#expression> into offset array
-        memcpy(offset->array[0], &arg[1], strlen(arg) - 1);
-        offset++;
+        memcpy(offset->array[0] = malloc(strlen(arg)), &arg[1], strlen(arg) - 1);
+        offset->array[0][strlen(arg) - 1] = '\0';
+        offset->size++;
 
         // Store shifttype and shift arguments into offset array
         arg = strtok(NULL, ",");
         if (arg) {
           bracket_end = strchr(arg, ']');
           char* space = strchr(arg, ' ');
-          memcpy(offset->array[1], arg, space - arg);
+          memcpy(offset->array[1] = malloc(space - arg + 1), arg, space - arg);
+          offset->array[1][space - arg] = '\0';
           if (bracket_end) {
             // arg = <shifttype> <shift>]
-            memcpy(offset->array[2], &space[1], bracket_end - &space[1]);
+            memcpy(offset->array[2] = malloc(bracket_end - &space[1] + 1), &space[1], bracket_end - &space[1]);
+            offset->array[2][bracket_end - &space[1]] = '\0';
           } else {
             // arg = <shifttype> <shift>
-            memcpy(offset->array[2], &space[1], strlen(&space[1]));
+            memcpy(offset->array[2] = malloc(strlen(&space[1]) + 1), &space[1], strlen(&space[1]));
+            offset->array[2][strlen(&space[1])] = '\0';
           }
           offset->size += 2;
         }
@@ -288,9 +305,13 @@ void tokenise_branch(char* str, Token *token, SymbolTable *symboltable) {
 // Tokenises assembly code and parses into Instruction
 int tokenise(char *line, Address address, SymbolTable *symboltable, 
     Instruction *instructions, Address *memory_address, Token *token) {
+  printf("Tokenising line %s:\n", line);
   char *opcode = strtok(line, " ");
-  char *args = strtok(NULL, " ");
- 
+  char *args = strtok(NULL, "");
+  
+  printf("Opcode: %s\n", opcode);
+  printf("Args: %s\n", args);
+
   if (!args) {
     return 0;
   }
@@ -312,13 +333,13 @@ int tokenise(char *line, Address address, SymbolTable *symboltable,
   
   switch(get_type(token->opcode)) {
     case DATA_P:
-      tokenise_dataprocessing(line, token); break;
+      tokenise_dataprocessing(args, token); break;
     case MULTIPLY:
-      tokenise_multiply(line, token); break;
+      tokenise_multiply(args, token); break;
     case SDT:
-      tokenise_datatransfer(line, token, memory_address, instructions); break;
+      tokenise_datatransfer(args, token, memory_address, instructions); break;
     default:
-      tokenise_branch(line, token, symboltable); break;
+      tokenise_branch(args, token, symboltable); break;
   }
   return 1;
 }
