@@ -196,7 +196,11 @@ void minimax(board_t board, move_t* move, Player player, legalmoves_t* legalmove
 	move_t best_move = legalmoves->moves[0];
 	int best_move_val = -9000;
 	for(int i = 0; i < legalmoves->size; i++) {
-		board_t temp_board;
+		board_t temp_board = calloc(1, sizeof(board_t));
+		if(temp_board == NULL) {
+			perror("failed to allocate memory for temp_board in minimax");
+			exit(EXIT_FAILURE);
+		}	
 		copy_board(board, temp_board);
 		make_move(legalmoves->moves[i], temp_board);
 		int val = minimax_value(temp_board, player, opponent, 1);
