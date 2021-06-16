@@ -148,7 +148,7 @@ void build_multiply_instr(Token *token, Instruction *i) {
 void build_branch_instr(Token *token, Instruction *i) {
   // Set cond field
   *i &= 0x0fffffff;
-	*i |= (token->cond << 27);
+	*i |= (token->cond << 28);
   
   // Set bits 27-24
   *i &= 0xf0ffffff;
@@ -178,6 +178,11 @@ void assemble(StringArray *source, char *filename) {
   // First pass - symboltable, labels removed from source
   SymbolTable *symboltable = create_symboltable(source);
   
+  printf("\nSource size (labels removed): %d\n", source->size);
+  for (int i = 0; i < source->size; i++) {
+    printf("Line %d: %s\n", i, source->array[i]);
+  }
+
   // Second pass - tokenise and build instructions
   Address address = 0;
   Address next_memory_address = source->size * 4;
@@ -205,7 +210,6 @@ void assemble(StringArray *source, char *filename) {
           build_branch_instr(&token, &instr);
           break;
       }
-      //flip_endian(&instr);
       instructions[address / 4] = instr;
       address += 4;
     } else {

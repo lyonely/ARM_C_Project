@@ -110,7 +110,7 @@ void parse_offset_data_transfer(StringArray *args, Token *token) {
   for (int i = 0; i < args->size; i++) {
     remove_spaces(args->array[i]);
   }
-  
+ 
   char **sections = args->array;
   if ('#' == sections[0][0]) {
     // Offset in the form <#expression>, 12 bits unsigned
@@ -138,7 +138,6 @@ void parse_offset_data_transfer(StringArray *args, Token *token) {
     } else {
       // Rm has no shift
       token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift_type = 0;
-      token->TokenType.SDT.offset.up_bit = 0;
       token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.is_imm = 1;
       token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.immediate_shift = 0;
     }
@@ -203,6 +202,7 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
   token->TokenType.SDT.rd = string_to_reg_address(arg); // rd
 
   arg = strtok(NULL, ",");
+  remove_spaces(arg);
   printf("Next argument grabbed: %s\n", arg);
   char* constant_offset = strchr(arg, '=');
   if (constant_offset) {
@@ -237,6 +237,7 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
     } else {
       // address in the form [Rn, <offset>]; arg = [Rn
       token->TokenType.SDT.offset.preindex = 1;
+      printf("current arg: %s\n", arg);
       token->TokenType.SDT.rn = string_to_reg_address(&arg[1]);
     }
 
@@ -274,8 +275,6 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
           offset->array[0][bracket_end - arg + 1] = '\0';
         }
         offset->size++;
-        printf("Stored arg %s into offset array: offset[0] = %s\n",
-            arg, offset->array[0]);
       } else {
         // arg = {+/-}Rm or <#expression>
         
@@ -333,7 +332,7 @@ void tokenise_multiply(char* str, Token *token) {
 
 void tokenise_branch(char* str, Token *token, SymbolTable *symboltable) {
   if (strchr(str, ',')) {
-    perror("Wrong number of args provided in tokenise_branch");
+    perror("Wrong number of args provided in tokenise_branch\n");
     exit(EXIT_FAILURE);
   }
   
@@ -343,7 +342,11 @@ void tokenise_branch(char* str, Token *token, SymbolTable *symboltable) {
     memcpy(addr, &str[1], arg_len);
     token->TokenType.Branch.target_address = (Address) parse_immediate_value(addr);
   } else {
-    token->TokenType.Branch.target_address = lookup_symbol(symboltable, str); 
+    if (!get_symbol_address(symboltable, str, 
+          &token->TokenType.Branch.target_address)) {
+      perror("Couldn't retrieve symbol address from symboltable in tokenise_branch\n");
+      exit(EXIT_FAILURE);
+    }
   }
 }
 
@@ -351,7 +354,6 @@ void tokenise_branch(char* str, Token *token, SymbolTable *symboltable) {
 int tokenise(char *line, Address address, SymbolTable *symboltable, 
     Instruction *instructions, Address *memory_address, Token *token) {
 
-  printf("Tokenising line %s:\n", line);
   char *opcode = strtok(line, " ");
   char *args = strtok(NULL, "");
 
