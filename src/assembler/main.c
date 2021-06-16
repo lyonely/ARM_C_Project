@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
   free(line);
    
   assemble(source, filename);
-
+  free(source->array);
   free(source);
   return 0;
 }

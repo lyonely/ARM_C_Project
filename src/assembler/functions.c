@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <ctype.h>
 #include "functions.h"
 #include "datatypes.h"
 
@@ -10,18 +11,26 @@ void write_to_file(Instruction *instructions, int size, char *filename) {
   FILE *fp = fopen(filename, "wb");
   fwrite(instructions, sizeof(Instruction), size, fp);
   printf("instructions written to file %s:\n", filename);
-  for (int i = 0; i < size; i++)  {
-    printf("Instruction %d: %x\n", i, instructions[i]);
+  for (int i = 0; i < size; i++)  { printf("Instruction %d: %x\n", i, instructions[i]);
   }
   fclose(fp);
 }
 
 void remove_spaces(char *str) {
-  for (int i = 0; str[i]; i++) {
-    if (str[i] == ' ') {
-      memmove(&str[i], &str[i+1], strlen(str) - i);
-    }
+  while (isspace(str[0])) {
+    memmove(str, &str[1], strlen(str));
   }
+
+  int pos = strlen(str) - 1;
+  
+  while (isspace(str[pos]) && pos >= 0) {
+    pos--;
+  }
+
+  if (pos < strlen(str) - 1) {
+    str[pos + 1] = '\0';
+  }
+  printf("Space removed, result: (%s)\n", str);
 }
 
 void delete_string_array(StringArray *string_array) {
@@ -47,26 +56,12 @@ void initialise_token(Token *token) {
   token->TokenType.Multiply.rn = 0;
 
   token->TokenType.Branch.target_address = 0;
-
+  
+  token->TokenType.SDT.offset.up_bit = 1;
   token->TokenType.SDT.rd = 0;
   token->TokenType.SDT.rn = 0;
   token->TokenType.SDT.offset.is_imm = 0;
   token->TokenType.SDT.offset.preindex = 0;
-}
-
-// Converts Instruction from big-endian to little-endian
-void flip_endian(Instruction *i) {
-  Instruction byte1 = *i & 0xFF000000;
-  Instruction byte2 = *i & 0x00FF0000;
-  Instruction byte3 = *i & 0x0000FF00;
-  Instruction byte4 = *i & 0x000000FF;
-
-  byte1 = byte1 >> 24;
-  byte2 = byte2 >> 8;
-  byte3 = byte3 << 8;
-  byte4 = byte4 << 24;
-
-  *i = byte1 | byte2 | byte3 | byte4;
 }
 
 Type get_type(Operation opcode) {
@@ -138,6 +133,7 @@ unsigned int get_num_args(Operation opcode) {
 }
 
 Operation string_to_operation(char *str) {
+  remove_spaces(str);
   if (!strcmp(str, "add")) {
     return ADD;
   }
@@ -213,6 +209,7 @@ Operation string_to_operation(char *str) {
 }
 
 Condition string_to_condition(char *str) {
+  remove_spaces(str);
   if (!strcmp(str, "eq")) {
     return EQ;
   }
@@ -239,10 +236,14 @@ Condition string_to_condition(char *str) {
 }
 
 unsigned int string_to_reg_address(char *str) {
+  printf("String to remove spaces: (%s)\n", str);
+  remove_spaces(str);
+  printf("Converting (%s) to reg address\n", str);
 	return strtol(&str[1], (char **) NULL, 10);
 }	
 
 ShiftType string_to_shift(char *str) {
+  remove_spaces(str);
 	if (!strcmp(str, "lsl")) {
 		return LSL_S;
 	}
@@ -260,6 +261,7 @@ ShiftType string_to_shift(char *str) {
 }
 
 uint32_t parse_immediate_value(char *str) {
+  remove_spaces(str);
   long result;
 	if(strstr(str, "0x")) {
 		result = strtol(str, (char**)NULL, 16);

@@ -115,16 +115,17 @@ Address lookup_symbol(SymbolTable* table, char* symbol) {
 }
 
 /* Frees a symbol table, including memory used for every entry */
-void free_symboltable(SymbolTable *table){
-    if(table == NULL){
+void free_symboltable(SymbolTable *symboltable){
+    if (symboltable == NULL) {
         perror("SymbolTable is NULL, free_symboltable failed");
         exit(EXIT_FAILURE);
     }
 
-    int size = table -> size;
+    int size = symboltable -> size;
     for(int i = 0; i < size; i ++){
-        free(table -> table[i].symbol);
+        free(symboltable->table[i].symbol);
     }
-    free(table);
+    free(symboltable->table);
+    free(symboltable);
 }
 

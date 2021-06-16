@@ -109,13 +109,13 @@ typedef struct {
 typedef struct {
   int is_imm; // = 1 if offset is interpreted as a shifted register (rn)
   int preindex;
+  int up_bit; // =1 if offset is added, =0 if offset is subtracted
   union {
     int expression; // offset by <#expression> bytes
 
     struct {
       ShiftType shift_type;
       int rm;
-      int up_bit; // =1 if offset is added, =0 if offset is subtracted
       Shift shift;
     } ShiftedReg;
   } OffsetType;

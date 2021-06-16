@@ -23,7 +23,7 @@ void build_datap_instr(Token *token, Instruction *i) {
     *i |= (get_opcode(token->opcode) << 21);
 
     // Set flags field
-    switch(token->opcode) {
+    switch (token->opcode) {
       case TST:
       case TEQ:
       case CMP: 
@@ -88,7 +88,7 @@ void build_sdt_instr(Token *token, Instruction *i) {
   }
 
   // Set upbit field
-  if (token->TokenType.SDT.offset.OffsetType.ShiftedReg.up_bit) {
+  if (token->TokenType.SDT.offset.up_bit) {
     *i |= 0x00800000;
   }
 
