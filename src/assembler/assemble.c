@@ -10,7 +10,6 @@
 #define BRANCH_OFFSET_MASK 0x3ffffff
 
 void build_datap_instr(Token *token, Instruction *i) {
-  printf("assemble.c: entered build_datap_instr with instruction %x\n", *i);
   // Sets instruction bits if opcode is not ANDEQ (all-zero)
   if (!(token->opcode == ANDEQ && token->TokenType.DataP.rd == 0 
         && token->TokenType.DataP.rn == 0 && token->TokenType.DataP.operand2.Op2Type.reg_operand.rm == 0)) {
@@ -60,14 +59,11 @@ void build_datap_instr(Token *token, Instruction *i) {
       }
     }
   } else {
-    printf("assemble.c: termination instruction built.\n");
     *i &= 0x0;
   } 
-  printf("assemble.c: %s instruction built - %x\n", opcode_to_string(token->opcode), *i);
 }
 
 void build_sdt_instr(Token *token, Instruction *i) {
-  printf("assemble.c: entered build_sdt_instr with instruction %x\n", *i);
   // Fixed bits
   *i &= 0xf79fffff;
   *i |= 0x04000000;
@@ -78,9 +74,7 @@ void build_sdt_instr(Token *token, Instruction *i) {
 
   // Set rn and rd fields
   *i |= (token->TokenType.SDT.rn << 16);
-  printf("rn field set to %d, instruction = %x\n", token->TokenType.SDT.rn, *i);
   *i |= (token->TokenType.SDT.rd << 12);
-  printf("rd field set to %d, instruction = %x\n", token->TokenType.SDT.rd, *i);
 
   // Set preindex field
   if (token->TokenType.SDT.offset.preindex) {
@@ -170,19 +164,10 @@ void build_branch_instr(Token *token, Instruction *i) {
 void assemble(StringArray *source, char *filename) {
   // Instruction words stored here
   Instruction instructions[2 * source->size]; // Allocate enough memory for LDR instructions
-  printf("Source size: %d\n", source->size);
-  for (int i = 0; i < source->size; i++) {
-    printf("Line %d: %s\n", i, source->array[i]);
-  }
 
   // First pass - symboltable, labels removed from source
   SymbolTable *symboltable = create_symboltable(source);
   
-  printf("\nSource size (labels removed): %d\n", source->size);
-  for (int i = 0; i < source->size; i++) {
-    printf("Line %d: %s\n", i, source->array[i]);
-  }
-
   // Second pass - tokenise and build instructions
   Address address = 0;
   Address next_memory_address = source->size * 4;
@@ -193,7 +178,6 @@ void assemble(StringArray *source, char *filename) {
     initialise_token(&token);
 
     char *line = source->array[current_line];
-    printf("\nGet line: %s\n", line); 
     if (tokenise(line, address, symboltable, instructions, &next_memory_address, &token)) {
       Instruction instr = 0;
       switch(get_type(token.opcode)) {

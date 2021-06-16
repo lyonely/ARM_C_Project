@@ -10,19 +10,16 @@
 void write_to_file(Instruction *instructions, int size, char *filename) {
   FILE *fp = fopen(filename, "wb");
   fwrite(instructions, sizeof(Instruction), size, fp);
-  printf("instructions written to file %s:\n", filename);
-  for (int i = 0; i < size; i++)  { printf("Instruction %d: %x\n", i, instructions[i]);
-  }
   fclose(fp);
 }
 
+// Removes whitespace in a string
 void remove_spaces(char *str) {
   while (isspace(str[0])) {
     memmove(str, &str[1], strlen(str));
   }
 
   int pos = strlen(str) - 1;
-  
   while (isspace(str[pos]) && pos >= 0) {
     pos--;
   }
@@ -30,9 +27,9 @@ void remove_spaces(char *str) {
   if (pos < strlen(str) - 1) {
     str[pos + 1] = '\0';
   }
-  printf("Space removed, result: (%s)\n", str);
 }
 
+// Frees members of StringArray struct
 void delete_string_array(StringArray *string_array) {
   for (int i = 0; i < string_array->size; i++) {
     free(string_array->array[i]);
@@ -64,6 +61,7 @@ void initialise_token(Token *token) {
   token->TokenType.SDT.offset.preindex = 0;
 }
 
+// Gets instruction type of operation
 Type get_type(Operation opcode) {
   switch(opcode) {
     case MUL:
@@ -85,6 +83,7 @@ Type get_type(Operation opcode) {
   }
 }
 
+// Gets opcode of data processing instruction
 unsigned int get_opcode(Operation op) {
   if (get_type(op) != DATA_P) {
     perror("Wrong instruction type passed into get_opcode\n");
@@ -106,6 +105,7 @@ unsigned int get_opcode(Operation op) {
   }
 }
 
+// Gets expected number of arguments for operation
 unsigned int get_num_args(Operation opcode) {
   switch(opcode) {
     case MLA:
@@ -132,6 +132,7 @@ unsigned int get_num_args(Operation opcode) {
   }
 }
 
+// Returns opcode from string
 Operation string_to_operation(char *str) {
   remove_spaces(str);
   if (!strcmp(str, "add")) {
@@ -203,11 +204,11 @@ Operation string_to_operation(char *str) {
   if (!strcmp(str, "andeq")) {
     return ANDEQ;
   }
-
   fprintf(stderr, "No such mnemonic found.\n");
   exit(EXIT_FAILURE);
 }
 
+// Returns condition code from string
 Condition string_to_condition(char *str) {
   remove_spaces(str);
   if (!strcmp(str, "eq")) {
@@ -235,6 +236,7 @@ Condition string_to_condition(char *str) {
   exit(EXIT_FAILURE);
 }
 
+// Returns register address from string
 unsigned int string_to_reg_address(char *str) {
   printf("String to remove spaces: (%s)\n", str);
   remove_spaces(str);
@@ -242,6 +244,7 @@ unsigned int string_to_reg_address(char *str) {
 	return strtol(&str[1], (char **) NULL, 10);
 }	
 
+// Returns ShiftType from string
 ShiftType string_to_shift(char *str) {
   remove_spaces(str);
 	if (!strcmp(str, "lsl")) {
@@ -260,6 +263,7 @@ ShiftType string_to_shift(char *str) {
   exit(EXIT_FAILURE);
 }
 
+// Returns immediate value from string
 uint32_t parse_immediate_value(char *str) {
   remove_spaces(str);
   long result;
@@ -271,6 +275,7 @@ uint32_t parse_immediate_value(char *str) {
 	return result;
 }
 
+// Converts Operation enum to string representation
 char *opcode_to_string(Operation opcode) {
   switch(opcode) {
     case ADD: return "add";

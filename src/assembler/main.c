@@ -38,8 +38,10 @@ int main(int argc, char **argv) {
     if (line[strlen(line) - 1] == '\n') {
       line[strlen(line) - 1] = '\0';
     }
-    strcpy(source->array[source->size], line);
-    source->size++;
+    if (strcmp(line, "\0")) {
+      strcpy(source->array[source->size], line);
+      source->size++;
+    }
   }
 
   fclose(fp);

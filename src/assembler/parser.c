@@ -7,7 +7,6 @@
 #include "symboltable.h"
 
 void parse_shift_data_processing(StringArray *args, Token *token) {
-	printf("Parsing shift: %s %s\n", args->array[0], args->array[1]);
 	token->TokenType.DataP.operand2.Op2Type.reg_operand.shift_type = string_to_shift(args->array[0]); // Shift type stored
 
   if ('#' == args->array[1][0]) {
@@ -17,7 +16,8 @@ void parse_shift_data_processing(StringArray *args, Token *token) {
     token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.immediate_shift = parse_immediate_value(number);
   } else if ('r' == args->array[1][0]) {
     // Shift by register
-    token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.is_imm = 0; token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.rs = string_to_reg_address(args->array[1]);
+    token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.is_imm = 0; 
+    token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.rs = string_to_reg_address(args->array[1]);
   } else {
     fprintf(stderr, "Shift not number or register");
     exit(EXIT_FAILURE);
@@ -46,10 +46,8 @@ void parse_operand_data_processing(StringArray *args, Token *token) {
     remove_spaces(args->array[i]);
   }
 
-  //printf("Parsing operands for %s instruction:\n", opcode_to_string(token->opcode));
   char **sections = args->array;
   if ('#' == sections[0][0]) {
-    //printf("<#expression> argument detected.\n");
     // Operand2 in the form <#expression>
     if (token->opcode == LSL) {
       // Convert to mov rd, rd, lsl <#expression>
@@ -116,7 +114,6 @@ void parse_offset_data_transfer(StringArray *args, Token *token) {
     // Offset in the form <#expression>, 12 bits unsigned
     token->TokenType.SDT.offset.is_imm = 0;
     token->TokenType.SDT.offset.OffsetType.expression = parse_immediate_value(&sections[0][1]);
-    printf("Offset expression: %d\n", token->TokenType.SDT.offset.OffsetType.expression); 
   } else if ('r' == sections[0][0]) {
     // Offset in the form Rm{,<shift>}
     token->TokenType.SDT.offset.is_imm = 1;
@@ -148,8 +145,6 @@ void parse_offset_data_transfer(StringArray *args, Token *token) {
 }
 
 void tokenise_dataprocessing(char *str, Token *token) {
-  //printf("Tokenising %s instruction:\n", opcode_to_string(token->opcode));
-
   StringArray *operand2 = malloc(sizeof(StringArray));
   operand2->array = malloc(token->num_args * sizeof(char*));
   operand2->size = 0;
@@ -167,23 +162,18 @@ void tokenise_dataprocessing(char *str, Token *token) {
     } else {
       // TST, TEQ, CMP
       token->TokenType.DataP.rn = string_to_reg_address(arg);
-      printf("token rn field set to %d\n", token->TokenType.DataP.rn);
     }
   }
  
   arg = strtok(NULL, ",");
-  //printf("Argument get: %s\n", arg);
   strcpy(operand2->array[0] = malloc(strlen(arg) + 1), arg);
-  //printf("Arg 0 stored in op2 array: %s\n", operand2->array[0]);
   operand2->size++;
  
   arg = strtok(NULL, " ,");
   if (arg) {
     strcpy(operand2->array[1] = malloc(strlen(arg) + 1), arg); // rm
-    //printf("Arg 1 stored in op2 array: %s\n", operand2->array[1]);
     arg = strtok(NULL, "");
     strcpy(operand2->array[2] = malloc(strlen(arg) + 1), arg); // rs or constant shift amt
-    //printf("Arg 2 stored in op2 array: %s\n", operand2->array[2]);
     operand2->size += 2;
   }
   parse_operand_data_processing(operand2, token);
@@ -193,7 +183,6 @@ void tokenise_dataprocessing(char *str, Token *token) {
 }
 
 void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Instruction *instructions) {
-
   StringArray* offset = malloc(sizeof(StringArray));
   offset->array = malloc(token->num_args * sizeof(char*));
   offset->size = 0;
@@ -203,7 +192,6 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
 
   arg = strtok(NULL, ",");
   remove_spaces(arg);
-  printf("Next argument grabbed: %s\n", arg);
   char* constant_offset = strchr(arg, '=');
   if (constant_offset) {
     // address in the form <=expression>
@@ -237,7 +225,6 @@ void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Ins
     } else {
       // address in the form [Rn, <offset>]; arg = [Rn
       token->TokenType.SDT.offset.preindex = 1;
-      printf("current arg: %s\n", arg);
       token->TokenType.SDT.rn = string_to_reg_address(&arg[1]);
     }
 
@@ -356,9 +343,6 @@ int tokenise(char *line, Address address, SymbolTable *symboltable,
 
   char *opcode = strtok(line, " ");
   char *args = strtok(NULL, "");
-
-  printf("Opcode: %s\n", opcode);
-  printf("Args: %s\n", args);
 
   if (!args) {
     perror("Error getting arguments");
