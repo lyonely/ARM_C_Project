@@ -1,205 +1,86 @@
-#include "parser.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "parser.h"
+#include "datatypes.h"
+#include "functions.h"
+#include "symboltable.h"
 
-Operation string_to_operation(char *str) {
-  if (!strcmp(str, "add")) {
-    return ADD;
-  }
-  if (!strcmp(str, "sub")) {
-    return SUB;
-  }
-  if (!strcmp(str, "rsb")) {
-    return RSB;
-  }
-  if (!strcmp(str, "and")) {
-    return AND;
-  }
-  if (!strcmp(str, "eor")) {
-    return EOR;
-  }
-  if (!strcmp(str, "orr")) {
-    return ORR;
-  }
-  if (!strcmp(str, "mov")) {
-    return MOV;
-  }
-  if (!strcmp(str, "tst")) {
-    return TST;
-  }
-  if (!strcmp(str, "teq")) {
-    return TEQ;
-  }
-  if (!strcmp(str, "cmp")) {
-    return CMP;
-  }
-  if (!strcmp(str, "mul")) {
-    return MUL;
-  }
-  if (!strcmp(str, "mla")) {
-    return MLA;
-  }
-  if (!strcmp(str, "ldr")) {
-    return LDR;
-  }
-  if (!strcmp(str, "str")) {
-    return STR;
-  }
-  if (!strcmp(str, "beq")) {
-    return BEQ;
-  }
-  if (!strcmp(str, "bne")) {
-    return BNE;
-  }
-  if (!strcmp(str, "bge")) {
-    return BGE;
-  }
-  if (!strcmp(str, "blt")) {
-    return BLT;
-  }
-  if (!strcmp(str, "bgt")) {
-    return BGT;
-  }
-  if (!strcmp(str, "ble")) {
-    return BLE;
-  }
-  if (!strcmp(str, "b")) {
-    return B;
-  }
-  if (!strcmp(str, "lsl")) {
-    return LSL;
-  }
-  if (!strcmp(str, "andeq")) {
-    return ANDEQ;
-  }
+void parse_shift_data_processing(StringArray *args, Token *token) {
+	token->TokenType.DataP.operand2.Op2Type.reg_operand.shift_type = string_to_shift(args->array[0]); // Shift type stored
 
-  fprintf(stderr, "No such mnemonic found.\n");
-  exit(EXIT_FAILURE);
-}
-
-Condition string_to_condition(char *str) {
-  if (!strcmp(str, "eq")) {
-    return EQ;
-  }
-  if (!strcmp(str, "ne")) {
-    return NE;
-  }
-  if (!strcmp(str, "ge")) {
-    return GE;
-  }
-  if (!strcmp(str, "lt")) {
-    return LT;
-  }
-  if (!strcmp(str, "gt")) {
-    return GT;
-  }
-  if (!strcmp(str, "le")) {
-    return LE;
-  }
-  if (!strcmp(str, "al") || 0 == strlen(str)) {
-    return AL;
-  }
-  fprintf(stderr, "No such condition found.\n");
-  exit(EXIT_FAILURE);
-}
-
-Opcode mnemonic_to_opcode(Operation operation) {
-	switch (operation) {
-    case ADD:
-      return ADD_O;
-      break;
-    case SUB:
-      return SUB_O;
-      break;
-    case RSB:
-      return RSB_O;
-      break;
-    case AND:
-      return AND_O;
-      break;
-    case EOR:
-      return EOR_O;
-      break;
-    case ORR:
-      return ORR_O;
-      break;
-    case MOV:
-      return MOV_O;
-      break;
-    case TST:
-      return TST_O;
-      break;
-    case TEQ:
-      return TEQ_O;
-      break;
-    case CMP:
-      return CMP_O;
-      break;
-    default:
-      fprintf(stderr, "No such opcode found.\n");
-      exit(EXIT_FAILURE);
-      break;
-  }			
-}	
-
-RegAddress string_to_reg_address(char *str) {
-	return strtol(&str[1], (char **) NULL, 10);
-}	
-
-Shift string_to_shift(char *str) {
-	if(!strcmp(str, "lsl")) {
-		return LSL_S;
-	}
-	fprintf(stderr, "No such shift found.\n");
-  exit(EXIT_FAILURE);
-}	
-
-void parse_shift_data_processing(StringArray *tokens, DataProcessingInstruction *instruction) {
-	instruction->shift_type = string_to_shift(tokens->array[0]);
-  if ('#' == tokens->array[1][0]) {
-    char *number = &tokens->array[1][1];
-    instruction->shift_amount = parse_immediate_value(number);
-  } else if ('r' == tokens->array[1][0]) {
-    instruction->rs = string_to_reg_address(tokens->array[1]);
+  if ('#' == args->array[1][0]) {
+    // Shift by immediate
+    char *number = &args->array[1][1];
+    token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.is_imm = 1;
+    token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.immediate_shift = parse_immediate_value(number);
+  } else if ('r' == args->array[1][0]) {
+    // Shift by register
+    token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.is_imm = 0; 
+    token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.rs = string_to_reg_address(args->array[1]);
   } else {
     fprintf(stderr, "Shift not number or register");
     exit(EXIT_FAILURE);
   }
 }
 
-void parse_shift_data_transfer(StringArray *tokens, DataTransferInstruction *instruction) {
-	instruction->shift_type = string_to_shift(tokens->array[0]);
-  if ('#' == tokens->array[1][0]) {
-    char *number = &tokens->array[1][1];
-    instruction->shift_amount = parse_immediate_value(number);
-  } else if ('r' == tokens->array[1][0]) {
-    instruction->rs = string_to_reg_address(tokens->array[1]);
+void parse_shift_data_transfer(StringArray *args, Token *token) {
+	token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift_type = string_to_shift(args->array[0]);  
+  if ('#' == args->array[1][0]) {
+    // Shift by immediate
+    char *number = &args->array[1][1];
+    token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.is_imm = 1;
+    token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.immediate_shift = parse_immediate_value(number);
+  } else if ('r' == args->array[1][0]) {
+    // Shift by register
+    token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.is_imm = 0;
+    token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.rs = string_to_reg_address(args->array[1]);
   } else {
     fprintf(stderr, "Shift not number or register");
     exit(EXIT_FAILURE);
   }
 }	
 
-void parse_operand_data_processing(StringArray *tokens, DataProcessingInstruction *instruction) {
-  char **sections = tokens->array;
+void parse_operand_data_processing(StringArray *args, Token *token) {
+  for (int i = 0; i < args->size; i++) {
+    remove_spaces(args->array[i]);
+  }
+
+  char **sections = args->array;
   if ('#' == sections[0][0]) {
-    instruction->imm = parse_immediate_value(&sections[0][1]);
+    // Operand2 in the form <#expression>
+    if (token->opcode == LSL) {
+      // Convert to mov rd, rd, lsl <#expression>
+      token->TokenType.DataP.operand2.is_imm = 0;
+      token->TokenType.DataP.operand2.Op2Type.reg_operand.rm = token->TokenType.DataP.rd;
+      token->TokenType.DataP.operand2.Op2Type.reg_operand.shift_type = LSL_S;
+      token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.is_imm = 1;
+      token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.immediate_shift = parse_immediate_value(&sections[0][1]);
+    } else {
+      token->TokenType.DataP.operand2.is_imm = 1;
+      
+      uint32_t *imm_addr = &token->TokenType.DataP.operand2.Op2Type.imm_operand.immediate;
+      *imm_addr = parse_immediate_value(&sections[0][1]);
 
-    uint16_t shift = WORD_SIZE;
-    if (instruction->imm > 0xFF) {
-      while (!(instruction->imm & 0x3)) {
-          instruction->imm >>= 2;
-          shift--;
+      int *rotation = &token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation;
+      *rotation = 0;
+
+      uint16_t shift = WORD_SIZE;
+      if (*imm_addr > 0xFF) {
+        while (!(*imm_addr & 0x3)) {
+          *imm_addr >>= 2;
+          shift -= 2;
+        }
+        *rotation = shift / 2;
       }
     }
-
-    instruction->shift_amount = shift;
-
   } else if ('r' == sections[0][0]) {
-    instruction->rm = string_to_reg_address(sections[0]);
+    // Operand2 in the form Rm{,<shift>}
+    token->TokenType.DataP.operand2.is_imm = 0;
+    token->TokenType.DataP.operand2.Op2Type.reg_operand.rm = string_to_reg_address(sections[0]);
 
-    if (tokens->size >= 2) {
+    if (args->size >= 2) {
+      // Rm has shift
       StringArray *shift_tokens = malloc(sizeof(StringArray));
 
       if (!shift_tokens) {
@@ -208,9 +89,14 @@ void parse_operand_data_processing(StringArray *tokens, DataProcessingInstructio
       }
 
       shift_tokens->array = &sections[1];
-      shift_tokens->size = tokens->size - 1;
-      parse_shift_data_processing(shift_tokens, instruction);
+      shift_tokens->size = args->size - 1;
+      parse_shift_data_processing(shift_tokens, token);
       free(shift_tokens);
+    } else {
+      // Rm has no shift
+      token->TokenType.DataP.operand2.Op2Type.reg_operand.shift_type = 0;
+      token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.is_imm = 1;
+      token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.immediate_shift = 0;
     }
   } else {
     fprintf(stderr, "Operand not number or register");
@@ -218,25 +104,23 @@ void parse_operand_data_processing(StringArray *tokens, DataProcessingInstructio
   }
 }				
 
-void parse_operand_data_transfer(StringArray *tokens, DataTransferInstruction *instruction) {
-  char **sections = tokens->array;
+void parse_offset_data_transfer(StringArray *args, Token *token) {
+  for (int i = 0; i < args->size; i++) {
+    remove_spaces(args->array[i]);
+  }
+ 
+  char **sections = args->array;
   if ('#' == sections[0][0]) {
-    instruction->imm_offset = parse_immediate_value(&sections[0][1]);
-
-    uint16_t shift = WORD_SIZE;
-    if (instruction->imm_offset > 0xFF) {
-      while (!(instruction->imm_offset & 0x3)) {
-          instruction->imm_offset >>= 2;
-          shift--;
-      }
-    }
-
-    instruction->shift_amount = shift;
-
+    // Offset in the form <#expression>, 12 bits unsigned
+    token->TokenType.SDT.offset.is_imm = 0;
+    token->TokenType.SDT.offset.OffsetType.expression = parse_immediate_value(&sections[0][1]);
   } else if ('r' == sections[0][0]) {
-    instruction->rm = string_to_reg_address(sections[0]);
+    // Offset in the form Rm{,<shift>}
+    token->TokenType.SDT.offset.is_imm = 1;
+    token->TokenType.SDT.offset.OffsetType.ShiftedReg.rm = string_to_reg_address(sections[0]);
 
-    if (tokens->size >= 2) {
+    if (args->size >= 2) {
+      // Rm has shift
       StringArray *shift_tokens = malloc(sizeof(StringArray));
 
       if (!shift_tokens) {
@@ -245,9 +129,14 @@ void parse_operand_data_transfer(StringArray *tokens, DataTransferInstruction *i
       }
 
       shift_tokens->array = &sections[1];
-      shift_tokens->size = tokens->size - 1;
-      parse_shift_data_transfer(shift_tokens, instruction);
+      shift_tokens->size = args->size - 1;
+      parse_shift_data_transfer(shift_tokens, token);
       free(shift_tokens);
+    } else {
+      // Rm has no shift
+      token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift_type = 0;
+      token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.is_imm = 1;
+      token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.immediate_shift = 0;
     }
   } else {
     fprintf(stderr, "Operand not number or register");
@@ -255,10 +144,236 @@ void parse_operand_data_transfer(StringArray *tokens, DataTransferInstruction *i
   }
 }
 
-Word parse_immediate_value(char *str) {
-	if(strstr(str, "0x")) {
-		return strtol(str, (char **)NULL, 16);
-	} else {
-		return strtol(str, (char **)NULL, 10);
-	}
-}	
+void tokenise_dataprocessing(char *str, Token *token) {
+  StringArray *operand2 = malloc(sizeof(StringArray));
+  operand2->array = malloc(token->num_args * sizeof(char*));
+  operand2->size = 0;
+
+  char *arg = strtok(str, ",");
+  if (token->num_args == 3) { 
+    // ADD, ANDEQ, EOR, SUB, RSB, ADD, ORR
+    token->TokenType.DataP.rd = string_to_reg_address(arg);
+    arg = strtok(NULL, ",");
+    token->TokenType.DataP.rn = string_to_reg_address(arg);
+  } else {
+    if (token->opcode == MOV || token->opcode == LSL) { 
+      // MOV, LSL
+      token->TokenType.DataP.rd = string_to_reg_address(arg);
+    } else {
+      // TST, TEQ, CMP
+      token->TokenType.DataP.rn = string_to_reg_address(arg);
+    }
+  }
+ 
+  arg = strtok(NULL, ",");
+  strcpy(operand2->array[0] = malloc(strlen(arg) + 1), arg);
+  operand2->size++;
+ 
+  arg = strtok(NULL, " ,");
+  if (arg) {
+    strcpy(operand2->array[1] = malloc(strlen(arg) + 1), arg); // rm
+    arg = strtok(NULL, "");
+    strcpy(operand2->array[2] = malloc(strlen(arg) + 1), arg); // rs or constant shift amt
+    operand2->size += 2;
+  }
+  parse_operand_data_processing(operand2, token);
+  delete_string_array(operand2);
+  free(operand2->array);
+  free(operand2);
+}
+
+void tokenise_datatransfer(char* str, Token *token, Address *memory_address, Instruction *instructions) {
+  StringArray* offset = malloc(sizeof(StringArray));
+  offset->array = malloc(token->num_args * sizeof(char*));
+  offset->size = 0;
+
+  char* arg = strtok(str, ",");
+  token->TokenType.SDT.rd = string_to_reg_address(arg); // rd
+
+  arg = strtok(NULL, ",");
+  remove_spaces(arg);
+  char* constant_offset = strchr(arg, '=');
+  if (constant_offset) {
+    // address in the form <=expression>
+    uint32_t exp = parse_immediate_value(&arg[1]);
+    if (exp <= 0xFF) {
+      // convert to mov instruction
+      token->TokenType.DataP.rd = token->TokenType.SDT.rd;
+      token->opcode = MOV;
+      token->num_args = 2;
+      token->TokenType.DataP.operand2.is_imm = 1;
+      token->TokenType.DataP.operand2.Op2Type.imm_operand.immediate = exp;
+      token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation = 0;
+
+    } else {
+      token->TokenType.SDT.rn = 15; // rn = PC
+      token->TokenType.SDT.offset.preindex = 1;
+      token->TokenType.SDT.offset.is_imm = 0;
+      token->TokenType.SDT.offset.OffsetType.expression = *memory_address - (token->address + 8);
+      instructions[*memory_address / 4] = exp; // Store value in memory
+      *memory_address += 4;
+    }
+  } else {
+    // address in the form [Rn] / [Rn, <offset>] / [Rn], <offset>
+    char* bracket_end = strchr(arg, ']');
+    if (bracket_end) {
+      // address in the form [Rn], <offset>; arg = [Rn]
+      token->TokenType.SDT.offset.preindex = 0;
+      memmove(arg, &arg[1], bracket_end - arg);
+      arg[bracket_end - arg - 1] = '\0';
+      token->TokenType.SDT.rn = string_to_reg_address(arg);
+    } else {
+      // address in the form [Rn, <offset>]; arg = [Rn
+      token->TokenType.SDT.offset.preindex = 1;
+      token->TokenType.SDT.rn = string_to_reg_address(&arg[1]);
+    }
+
+    arg = strtok(NULL, ",");
+    if (!arg) {
+      // no offset, address is [Rn]
+      token->TokenType.SDT.offset.preindex = 1;
+      offset->array[0] = "#0";
+      offset->size++;
+    } else {
+      remove_spaces(arg);
+      // arg = <#expression] / <#expression> / {+/-}Rm 
+      // Set up bit
+      if (arg[0] == '#' && arg[1] == '-') {
+        token->TokenType.SDT.offset.up_bit = 0;
+      } else if (arg[0] == '-') {
+        token->TokenType.SDT.offset.up_bit = 0;
+      } else {
+        token->TokenType.SDT.offset.up_bit = 1;
+      }
+      
+      bracket_end = strchr(arg, ']');
+      offset->array[0] = malloc(strlen(arg) + 1);
+      
+      if (bracket_end) {
+        // Store #expression into offset array
+        // arg = <#expression>]
+        if (arg[1] == '-' || arg[1] == '+') {
+          memmove(&arg[1], &arg[2], bracket_end - arg - 2);
+          arg[bracket_end - arg - 1] = '\0';
+          memcpy(offset->array[0], arg, strlen(arg) + 1);
+          offset->array[0][bracket_end - arg] = '\0';
+        } else {
+          memcpy(offset->array[0], arg, bracket_end - arg);
+          offset->array[0][bracket_end - arg + 1] = '\0';
+        }
+        offset->size++;
+      } else {
+        // arg = {+/-}Rm or <#expression>
+        
+        // Store Rm or <#expression> into offset array
+        if (arg[0] == '-' || arg[0] == '+') {
+          memcpy(offset->array[0], &arg[1], strlen(arg));
+          offset->array[0][strlen(arg)] = '\0';
+        } else {
+          offset->array[0] = arg;
+        }
+        offset->size++;
+
+        // Store shifttype and shift arguments into offset array
+        arg = strtok(NULL, ",");
+        if (arg) {
+          remove_spaces(arg);
+          bracket_end = strchr(arg, ']');
+          char* space = strchr(arg, ' ');
+          memcpy(offset->array[1] = malloc(space - arg + 1), arg, space - arg);
+          offset->array[1][space - arg] = '\0';
+          if (bracket_end) {
+            // arg = <shifttype> <shift>]
+            memcpy(offset->array[2] = malloc(bracket_end - &space[1] + 1), &space[1], bracket_end - &space[1]);
+            offset->array[2][bracket_end - &space[1]] = '\0';
+          } else {
+            // arg = <shifttype> <shift>
+            memcpy(offset->array[2] = malloc(strlen(&space[1]) + 1), &space[1], strlen(&space[1]));
+            offset->array[2][strlen(&space[1])] = '\0';
+          }
+          offset->size += 2;
+        }
+      }
+    }
+    parse_offset_data_transfer(offset, token);
+  }
+  free(offset->array);
+  free(offset);
+}
+
+void tokenise_multiply(char* str, Token *token) {
+  char* args = strcpy(malloc(strlen(str) + 1), str);
+  char* operand = strtok(args, ",");
+  token->TokenType.Multiply.rd = string_to_reg_address(operand);
+  operand = strtok(NULL, ",");
+  token->TokenType.Multiply.rm = string_to_reg_address(operand);
+  operand = strtok(NULL, ",");
+  token->TokenType.Multiply.rs = string_to_reg_address(operand);
+
+  if (token->opcode == MLA) {
+    operand = strtok(NULL, ",");
+    token->TokenType.Multiply.rn = string_to_reg_address(operand);
+  }
+  free(args);
+}
+
+void tokenise_branch(char* str, Token *token, SymbolTable *symboltable) {
+  if (strchr(str, ',')) {
+    perror("Wrong number of args provided in tokenise_branch\n");
+    exit(EXIT_FAILURE);
+  }
+  
+  if (str[0] == '#') {
+    size_t arg_len = strlen(str);
+    char addr[arg_len];
+    memcpy(addr, &str[1], arg_len);
+    token->TokenType.Branch.target_address = (Address) parse_immediate_value(addr);
+  } else {
+    if (!get_symbol_address(symboltable, str, 
+          &token->TokenType.Branch.target_address)) {
+      perror("Couldn't retrieve symbol address from symboltable in tokenise_branch\n");
+      exit(EXIT_FAILURE);
+    }
+  }
+}
+
+// Tokenises assembly code and parses into Instruction
+int tokenise(char *line, Address address, SymbolTable *symboltable, 
+    Instruction *instructions, Address *memory_address, Token *token) {
+
+  char *opcode = strtok(line, " ");
+  char *args = strtok(NULL, "");
+
+  if (!args) {
+    perror("Error getting arguments");
+    exit(EXIT_FAILURE);
+  }
+
+  token->opcode = string_to_operation(opcode);
+  token->address = address;
+  token->num_args = get_num_args(token->opcode);
+
+  // Condition setting
+  if (opcode[0] == 'b' && opcode[1]) {
+    char cond[2];
+    memcpy(cond, &opcode[1], 2);
+    token->cond = string_to_condition(cond);
+  } else if (token->opcode == ANDEQ) {
+    token->cond = EQ;
+  } else {
+    token->cond = AL;
+  }
+  
+  switch(get_type(token->opcode)) {
+    case DATA_P:
+      tokenise_dataprocessing(args, token); break;
+    case MULTIPLY:
+      tokenise_multiply(args, token); break;
+    case SDT:
+      tokenise_datatransfer(args, token, memory_address, instructions); break;
+    default:
+      tokenise_branch(args, token, symboltable); break;
+  }
+  return 1;
+}
+

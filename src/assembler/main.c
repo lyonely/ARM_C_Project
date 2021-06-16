@@ -1,43 +1,54 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include "assemble.h"
 #include "datatypes.h"
+#include "functions.h"
 
 int main(int argc, char **argv) {
   FILE *fp = fopen(argv[1], "r");
-  
+  char *filename = argv[2];
+
   if (fp == NULL) {
-    perror("Error opening file.\n");
+    perror("Error opening file in main\n");
     exit(EXIT_FAILURE);
   }
   
   fseek(fp, 0, SEEK_END);
-  long size = ftell(fp);
+  int size = ftell(fp) + 1;
   rewind(fp);  
-
-  char **assembly_code = calloc(size, MAX_CHARS_PER_LINE + 1); // +1 for \0 char
-  if (assembly_code == NULL) {
-    perror("Error allocating memory.\n");
-    exit(EXIT_FAILURE);
-  }
-
-  size_t result = fread(assembly_code, MAX_CHARS_PER_LINE + 1, size, fp);
-  if (result != size) {
-    perror("Error reading file.\n");
-    exit(EXIT_FAILURE);
-  }
-  
-  fclose(fp);
   
   StringArray *source = malloc(sizeof(StringArray));
+  source->array = calloc(size, sizeof(char*));
+  if (!source->array) {
+    perror("Error allocating memory for source->array in main\n");
+    exit(EXIT_FAILURE);
+  }
 
-  source->array = assembly_code;
-  source->size = size;
-  /* TEXT FILE HAS BEEN READ INTO SOURCE STRINGARRAY */
+  source->size = 0;
+  char *line = malloc(MAX_CHARS_PER_LINE + 1);
 
-  // assemble(source);
+  while (fgets(line, MAX_CHARS_PER_LINE + 1, fp)) {
+    source->array[source->size] = malloc(MAX_CHARS_PER_LINE + 1);
+    if (!source->array[source->size]) {
+      perror("Error allocating memory for source->array[size] in main\n");
+      exit(EXIT_FAILURE);
+    }
+    // Remove newline character
+    if (line[strlen(line) - 1] == '\n') {
+      line[strlen(line) - 1] = '\0';
+    }
+    if (strcmp(line, "\0")) {
+      strcpy(source->array[source->size], line);
+      source->size++;
+    }
+  }
 
-  free(assembly_code);
+  fclose(fp);
+  free(line);
+   
+  assemble(source, filename);
+  free(source->array);
   free(source);
   return 0;
 }

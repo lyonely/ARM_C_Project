@@ -1,22 +1,18 @@
 #ifndef ASSEMBLER_DATATYPES_H
 #define ASSEMBLER_DATATYPES_H
-#define WORD_SIZE 32
+
 #include <stdint.h>
 
+#define WORD_SIZE (32)
 #define MAX_CHARS_PER_LINE (511)
 
 typedef uint32_t Instruction;
+typedef uint32_t Address;
 
 typedef struct {
-    char ** array;
-    uint16_t size;
+  char **array;
+  uint16_t size;
 } StringArray;    
-
-typedef uint8_t RegAddress;
-
-typedef uint32_t Word;
-
-typedef uint32_t Address;
 
 /* Struct to represent an entry in the symbol table */
 typedef struct {
@@ -30,7 +26,7 @@ typedef struct {
   Symbol* table;
 } SymbolTable;
 
-/* Enum for representing the Mnemonics of different operations */
+/* Operation mnemonics */
 typedef enum {
     ADD,
     SUB,
@@ -39,7 +35,7 @@ typedef enum {
     EOR,
     ORR,
     MOV,
-    TST,
+    TST, 
     TEQ,
     CMP,
     MUL,
@@ -57,36 +53,23 @@ typedef enum {
     ANDEQ
 } Operation;
 
-// used for defining opcode
+/* Instruction types*/
 typedef enum {
-  // And. 
-  AND_O = 0x0,
-  // Exclusive or. 
-  EOR_O = 0x1,
-  // Subtract. 
-  SUB_O = 0x2,
-  // Reverse subtract. 
-  RSB_O = 0x3,
-  // Add. 
-  ADD_O = 0x4,
-  // And, set flags only. 
-  TST_O = 0x8,
-  // Exclusive or, set flags only.
-  TEQ_O = 0x9,
-  // Subtract, set flags only. 
-  CMP_O = 0xA,
-  // Or. 
-  ORR_O = 0xC,
-  //Move.
-  MOV_O = 0xD,
-} Opcode;
+  DATA_P,
+  MULTIPLY,
+  SDT,
+  BRANCH
+} Type;
 
-//used to identify type of shift for shifter
+/* Shift types */
 typedef enum {
   LSL_S = 0,
-} Shift;
+  LSR_S = 1,
+  ASR_S = 2,
+  ROR_S = 3
+} ShiftType;
 
-// used to identify type of condition
+/* Condition codes */
 typedef enum {
   EQ = 0,
   NE = 1,
@@ -94,52 +77,81 @@ typedef enum {
   LT = 0xB,
   GT = 0xC,
   LE = 0xD,
-  AL = 0xE,
+  AL = 0xE
 } Condition;  
 
+/* Struct representing possible shifts */
 typedef struct {
-  Opcode opcode;
-  int rd;
-  int rn;
   int is_imm;
-  int rotation; // set when is_imm = 1
-  int imm; // set when is_imm = 1
-  Shift shift_type; // set when is_imm = 0
-  int shift_by_reg; // is_imm = 0
-  int shift_amount; // is_imm = 0, shift_by_reg = 0
-  int rs; // is_imm = 0, shift_by_reg = 1
-  int rm; // is_imm = 0 
-} DataProcessingInstruction;
-
-typedef struct {
-  int acc;
-  int rd;
-  int rn;
+  int immediate_shift;
   int rs;
-  int rm;
-} MultiplyInstruction;
+} Shift;
 
+/* Struct representing data processing instruction operand2 */
 typedef struct {
-  Condition cond;
-  char* symbol;
-} BranchInstruction;
-
-typedef struct {
-  Condition cond;
   int is_imm;
+  
+  union {
+    struct {
+      uint32_t immediate;
+      int rotation;
+    } imm_operand;
+
+    struct {
+      ShiftType shift_type;
+      int rm;
+      Shift shift;
+    } reg_operand;
+  } Op2Type;
+} Op2;
+
+/* Struct representing SDT instruction offset */
+typedef struct {
+  int is_imm; // = 1 if offset is interpreted as a shifted register (rn)
   int preindex;
-  int up_bit;
-  int load_store;
-  int rn;
-  int rd;
-  int imm_offset;
-  Shift shift_type;
-  int shift_by_reg;
-  int shift_amount;
-  int rs;
-  int rm;
-} DataTransferInstruction;
+  int up_bit; // =1 if offset is added, =0 if offset is subtracted
+  union {
+    int expression; // offset by <#expression> bytes
 
+    struct {
+      ShiftType shift_type;
+      int rm;
+      Shift shift;
+    } ShiftedReg;
+  } OffsetType;
+} Offset;
+
+/* Struct for storing tokenised assembly code */
+typedef struct {
+  Address address;
+  Operation opcode;
+  Condition cond;
+  unsigned int num_args;
+  union {
+    struct {
+      int rd;
+      int rn;
+      Op2 operand2;
+    } DataP;
+
+    struct {
+      int rd;
+      int rm;
+      int rs;
+      int rn;
+    } Multiply;
+
+    struct {
+      Address target_address;
+    } Branch;
+
+    struct {
+      int rd;
+      int rn;
+      Offset offset;
+    } SDT;
+  } TokenType;
+} Token;
 
 #endif
 

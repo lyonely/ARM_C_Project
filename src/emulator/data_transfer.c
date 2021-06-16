@@ -25,7 +25,7 @@ void single_data_transfer(Instruction instr, struct Registers *registers, Byte* 
 		// Offset interpreted as a shifted register
 		// Assume single data transfer does not need to set cpsr
 		int set_cpsr = 0;
-		offset = (unsigned int) operand2_shiftedReg(operand2(instr), registers, set_cpsr);
+		offset = (unsigned int) operand2_shifted_reg(operand2(instr), registers, set_cpsr);
 	} else {
 		// offset is an unsigned 12 bit immediate offset
 		offset = operand2(instr);

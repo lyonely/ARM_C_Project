@@ -2,32 +2,50 @@
 #define FUNCTIONS_H
 
 #include <stdio.h>
+#include <stdint.h>
 #include "datatypes.h"
 
-// Writes an array of instructions into a binary file (/out/program.bin)
-void write_to_file(Instruction *instructions, int num_instructions);
+// Writes an array of instructions into a binary file
+void write_to_file(Instruction *instructions, int size, char *filename);
 
-// Sets bit 25 of instruction
-void set_imm_field(Instruction* i);
+// Removes whitespace in a string
+void remove_spaces(char *str);
 
-// Sets bits 19-16 to rn number
-void set_rn_field(int rn, Instruction* i);
+// Frees members of StringArray struct
+void delete_string_array(StringArray *string_array);
 
-// Sets bits 15-12 to rd number
-void set_rd_field(int rd, Instruction* i);
+// Initialises values of Token struct
+void initialise_token(Token *token);
 
-// Sets bits 11-7 to shift amount
-void set_op2reg_shiftamt_field(int amt, Instruction* i);
+// Converts instruction from big-endian to little-endian format
+void flip_endian(Instruction *i);
 
-// Sets bits 6-5 to shift type
-void set_op2reg_shifttype_field(Shift type, Instruction* i);
+// Gets instruction type of operation
+Type get_type(Operation op);
 
-// Sets bits 11-8 to rs number, sets bit 7 = 0 and sets bit 4
-// (register specified shift)
-void set_op2reg_shiftreg_field(int rs, Instruction* i);
+// Gets opcode of data processing instruction
+unsigned int get_opcode(Operation op);
 
-// Sets bits 3-0 to rm number
-void set_op2reg_rm_field(int rm, Instruction* i);
+// Gets expected number of arguments for operation
+unsigned int get_num_args(Operation op);
+
+// Returns opcode from string
+Operation string_to_operation(char *str);
+
+// Returns condition code from string
+Condition string_to_condition(char *str);
+
+// Returns register address from string
+unsigned int string_to_reg_address(char *str);
+
+// Returns ShiftType from string
+ShiftType string_to_shift(char *str);
+
+// Returns immediate value from string
+uint32_t parse_immediate_value(char *str);
+
+// Converts Operation enum to string representation
+char *opcode_to_string(Operation opcode);
 
 #endif
 

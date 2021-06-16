@@ -1,17 +1,210 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "assemble.h"
+#include "datatypes.h"
+#include "functions.h"
+#include "symboltable.h"
+#include "parser.h"
 
-void assemble() {
-  /* 
-   * Create symbol table
-   * 
-   * Read mnemonic and operands
-   *
-   * Operation op;
-   * switch(op) {
-   *
-   * }
-   */
+#define NEGATIVE_SIGN_BIT ((-1)<<26)
+#define BRANCH_OFFSET_MASK 0x3ffffff
+
+void build_datap_instr(Token *token, Instruction *i) {
+  // Sets instruction bits if opcode is not ANDEQ (all-zero)
+  if (!(token->opcode == ANDEQ && token->TokenType.DataP.rd == 0 
+        && token->TokenType.DataP.rn == 0 && token->TokenType.DataP.operand2.Op2Type.reg_operand.rm == 0)) {
+     
+    // Set cond field
+    *i &= 0x0fffffff;
+	  *i |= (token->cond << 28);    
+
+    // Set opcode field
+    *i |= (get_opcode(token->opcode) << 21);
+
+    // Set flags field
+    switch (token->opcode) {
+      case TST:
+      case TEQ:
+      case CMP: 
+        *i |= 0x00100000; 
+        break;
+      default: 
+        *i &= 0xffefffff; 
+        break; }
+
+    // Set rn and rd fields
+      *i |= (token->TokenType.DataP.rn << 16);
+      *i |= (token->TokenType.DataP.rd << 12);
+
+    if (token->TokenType.DataP.operand2.is_imm) {
+      // Set imm field and immediate operand2
+      *i |= 0x02000000; // I bit
+      *i |= (token->TokenType.DataP.operand2.Op2Type.imm_operand.rotation << 8); // Rotation
+      *i |= token->TokenType.DataP.operand2.Op2Type.imm_operand.immediate; // Immediate operand
+    
+    } else {
+      // Set shifted register operand2 fields
+      *i |= token->TokenType.DataP.operand2.Op2Type.reg_operand.rm; // Rm
+      *i |= (token->TokenType.DataP.operand2.Op2Type.reg_operand.shift_type << 5); // Shift type
+
+      if (token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.is_imm) {
+        // Set shift by immediate fields
+        *i |= (token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.immediate_shift << 7);
+      
+      } else {
+        // Set shift by register fields
+        *i |= 0x10; // Shift by register value field
+        *i &= 0xFFFFFF7F;
+        *i |= (token->TokenType.DataP.operand2.Op2Type.reg_operand.shift.rs << 8); // Rs
+      }
+    }
+  } else {
+    *i &= 0x0;
+  } 
+}
+
+void build_sdt_instr(Token *token, Instruction *i) {
+  // Fixed bits
+  *i &= 0xf79fffff;
+  *i |= 0x04000000;
+  
+  // Set cond field
+  *i &= 0x0fffffff;
+  *i |= (token->cond << 28);
+
+  // Set rn and rd fields
+  *i |= (token->TokenType.SDT.rn << 16);
+  *i |= (token->TokenType.SDT.rd << 12);
+
+  // Set preindex field
+  if (token->TokenType.SDT.offset.preindex) {
+    *i |= 0x01000000;
+  }
+
+  // Set upbit field
+  if (token->TokenType.SDT.offset.up_bit) {
+    *i |= 0x00800000;
+  }
+
+  // Set load field
+  if (token->opcode == LDR) {
+    *i |= 0x00100000;
+  }
+
+  if (token->TokenType.SDT.offset.is_imm) {
+    // Set fields for register offset
+    *i |= 0x02000000; // I bit
+    *i |= (token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift_type << 5); // Shift type
+    *i |= token->TokenType.SDT.offset.OffsetType.ShiftedReg.rm; // Rm
+
+    if (token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.is_imm) {
+      // Shift by immediate
+      *i |= (token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.immediate_shift << 7);
+    } else {
+      // Shift by register value
+      *i |= 0x10;
+      *i &= 0xFFFFFF7F;
+      *i |= (token->TokenType.SDT.offset.OffsetType.ShiftedReg.shift.rs << 8); // Rs
+    }
+  } else {
+    // Set fields for immediate offset
+    *i &= 0xfffff000;
+    *i |= token->TokenType.SDT.offset.OffsetType.expression;
+  }
+}
+
+void build_multiply_instr(Token *token, Instruction *i) {
+  // Set cond field
+  *i &= 0x0fffffff;
+	*i |= (token->cond << 28);
+
+  // Set flags field
+  *i &= 0xffefffff;
+
+  // Set bits 7-4
+  *i &= 0xffffff0f;
+	*i |= 0x00000090;
+
+  // Set rd, rs, rm fields
+	*i |= (token->TokenType.Multiply.rd << 16);
+	*i |= (token->TokenType.Multiply.rs << 8);
+	*i |= token->TokenType.Multiply.rm;
+
+  // Set accumulate and rn fields for MLA
+  if (token->opcode == MLA) {
+		*i |= 0x00200000;
+		*i |= (token->TokenType.Multiply.rn << 12);
+	} else {
+		*i &= 0xffdfffff;
+	}
+}
+
+void build_branch_instr(Token *token, Instruction *i) {
+  // Set cond field
+  *i &= 0x0fffffff;
+	*i |= (token->cond << 28);
+  
+  // Set bits 27-24
+  *i &= 0xf0ffffff;
+	*i |= 0x0a000000;
+
+  Address curr = token->address;
+	curr += 8;
+
+	int32_t offset = BRANCH_OFFSET_MASK & (token->TokenType.Branch.target_address - curr);
+	if (token->TokenType.Branch.target_address < curr) {
+		offset |= 0x2000000;
+	} else {
+		offset &= 0x0ffffff;
+	}
+	*i &= 0xff000000;
+	*i |= (offset >> 2);
+}
+
+void assemble(StringArray *source, char *filename) {
+  // Instruction words stored here
+  Instruction instructions[2 * source->size]; // Allocate enough memory for LDR instructions
+
+  // First pass - symboltable, labels removed from source
+  SymbolTable *symboltable = create_symboltable(source);
+  
+  // Second pass - tokenise and build instructions
+  Address address = 0;
+  Address next_memory_address = source->size * 4;
+
+  int current_line = 0;
+  while (current_line < source->size) {
+    Token token;
+    initialise_token(&token);
+
+    char *line = source->array[current_line];
+    if (tokenise(line, address, symboltable, instructions, &next_memory_address, &token)) {
+      Instruction instr = 0;
+      switch(get_type(token.opcode)) {
+        case DATA_P:
+          build_datap_instr(&token, &instr);
+          break;
+        case MULTIPLY:
+          build_multiply_instr(&token, &instr);
+          break;
+        case SDT:
+          build_sdt_instr(&token, &instr);
+          break;
+        default:
+          build_branch_instr(&token, &instr);
+          break;
+      }
+      instructions[address / 4] = instr;
+      address += 4;
+    } else {
+      perror("Error tokenising instruction in assemble");
+      exit(EXIT_FAILURE);
+    }
+    current_line++;
+  }
+
+  free_symboltable(symboltable);
+  // Writes instruction array + memory bytes to binary file
+  write_to_file(instructions, next_memory_address / 4, filename);
 }
 
