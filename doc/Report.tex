@@ -1,21 +1,121 @@
-\documentclass[11pt]{article}
-
-\usepackage{fullpage}
+\documentclass[a4paper,11pt]{article}
+\usepackage{tabularx} 
+\usepackage{graphicx} 
+\usepackage[margin=1in,letterpaper]{geometry}
 
 \begin{document}
 
-\title{Our Extension...}
-\author{TODO}
-
+\title{\vspace{-1.0cm}ARM11 Project Final Report - Group 12}
+\author{Tanish Goel, Wan Sze Lee, Athena Yim, Yufeng Zhang}
+\date{18 June 2021}
 \maketitle
 
-\section{Introduction}
+\section{Assembler (Part II)}
+\subsection{Implementation}
+Our group chose to implement a two-pass assembler. In the first pass, a symbol table is constructed to keep track of labels and their associated addresses. In the second pass, the assembly code is tokenised and parsed line by line into an array of instruction words which are then written to the output file. The assembler structure is outlined below.
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+\subsection{File Structure}
+\begin{itemize}
+\item main.c - Reads the input file into a string array containing the lines of assembly code, and calls the main assembler function.
+\item assemble.c - Contains the main assembler loop with two pass logic, as well as functions used to build each instruction type from the Token struct in the second pass. The results in an array which is written to a specified output file.
+\item symboltable.c - Contains logic for building the symbol table in the first pass, and a function for looking up label addresses.
+\item parser.c - Contains string tokenisation and parsing logic, to parse strings into the Token struct.
+\item functions.c - Contains utility functions used in other files, including string token parsing and binary file writing logic.
+\item datatypes.h - Contains the type definitions of the structures used to store the assembler state, such as instructions and registers.
+\end{itemize}
+
+\subsection{Group Organisation}
+Each member had contributed to the initial stages of the assembler logic, with Athena completing and debugging the assembler in its later stages while Tanish, Wan Sze and Yufeng focused their efforts on the extension.
+
+The symbol table logic was written by Wan Sze, parsing functions were written by Tanish, Multiply and Branch instruction assembling functions were written by Yufeng, and the Data Processing and Single Data Transfer instruction assembling functions, file writing functions, tokenising functions and two pass assembly logic were written by Athena.
+
+\subsection{Testing}
+When testing the assembler, the failed tests were sorted into categories based on the type of error to trace back to the root cause. For larger issues such as segmentation faults and other cases where the output file was not produced, Valgrind was used to identify whether uninitialised values were being accessed. We also used Valgrind to ensure that all dynamically allocated memory was freed after use. 
+
+For other issues where there was an output, we compared it against the test case to identify incorrect bits, and narrowed down the location of the error by using print statements to track the relevant variables in each function. For example, a majority of the errors with the Single Data Transfer instructions were due to edge cases in the base register and offset tokenisation, so printing out the accessed tokens allowed us to keep track of them throughout the program and identify the source of error.
+
+After debugging, our assembler was able to pass all the test cases.
+
+\subsection{Challenges and Reflection}
+During the process of implementing the assembler, we faced a number of obstacles. Initially, we structured our files so that everyone was able to work on their part separately to avoid merge conflicts when committing our changes. While we had a general idea of the data structures and functions that other members were implementing, one downfall was that we mainly implemented functions with only our parts in mind. 
+
+For example, we had initially defined a separate struct for each instruction type, and a separate file for the assembling functions for each instruction. This made it difficult to link all the parts together as C does not support function overloading. Eventually, we combined the structs into a single Token struct that could store all instruction types, refactoring the functions as well. The file structure was also reorganised and redundant files were removed.
+
+Although we split the tasks, there were still some ambiguities regarding who would implement functions that were meant to link one part of the assembler to another. This resulted in some functions being neglected or duplicated in the process at times, in our case the string tokenising functions.
+
+Reflecting upon this experience, these problems could have been avoided had we designed the key parts of the assembler as a group, before breaking off to work on separate parts. Explicitly listing out the functions we intended to implement for each of our parts would have helped us to identify any missing components, and would have left us with more time to test and add on extensions.
+
+\section{Extension (Part IV)}
+
+\subsection{Othello}
+Our extension is an implementation of the two-player strategy board game 'Othello' (or 'Reversi'). Discs, which are black on one side and white on the other, are used as playing pieces, and players take turns placing them on an 8x8 board with their colour facing up. The player can only make 'legal moves' which means placing discs in any position that sandwiches any number of the opponent's pieces in a row, column or diagonally. Once placed, the sandwiched pieces are flipped and 'claimed' by the player. The goal is to claim a majority of the pieces when the game ends. The game ends once all positions are filled, or if there are no more legal moves.
+
+\subsection{Overview}
+In our Othello implementation, players can choose between two modes: single-player and multiplayer. In multiplayer mode, 2 players can play against each other. In single-player mode, the player can choose to play against one of five bots, each with a different game strategy as detailed below:
+\begin{itemize}
+\item Greedy Gregory - Implements a 'greedy' strategy by choosing the move (position to place the player's piece) which allows the most pieces to be gained by the bot on each turn.
+
+\item Lousy Louis - Implements a 'lousy' strategy by choosing the move which allows the least number of pieces to be gained by the bot on each turn.
+
+\item Random Ralph - Implements a 'random' strategy by randomly choosing a move from all the possible legal moves on each turn.
+
+\item Minimax Matt - Implements a 'minimax' strategy whereby the bot will either choose the move which allows most pieces to be gained, or a move which reduces the most pieces the opponent can obtain on their turn.
+
+\item Turbo Tony - Implements the same 'minimax' algorithm as Minimax Matt but using a higher search depth to observe the effectiveness of the algorithm and provide a higher-difficulty bot.
+\end{itemize}
+
+\subsection{File Structure}
+We have separated the extension into 3 files:
+\begin{itemize}
+\item main.c - Contains the main logic for playing a game of Othello. This includes letting players choose between modes, picking a bot to play against, and continuously taking turns to play until the game has ended.
+
+\item othello.c - Contains the utility functions for running the game, including functions to create the initial board, print the current board, make a move, determine if the move is legal, updating the board, getting user input and checking if the game has ended.
+
+\item playerbot.c - Contains the logic for each bot which implement the different strategies in choosing its next move.
+\end{itemize} 
+
+
+\subsection{Implementation}
+
+\begin{figure}[hpt]
+    \centering
+    \includegraphics[width=5cm]{othello initial board.png}
+    \caption{Initial board layout}
+    \label{fig:initial othello board}
+\end{figure}
+
+We chose to represent the two colors of the disc using characters 'X' (Black) and 'O' (White). The player using Black starts first. At every turn, the current player inputs the position they wish to claim in a 'row' 'column' format (i.e. "3D"), then our program checks if the move is legal, before updating the board and checking if the game has ended. If not, the program prompts the next player to take their turn, or the chosen bot will automatically complete their turn. \newline
+
+To determine if a move is legal, we implemented a function which takes a position on the board as a parameter and checks that there is another piece owned by the player in the North, North-East, East, South-East, South, South-West, West, or North-West direction that sandwiches any number of the opponent's pieces. If the move is illegal, the player is prompted again to enter a legal move. If the move entered is legal, the program updates the board by 'placing' the player's piece on the indicated position and flipping all the opponent's pieces which are sandwiched. After every turn, the updated board and the current number of pieces owned by each player is printed. \newline
+
+To aid the implementation of the bots, we wrote a function to determine the set of legal moves given the current state of the board. This is done through iterating through all possible moves and keeping track of the legal moves. We then use this set of legal moves as input to the various bots. The bots Greedy Gregory, Lousy Louis and Random Ralph chooses a move from this set as detailed in the Overview. \newline
+
+For the other bots (Minimax Matt, Turbo Tony), we used a pretty widely used algorithm across board game AIs-- minimax. A minimax algorithm works by calculating the maximin value (highest value) that a player is sure to get without knowing the moves of the other players. It works by going through every possible move that a player can make and evaluate it based on what the worst case scenario for that move is. Currently, our algorithm implements a basic score function to calculate this value, which isn't the best strategy in othello. We have plans to make it harder to play against by incentivising the AI to take corner positions (by increasing weights of the corner positions).
+
+\subsection{Group Organisation}
+For the extension, Wan Sze wrote the functions for implementing a player's turn, and Yufeng wrote the main game logic. Tanish focused on the Minimax implementation, while Yufeng and Wan Sze completed the logic for the remaining bots.
+
+\subsection{Testing}
+Our testing was primarily done via user testing and focus groups, which allowed us to test out different user input permutations, receive user feedback and identify bugs. For example, when testing the Minimax algorithm, a memory allocation issue was identified and resolved. With ongoing feedback throughout the implementation process, we were able to produce a fully functioning rendition of the game which has interesting features for its users.
+
+\subsection{Improvements and Extension}
+A further improvement we could implement to increase the difficulty of the bots is multi-layered decision making. In Othello, corner pieces should be prioritized as they cannot be flipped, and occupying the edge rows and columns gives the player more control over the board. Besides that, the rows directly adjacent from the outer rows and columns should be avoided since they allow the opponent to capture the edge positions. Currently, our bots do not account for these strategies and hence are still quite easily beaten by a human player.
+
+\section{Group Feedback}
+Throughout the project, our group maintained frequent communication and as a result, the workflow was smooth. We used a combination of Discord, WhatsApp, and Google Docs for organization and documenting progress. By setting internal deadlines for smaller checkpoints, we ensured that we were on track with the timeline to complete the project. We constantly updated the group on the progress of our individual tasks, discussed project structure and assisted one another in debugging. This allowed members to easily switch to work on different parts when required. \newline
+
+Our initial division of work in both parts fell short of equal division despite looking even on paper, as some tasks took longer than others to complete. However, we all worked proactively to take up incomplete tasks, which evened out the workload. \newline
+
+Additionally, despite one of our members working from a different timezone, our use of collaborative software (Overleaf, Google Slides) allowed the project to be easily accessible by all members.
+
+\section{Individual Reflections}
+
+\paragraph{Tanish Goel} The time I spent on the project has been extremely fruitful. I have gained a lot of new skills and met some extremely motivated people. The communication between us was pretty great from the start which helped us dive straight into the work. I learned a lot about memory management, debugging, and integrating multiple workflows into one cohesive whole. Honestly, the one thing I didn't expect to learn anything new in was file management. But, using Git with multiple people working on the same code-base was a new and welcome experience through which I became more familiar with Git and coding in teams in general. I think my time management was pretty good and I managed to get the work done on or before our soft deadlines. In the future, I would improve on my file management skills and code hygiene to make it more easier to collaborate with others. This was a really fun experience for me wherein I ended up having lots of fun while doing something productive and interesting.
+
+\paragraph{Wan Sze Lee} Initially, I felt very intimidated by this project as I had to re-read the specification several times to understand its details. However, once our group started discussions and delegating tasks, I felt it became much more manageable. Furthermore, this project enhanced my understanding of a group-workflow, especially in using version control software (Git). Personally, I struggled with visualizing the main flow of the emulator and assembler structure and was more confident in writing utility functions, but luckily my group mates helped me gain a better understanding of it. Additionally, coding the emulator, assembler, and using C gave me a deeper understanding of low-level languages, memory management and machine code instructions, all topics which I was not confident in before. One element that I believe helped our group a lot was our constant communication and delegation of tasks which allowed us to complete everything punctually. In hindsight, the project was challenging yet enjoyable, and I feel as though I've learnt a lot through completing it.
+
+\paragraph{Athena Yim} The summer project taught me a lot knowledge-wise and skill-wise. Personally, it helped me to link together my knowledge from computer architecture with the programming module, and overall I gained a lot more insight into how architectures work. Although I came into the project with lots of group work experience, this was my first time working collaboratively on a codebase. This was also my first extended group programming project, so I had to learn to effectively use Git version control to streamline the coding process. In addition, I became more well-versed in using C, GNU make, Valgrind, and other skills which I can carry over to future projects. Being able to work in a group was a valuable experience, and I learned a lot from my peers in the process. While I normally struggle with motivation when working on personal projects, this project was different as discussing ideas with my teammates on how we would design each part of the project made me keen on contributing as much as I could, in order to bring our ideas to fruition. I am looking forward to future group programming projects, where I can further build upon the skills I have gained through this experience.
+
+\paragraph{Yufeng Zhang} It was tough for me as I was the only member in a different time zone (GMT+8). This meant that I was usually asleep while my group members were discussing and coding. What really helped was the initial delegation of work and constant communication. I was confident that I was doing my part in the project and was kept up to date on the ongoing developments. I was also glad that I could learn more about source control. Git had always been something rather foreign to me and I never understood its versatility and usefulness in group work until I had to use it in this project myself. I also felt that doing this C project was a good substitution for the PPT sessions that we used to have for Haskell and Java. While we did not have a tutor to help answer our queries, it was nice to have teammates who could share their learnings and help rectify any mistakes we might have made. This made learning C a less arduous task than it was at the beginning, when the project had yet to start. I hope to be given more opportunities to work in a group setting, as well as program in C.
 
 \end{document}
