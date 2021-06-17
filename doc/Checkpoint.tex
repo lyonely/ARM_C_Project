@@ -1,30 +1,56 @@
-\documentclass[11pt]{article}
-
-\usepackage{fullpage}
+\documentclass[letterpaper,11pt]{article}
+\usepackage{tabularx} 
+\usepackage[margin=1in,letterpaper]{geometry}
 
 \begin{document}
 
-\title{ARM Checkpoint... }
-\author{TODO}
-
+\title{ARM11 Project Checkpoint Report}
+\author{Tanish Goel, Wan Sze Lee, Athena Yim, Yufeng Zhang}
+\date{4 June 2021}
 \maketitle
 
-\section{Group Organisation}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+\section{Task Organisation and Coordination}
 
-\section{Implementation Strategies}
+In delegating tasks for Part I, our group first devised an overall structure and determined the type definitions needed to store the Emulator's state. The tasks were then partitioned as such:  Athena worked on the data processing instructions, Tanish worked on the multiply and branch instructions, Wan Sze worked on the single data transfer instructions, and Yufeng worked on the main emulator pipeline. Moreover, files with shared utility functions and debugging were completed as a group effort.
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+\vspace{\baselineskip}
+
+\noindent Using Git version control, our group was able to work efficiently, with members working on separate features. This minimised merge conflicts and errors in the main branch. Additionally, members worked simultaneously on different branches to test various experimental implementations which streamlined the debugging process.
+
+
+\section{Group Progress}
+
+Our group has worked effectively so far. When programming the emulator, we have helped each other whenever someone was stuck. Moreover, we have met internal deadlines which we initially set to accomplish different tasks. For the upcoming parts, we can use our experience from working on the emulator to assign tasks based on each member's strengths. This will help minimise delays and ensure a more efficient work distribution, giving us more time to work on the extension.
+
+\vspace{\baselineskip}
+
+\noindent Currently, our task organisation has been effective with our continued communication through regularly scheduled meetings. Though upon reflection, it would have been beneficial to have discussed a rough implementation for all the instructions before starting work on our individual tasks, as it lead to some redundancies when implementing shared functions. For example, we initially had 2 different shifter implementations for the Data Processing instructions and the Single Data Transfer instruction. The code was later combined and written into a separate file (shifter.c) to eliminate redundant code. 
+\vspace{\baselineskip}
+
+\noindent Furthermore, we had to edit the type definitions several times when it did not complement our function implementation. This could have been avoided had we taken more time to plan out the entire structure of the emulator at the start, and consider how the emulator state would be manipulated. Bearing this in mind, we can avoid encountering this issue when implementing the assembler. Additionally, we will implement a more stringent system of version control to better format our workflow.
+
+\vspace{\baselineskip}
+
+\noindent Moving forward, we plan to adopt a similar method of organisation since the assembler also involves processing the same four instruction types. However, the first few parts involving the binary file writer, establishing the abstract data type, and the tokenizer would likely be broken down into smaller features and completed with more collaboration as to avoid the issues we faced in Part I. 
+
+
+\section{Emulator (Part I)}
+We structured our emulator with 8 files, as listed below:
+\begin{itemize}
+\item emulate.c - Contains the main emulator pipeline and loop, with the fetch-decode-execute cycle.
+\item functions.c - Contains all the utility functions, such as binary file reading and CPSR flag setting.
+\item datatypes.h - Contains the type definitions of the structures used to store the emulator state, such as instructions and registers.
+\item data\_processor.c - Contains the logic for the data processing instructions.
+\item multiply.c - Contains the logic for the multiply instructions.
+\item data\_transfer.c - Contains the logic for the single data transfer instructions.
+\item branch.c - Contains the logic for the branch instructions.
+\item shifter.c - Contains the logic for the barrel shifter, which is used by the data processing and single data transfer instructions.
+\end{itemize}
+
+
+\section{Challenges}
+
+For Part II, we intend to implement two-pass assembly as we can delegate smaller tasks so multiple members can work on the main assembler loop simultaneously. As mentioned earlier, the instructions are the same as in the emulator so members can write separate functions to assemble each type. Part II does contain additional components like the binary file writer, symbol table and tokenizer, which were not in Part I. This may be a more challenging task, so extensive planning before writing the implementation is crucial to ensure we avoid rewriting large blocks of code.
 
 \end{document}
