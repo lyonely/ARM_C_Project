@@ -17,7 +17,7 @@ Our group chose to implement a two-pass assembler. In the first pass, a symbol t
 \subsection{File Structure}
 \begin{itemize}
 \item main.c - Reads the input file into a string array containing the lines of assembly code, and calls the main assembler function.
-\item assemble.c - Contains the main assembler loop with two pass logic, as well as functions used to build each instruction type from the Token struct in the second pass. The results in an array which is written to a specified output file.
+\item assemble.c - Contains the main assembler loop with two-pass logic, as well as functions used to build each instruction type from the Token struct in the second pass. The results in an array which is written to a specified output file.
 \item symboltable.c - Contains logic for building the symbol table in the first pass, and a function for looking up label addresses.
 \item parser.c - Contains string tokenisation and parsing logic, to parse strings into the Token struct.
 \item functions.c - Contains utility functions used in other files, including string token parsing and binary file writing logic.
@@ -25,23 +25,21 @@ Our group chose to implement a two-pass assembler. In the first pass, a symbol t
 \end{itemize}
 
 \subsection{Group Organisation}
-Each member had contributed to the initial stages of the assembler logic, with Athena completing and debugging the assembler in its later stages while Tanish, Wan Sze and Yufeng focused their efforts on the extension.
+Each member had contributed to the initial stages of the assembler logic, with Athena completing and debugging the assembler in its later stages while Tanish, Wan Sze and Yufeng focused their efforts on the extension.\newline
 
 The symbol table logic was written by Wan Sze, parsing functions were written by Tanish, Multiply and Branch instruction assembling functions were written by Yufeng, and the Data Processing and Single Data Transfer instruction assembling functions, file writing functions, tokenising functions and two pass assembly logic were written by Athena.
 
 \subsection{Testing}
-When testing the assembler, the failed tests were sorted into categories based on the type of error to trace back to the root cause. For larger issues such as segmentation faults and other cases where the output file was not produced, Valgrind was used to identify whether uninitialised values were being accessed. We also used Valgrind to ensure that all dynamically allocated memory was freed after use. 
+When testing the assembler, the failed tests were sorted into categories based on the type of error to trace back to the root cause. For larger issues such as segmentation faults and other cases where the output file was not produced, Valgrind was used to identify whether uninitialised values were being accessed. We also used Valgrind to ensure that all dynamically allocated memory was freed after use. \newline
 
-For other issues where there was an output, we compared it against the test case to identify incorrect bits, and narrowed down the location of the error by using print statements to track the relevant variables in each function. For example, a majority of the errors with the Single Data Transfer instructions were due to edge cases in the base register and offset tokenisation, so printing out the accessed tokens allowed us to keep track of them throughout the program and identify the source of error.
-
-After debugging, our assembler was able to pass all the test cases.
+For other issues where there was an output, we compared it against the test case to identify incorrect bits, and narrowed down the location of the error by using print statements to track the relevant variables in each function. For example, a majority of the errors with the Single Data Transfer instructions were due to edge cases in the base register and offset tokenisation, so printing out the accessed tokens allowed us to keep track of them throughout the program and identify the source of error. After debugging, our assembler was able to pass all the test cases.
 
 \subsection{Challenges and Reflection}
-During the process of implementing the assembler, we faced a number of obstacles. Initially, we structured our files so that everyone was able to work on their part separately to avoid merge conflicts when committing our changes. While we had a general idea of the data structures and functions that other members were implementing, one downfall was that we mainly implemented functions with only our parts in mind. 
+During the process of implementing the assembler, we faced a number of obstacles. Initially, we structured our files so that everyone was able to work on their part separately to avoid merge conflicts when committing our changes. While we had a general idea of the data structures and functions that other members were implementing, one downfall was that we mainly implemented functions with only our parts in mind. \newline
 
-For example, we had initially defined a separate struct for each instruction type, and a separate file for the assembling functions for each instruction. This made it difficult to link all the parts together as C does not support function overloading. Eventually, we combined the structs into a single Token struct that could store all instruction types, refactoring the functions as well. The file structure was also reorganised and redundant files were removed.
+For example, we had initially defined a separate struct for each instruction type, and had a separate file for the assembling functions for each instruction. This made it difficult to link all the parts together as C does not support function overloading. Eventually, we combined the structs into a single Token struct that could store all instruction types, refactoring the functions as well. The file structure was also reorganised and redundant files were removed. \newline
 
-Although we split the tasks, there were still some ambiguities regarding who would implement functions that were meant to link one part of the assembler to another. This resulted in some functions being neglected or duplicated in the process at times, in our case the string tokenising functions.
+Although we split the tasks, there were still some ambiguities regarding who would implement functions that were meant to link one part of the assembler to another. This resulted in some functions being neglected or duplicated at times, in our case the string tokenising functions.\newline
 
 Reflecting upon this experience, these problems could have been avoided had we designed the key parts of the assembler as a group, before breaking off to work on separate parts. Explicitly listing out the functions we intended to implement for each of our parts would have helped us to identify any missing components, and would have left us with more time to test and add on extensions.
 
@@ -52,6 +50,7 @@ Our extension is an implementation of the two-player strategy board game 'Othell
 
 \subsection{Overview}
 In our Othello implementation, players can choose between two modes: single-player and multiplayer. In multiplayer mode, 2 players can play against each other. In single-player mode, the player can choose to play against one of five bots, each with a different game strategy as detailed below:
+
 \begin{itemize}
 \item Greedy Gregory - Implements a 'greedy' strategy by choosing the move (position to place the player's piece) which allows the most pieces to be gained by the bot on each turn.
 
@@ -65,7 +64,7 @@ In our Othello implementation, players can choose between two modes: single-play
 \end{itemize}
 
 \subsection{File Structure}
-We have separated the extension into 3 files:
+We separated the extension into 3 files:
 \begin{itemize}
 \item main.c - Contains the main logic for playing a game of Othello. This includes letting players choose between modes, picking a bot to play against, and continuously taking turns to play until the game has ended.
 
@@ -84,29 +83,27 @@ We have separated the extension into 3 files:
     \label{fig:initial othello board}
 \end{figure}
 
-We chose to represent the two colors of the disc using characters 'X' (Black) and 'O' (White). The player using Black starts first. At every turn, the current player inputs the position they wish to claim in a 'row' 'column' format (i.e. "3D"), then our program checks if the move is legal, before updating the board and checking if the game has ended. If not, the program prompts the next player to take their turn, or the chosen bot will automatically complete their turn. \newline
+We chose to represent the two colors of the disc using characters 'X' (Black) and 'O' (White). The player using Black starts first. At every turn, the current player inputs the position they wish to claim in a 'row' 'column' format (i.e. "3D"). The program checks if the move is legal, before updating the board and checking if the game has ended. If not, the program prompts the next player to take their turn, or the chosen bot will automatically complete their turn. \newline
 
-To determine if a move is legal, we implemented a function which takes a position on the board as a parameter and checks that there is another piece owned by the player in the North, North-East, East, South-East, South, South-West, West, or North-West direction that sandwiches any number of the opponent's pieces. If the move is illegal, the player is prompted again to enter a legal move. If the move entered is legal, the program updates the board by 'placing' the player's piece on the indicated position and flipping all the opponent's pieces which are sandwiched. After every turn, the updated board and the current number of pieces owned by each player is printed. \newline
+To determine if a move is legal, we implemented a function which takes a position on the board as a parameter and checks that there is another piece owned by the player in any direction that sandwiches any number of the opponent's pieces. If the move is illegal, the player is prompted again to enter a legal move. Otherwise, the program updates the board by marking the player's piece on the indicated position and flipping all the opponent's pieces which are sandwiched. After every turn, the updated board and the current number of pieces owned by each player is printed. \newline
 
-To aid the implementation of the bots, we wrote a function to determine the set of legal moves given the current state of the board. This is done through iterating through all possible moves and keeping track of the legal moves. We then use this set of legal moves as input to the various bots. The bots Greedy Gregory, Lousy Louis and Random Ralph chooses a move from this set as detailed in the Overview. \newline
+To aid the implementation of the bots, we wrote a function to determine the set of legal moves given the current state of the board. This was done by iterating through all possible moves and keeping track of the legal moves. We then use this set of legal moves as input to the various bots. The bots Greedy Gregory, Lousy Louis and Random Ralph chooses a move from this set as detailed in the Overview. \newline
 
-For the other bots (Minimax Matt, Turbo Tony), we used a pretty widely used algorithm across board game AIs-- minimax. A minimax algorithm works by calculating the maximin value (highest value) that a player is sure to get without knowing the moves of the other players. It works by going through every possible move that a player can make and evaluate it based on what the worst case scenario for that move is. Currently, our algorithm implements a basic score function to calculate this value, which isn't the best strategy in othello. We have plans to make it harder to play against by incentivising the AI to take corner positions (by increasing weights of the corner positions).
+For the other bots (Minimax Matt, Turbo Tony), we chose to implement a commonly-used algorithm across board game AIs-- minimax. A minimax algorithm works by calculating the maximum value that a player is sure to get without knowing the moves of the other players, while minimising their losses. This is done by checking every possible move and evaluating the worst case scenario outcome, then selecting the option with the best payoff. Currently, our algorithm implements a basic score function to calculate this value, but due to the complexity of Othello there are more optimal strategies. One example would be to incentivise the AI to take corner tiles by increasing the weightings of those positions.
 
 \subsection{Group Organisation}
-For the extension, Wan Sze wrote the functions for implementing a player's turn, and Yufeng wrote the main game logic. Tanish focused on the Minimax implementation, while Yufeng and Wan Sze completed the logic for the remaining bots.
+For the game implementation, Wan Sze wrote the functions for implementing a player's turn and Yufeng wrote the main game logic. For the bots, Tanish focused on the Minimax implementation, while Yufeng and Wan Sze completed the logic for the other three.
 
 \subsection{Testing}
 Our testing was primarily done via user testing and focus groups, which allowed us to test out different user input permutations, receive user feedback and identify bugs. For example, when testing the Minimax algorithm, a memory allocation issue was identified and resolved. With ongoing feedback throughout the implementation process, we were able to produce a fully functioning rendition of the game which has interesting features for its users.
 
 \subsection{Improvements and Extension}
-A further improvement we could implement to increase the difficulty of the bots is multi-layered decision making. In Othello, corner pieces should be prioritized as they cannot be flipped, and occupying the edge rows and columns gives the player more control over the board. Besides that, the rows directly adjacent from the outer rows and columns should be avoided since they allow the opponent to capture the edge positions. Currently, our bots do not account for these strategies and hence are still quite easily beaten by a human player.
+A further improvement we could implement to increase the difficulty of the bots is multi-layered decision making. In Othello, corner pieces should be prioritized as they cannot be flipped, and occupying the edge rows and columns gives the player more control over the board. Besides that, the rows directly adjacent from the outer rows and columns should be avoided since they allow the opponent to capture the edge positions. Currently, our bots do not account for these strategies and can still be easily beaten by a human player, so implementing more complex strategies would be an area for further development. Additionally, as with other board games, machine learning could be used to train an AI to seek out optimal strategies.
 
 \section{Group Feedback}
-Throughout the project, our group maintained frequent communication and as a result, the workflow was smooth. We used a combination of Discord, WhatsApp, and Google Docs for organization and documenting progress. By setting internal deadlines for smaller checkpoints, we ensured that we were on track with the timeline to complete the project. We constantly updated the group on the progress of our individual tasks, discussed project structure and assisted one another in debugging. This allowed members to easily switch to work on different parts when required. \newline
+Throughout the project, our group maintained frequent communication and as a result, the workflow was smooth. Despite one of our members working from a different timezone, we used a combination of Discord, WhatsApp, and Google Docs for organization and documenting progress which overcame this barrier. We also used collaborative software (Overleaf, Google Slides) which allowed our documentation and presentation to be easily accessible by all members. \newline
 
-Our initial division of work in both parts fell short of equal division despite looking even on paper, as some tasks took longer than others to complete. However, we all worked proactively to take up incomplete tasks, which evened out the workload. \newline
-
-Additionally, despite one of our members working from a different timezone, our use of collaborative software (Overleaf, Google Slides) allowed the project to be easily accessible by all members.
+By setting internal deadlines for smaller checkpoints, we ensured that we were on track with the timeline to complete the project. We constantly updated the group on the progress of our individual tasks, discussed project structure and assisted one another in debugging. This allowed members to easily switch to work on different parts when required. We all worked proactively to take up incomplete tasks, which ensured an even workload distribution overall. 
 
 \section{Individual Reflections}
 
